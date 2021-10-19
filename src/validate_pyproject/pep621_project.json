@@ -1,0 +1,221 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "https://www.python.org/dev/peps/pep-0621/schema/project",
+  "description": "Data structure for the 'project' table inside `pyproject.toml` according to PEP 621",
+  "type": "object",
+  "properties": {
+    "name": {
+       "type": "string",
+       "description": "The name (primary identifier) of the project. MUST be statically defined.",
+       "$comment": "TODO: add regex pattern?"
+    },
+    "version": {
+      "type": "string",
+      "description": "The version of the project as supported by PEP 440.",
+      "$comment": "TODO: add regex pattern?"
+    },
+    "description": {
+      "type": "string",
+      "description": "The summary description of the project.",
+      "$comment": "https://packaging.python.org/specifications/core-metadata/#summary"
+    },
+    "readme": {
+      "$comment": "https://packaging.python.org/specifications/core-metadata/#description",
+      "OneOf": [
+        {
+          "type": "string",
+          "description": "Relative path to a text file (UTF-8) containing the full description of the project.",
+          "$comment": "If the file path ends in case-insensitive `.md` or `.rst` suffixes, then the content-type is respectively `text/markdown` or `text/x-rst`"
+        },
+        {
+          "type": "object",
+          "AllOf": [
+            {
+              "AnyOf": [
+                {
+                  "properties": {
+                    "file": {
+                      "type": "string",
+                      "description": "Relative path to a text file containing the full description of the project."
+                    }
+                  }
+                },
+                {
+                  "properties": {
+                    "text": {
+                      "type": "string",
+                      "description": "Full text describing the project."
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "properties": {
+                "content-type" : {
+                  "type": "string",
+                  "description": "Content-type (RFC 1341) of the full description (e.g. `text/markdown`). The `charset` parameter is assumed UTF-8 when not present.",
+                  "$comment": "TODO: add regex pattern?"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "requires-python": {
+      "type": "string",
+      "description": "The Python version requirements of the project.",
+      "$comment": "https://packaging.python.org/specifications/core-metadata/#requires-python (TODO: add regex pattern?)"
+    },
+    "license": {
+      "OneOf": [
+        {
+          "properties": {
+            "file": {
+              "type": "string",
+              "description": "Relative path to the file (UTF-8) which contains the license for the project."
+            }
+          }
+        },
+        {
+          "properties": {
+            "text": {
+              "type": "string",
+              "description": "The license of the project whose meaning is that of the License field from the core metadata",
+              "$comment": "https://packaging.python.org/specifications/core-metadata/#license"
+            }
+          }
+        }
+      ]
+    },
+    "authors": {
+      "type": "array",
+      "items": {"$ref": "/schema/project/author"},
+      "description": "The people or organizations considered to be the 'authors' of the project. The exact meaning is open to interpretation."
+    },
+    "maintainers": {
+      "type": "array",
+      "items": {"$ref": "/schema/project/author"},
+      "description": "The people or organizations considered to be the 'maintainers' of the project. The exact meaning is open to interpretation."
+    },
+    "keywords": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "List of keywords to assist searching for the distribution in a larger catalog"
+    },
+    "classifiers": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Trove classifiers which apply to the project.",
+      "$comment": "https://pypi.org/classifiers/"
+    },
+    "urls": {
+      "type": "array",
+      "items": {"type": "string", "format": "uri"},
+      "description": "URLs associated with the project in the form `label => value`."
+    },
+    "scripts": {
+      "description": "Instruct the installer to create command-line wrappers for the given entry points.",
+      "AllOf": [{"$ref": "/schema/project/entry-point-group"}],
+      "$comment": "https://packaging.python.org/specifications/entry-points/"
+    },
+    "gui-scripts": {
+      "description": "Instruct the installer to create GUI wrappers for the given entry points. The difference between `scripts` and `gui-scripts` is only relevant in Windows.",
+      "AllOf": [{"$ref": "/schema/project/entry-point-group"}],
+      "$comment": "https://packaging.python.org/specifications/entry-points/"
+    },
+    "entry-points": {
+      "description": "Instruct the installer to expose the given modules/functions via `entry-point` discovery mechanism (useful for plugins).",
+      "$comment": "https://packaging.python.org/specifications/entry-points/",
+      "patternProperties": {
+        "^\\w+(\\.\\w+)*$": {
+          "$comment": "Entry-point group (regex taken from https://packaging.python.org/specifications/entry-points/)",
+          "AllOf": [{"$ref": "/schema/project/entry-point-group"}]
+        }
+      }
+    },
+    "dependencies": {
+      "type": "array",
+      "description": "Project (mandatory) dependencies.",
+      "items": {"$ref": "/schema/project/dependency"}
+    },
+    "optional-dependencies": {
+      "type": "object",
+      "description": "Optional dependency for the project",
+      "patternProperties": {
+        "^([A-Z0-9]|[A-Z0-9][A-Z0-9._-]*[A-Z0-9])$": {
+          "type": "array",
+          "items": {"$ref": "/schema/project/dependency"},
+          "$comment": "The regex is taken from PEP 508 definition of identifier/name"
+        }
+      }
+    },
+    "dynamic": {
+      "type": "array",
+      "description": "Specifies which fields are intentionally unspecified and expected to be dynamically provided by build tools",
+      "items": {
+        "enum": [
+          "version",
+          "description",
+          "readme",
+          "requires-python",
+          "license",
+          "authors",
+          "maintainers",
+          "keywords",
+          "classifiers",
+          "urls",
+          "scripts",
+          "gui-scripts",
+          "entry-points",
+          "dependencies",
+          "optional-dependencies"
+        ]
+      }
+    }
+  },
+  "required": ["name"],
+  "OneOf": [
+    {"required": ["version"], "$comment": "Core metadata specifies only `name` and `version` as mandatory, but `name` MUST be static in PEP 621."},
+    {"properties": {"dynamic": {"contains": {"const": "version"}}}}
+  ],
+
+  "$defs": {
+    "author": {
+      "$id": "/schema/project/author",
+      "$comment": "https://www.python.org/dev/peps/pep-0621/#authors-maintainers",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "MUST be a valid email name (i.e. whatever can be put as a name, before an email, in RFC #822)"
+        },
+        "email": {
+          "type": "string",
+          "format": "idn-email",
+          "description": "MUST be a valid email address"
+        }
+      }
+    },
+    "entry-point-group": {
+      "$id": "/schema/project/entry-point-group",
+      "type": "object",
+      "additionalProperties": false,
+      "$comment": "Keys should be the entry-point name (recommended `[\\w.-]+` - https://packaging.python.org/specifications/entry-points/ - TODO: should we make it mandatory?)",
+      "patternProperties": {
+        "^[^\\[\\s=]([^=]*[^\\s=])?$": {
+          "type": "string",
+          "description": "Pointer to a Python object. It is either in the form `importable.module`, or `importable.module:object.attr`.",
+          "$comment": "https://packaging.python.org/specifications/entry-points/ (TODO: Add regex pattern?)"
+        }
+      }
+    },
+    "dependency": {
+      "$id": "/schema/project/dependency",
+      "type": "string",
+      "description": "Project dependency specification according to PEP 508",
+      "$comment": "https://python.github.io/peps/pep-0508 (TODO: Add regex pattern?)"
+    }
+  }
+}
