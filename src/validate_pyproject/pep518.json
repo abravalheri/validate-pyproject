@@ -1,0 +1,30 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+
+  "$id": "https://www.python.org/dev/peps/pep-0518/schema/pyproject",
+  "description": "Partial data structure for the `pyproject.toml` according to PEP 518 (missing PEP 621)",
+
+  "type": "object",
+  "additionalProperties": false,
+
+  "properties": {
+    "build-system": {
+      "type": "object",
+      "additionalProperties": false,
+
+      "properties": {
+        "requires": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": ["requires"]
+    },
+
+    "tool": {
+      "type": "object"
+    }
+  }
+}
