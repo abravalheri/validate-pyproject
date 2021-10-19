@@ -9,12 +9,12 @@
     "name": {
        "type": "string",
        "description": "The name (primary identifier) of the project. MUST be statically defined.",
-       "$comment": "TODO: add regex pattern?"
+       "format": "pep508-identifier"
     },
     "version": {
       "type": "string",
       "description": "The version of the project as supported by PEP 440.",
-      "$comment": "TODO: add regex pattern?"
+      "$comment": "pep440"
     },
     "description": {
       "type": "string",
@@ -57,7 +57,7 @@
                 "content-type" : {
                   "type": "string",
                   "description": "Content-type (RFC 1341) of the full description (e.g. `text/markdown`). The `charset` parameter is assumed UTF-8 when not present.",
-                  "$comment": "TODO: add regex pattern?"
+                  "$comment": "TODO: add regex pattern or format?"
                 }
               }
             }
@@ -68,7 +68,8 @@
     "requires-python": {
       "type": "string",
       "description": "The Python version requirements of the project.",
-      "$comment": "https://packaging.python.org/specifications/core-metadata/#requires-python (TODO: add regex pattern?)"
+      "format": "pep508-versionspec",
+      "$comment": "https://packaging.python.org/specifications/core-metadata/#requires-python"
     },
     "license": {
       "OneOf": [
@@ -114,7 +115,7 @@
     },
     "urls": {
       "type": "array",
-      "items": {"type": "string", "format": "uri"},
+      "items": {"type": "string", "format": "url"},
       "description": "URLs associated with the project in the form `label => value`."
     },
     "scripts": {
@@ -209,7 +210,8 @@
         "^[^\\[\\s=]([^=]*[^\\s=])?$": {
           "type": "string",
           "description": "Pointer to a Python object. It is either in the form `importable.module`, or `importable.module:object.attr`.",
-          "$comment": "https://packaging.python.org/specifications/entry-points/ (TODO: Add regex pattern?)"
+          "format": "python-entry-point",
+          "$comment": "https://packaging.python.org/specifications/entry-points/"
         }
       }
     },
@@ -217,7 +219,7 @@
       "$id": "/schema/project/dependency",
       "type": "string",
       "description": "Project dependency specification according to PEP 508",
-      "$comment": "https://python.github.io/peps/pep-0508 (TODO: Add regex pattern?)"
+      "format": "pep508"
     }
   }
 }
