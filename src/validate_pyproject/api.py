@@ -4,10 +4,11 @@ Retrieve JSON schemas for validating dicts representing a ``pyproject.toml`` fil
 import json
 import logging
 import sys
+from enum import Enum
 from functools import reduce
 from itertools import chain
 from types import MappingProxyType
-from typing import Dict, List, Mapping, Optional, Sequence, TypeVar, cast
+from typing import Dict, List, Mapping, Optional, Sequence, TypeVar, Union, cast
 
 import fastjsonschema
 
@@ -37,6 +38,9 @@ else:  # pragma: no cover
 
 
 T = TypeVar("T", bound=Mapping)
+AllPlugins = Enum("AllPlugins", "ALL_PLUGINS")
+ALL_PLUGINS = AllPlugins.ALL_PLUGINS
+
 TOP_LEVEL_SCHEMA_FILE = "pep517_518"
 PROJECT_TABLE_SCHEMA_FILE = "pep621_project"
 
@@ -98,17 +102,23 @@ def combine(self, plugins: Sequence[Plugin] = ()) -> Schema:
 class Validator:
     def __init__(
         self,
-        plugins: Sequence[Plugin] = (),
+        plugins: Union[Sequence[Plugin], AllPlugins] = ALL_PLUGINS,
         format_validators: Mapping[str, FormatValidationFn] = FORMAT_FUNCTIONS,
         extra_validations: Sequence[ValidationFn] = EXTRA_VALIDATIONS,
     ):
-        self.plugins = tuple(plugins)  # force immutability / read only
         self._cache: Optional[ValidationFn] = None
         self._schema: Optional[Schema] = None
         self._format_validators: Optional[Dict[str, FormatValidationFn]] = None
         self._in_format_validators = dict(format_validators)
         self._extra_validations: Optional[List[ValidationFn]] = None
         self._in_extra_validations = list(extra_validations)
+
+        if plugins is ALL_PLUGINS:
+            from .plugins import list_from_entry_points
+
+            plugins = list_from_entry_points()
+
+        self.plugins = tuple(plugins)  # force immutability / read only
 
     @property
     def schema(self) -> Schema:

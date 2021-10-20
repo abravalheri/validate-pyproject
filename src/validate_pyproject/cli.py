@@ -16,6 +16,7 @@ from fastjsonschema import JsonSchemaValueException
 
 from . import __version__
 from .api import Validator, plugin_id
+from .plugins import list_from_entry_points as list_plugins_from_entry_points
 from .types import Plugin
 
 _logger = logging.getLogger(__package__)
@@ -26,7 +27,7 @@ try:
     from tomli import loads
 except ImportError:  # pragma: no cover
     try:
-        from toml import loads
+        from toml import loads  # type: ignore
     except ImportError as ex:
         raise ImportError("Please install a TOML parser (e.g. `tomli`)") from ex
 
@@ -106,7 +107,9 @@ def __meta__(plugins: Sequence[Plugin]) -> Dict[str, dict]:
 
 @critical_logging()
 def parse_args(
-    args: Sequence[str], plugins: Sequence[Plugin], params_class: Type[T] = CliParams
+    args: Sequence[str],
+    plugins: Sequence[Plugin],
+    params_class: Type[T] = CliParams,  # type: ignore[assignment]
 ) -> T:
     """Parse command line parameters
 
@@ -189,8 +192,8 @@ def run(args: Sequence[str] = ()):
           (for example  ``["--verbose", "setup.cfg"]``).
     """
     args = args or sys.argv[1:]
-    plugins: List[Plugin] = []  # TODO: load from entry_points
-    params = parse_args(args, plugins)
+    plugins: List[Plugin] = list_plugins_from_entry_points()
+    params: CliParams = parse_args(args, plugins)
     setup_logging(params.loglevel)
     validator = Validator(plugins=params.plugins)
     toml_equivalent = loads(params.input_file.read())
