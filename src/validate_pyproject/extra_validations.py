@@ -40,7 +40,7 @@ def validate_project_dynamic(pyproject: T) -> T:
     project_table = pyproject.get("project", {})
     dynamic = project_table.get("dynamic", [])
     # we need to ensure `version` (`name` is already mandatory in the JSON Schema)
-    if "version" not in pyproject and "version" not in dynamic:
+    if "version" not in project_table and "version" not in dynamic:
         msg = "You need to provide a value for `project.version` or "
         msg += "list it under `project.dynamic`"
         name = "data.project.version"

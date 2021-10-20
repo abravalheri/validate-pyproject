@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema",
 
-  "$id": "https://www.python.org/dev/peps/pep-0621/schema/project",
+  "$id": "https://www.python.org/dev/peps/pep-0621/schema/pyproject/project",
   "description": "Data structure for the 'project' table inside `pyproject.toml` according to PEP 621",
 
   "type": "object",
@@ -118,7 +118,10 @@
       "description": "URLs associated with the project in the form `label => value`.",
       "additionalProperties": false,
       "patternProperties": {
-        "^.+$": {"type": "string", "format": "url"}
+        "^.+$": {
+          "type": "string",
+          "format": "url"
+        }
       }
     },
     "scripts": {

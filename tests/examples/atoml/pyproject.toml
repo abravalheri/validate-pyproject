@@ -1,0 +1,59 @@
+[tool.pdm]
+
+[tool.pdm.dev-dependencies]
+test = [
+    "pytest",
+    "pytest-cov",
+    "pyyaml~=5.4",
+]
+
+[build-system]
+requires = ["pdm-pep517"]
+build-backend = "pdm.pep517.api"
+
+
+[project]
+# PEP 621 project metadata
+# See https://www.python.org/dev/peps/pep-0621/
+name = "atoml"
+# version = {use_scm = true}  ->  invalid, must be string
+authors = [
+    {name = "Frost Ming", email = "mianghong@gmail.com"},
+    {name = "Sébastien Eustace", email = "sebastien@eustace.io"},
+]
+license = {text = "MIT"}
+requires-python = ">=3.6"
+dependencies = []
+description = "Yet another style preserving TOML library"
+readme = "README.md"
+dynamic = ["classifiers", "version"]
+
+[project.urls]
+Homepage = "https://github.com/frostming/atoml.git"
+Repository = "https://github.com/frostming/atoml.git"
+
+[tool.black]
+line-length = 88
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | build
+  | dist
+  | tests/toml-test
+)/
+'''
+
+[tool.isort]
+profile = "black"
+atomic = true
+lines_after_imports = 2
+lines_between_types = 1
+
+known_first_party = ["atoml"]
+known_third_party = ["pytest"]

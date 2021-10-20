@@ -1,0 +1,54 @@
+[build-system]
+build-backend = 'trampolim'
+backend-path = ['.']
+requires = [
+  'tomli>=1.0.0',
+  'packaging',
+  'pep621>=0.4.0',
+  'backports.cached-property ; python_version < "3.8"',
+]
+
+[project]
+name = 'trampolim'
+version = '0.1.0'
+description = 'A modern Python build backend'
+readme = 'README.md'
+requires-python = '>=3.7'
+license = { file = 'LICENSE' }
+keywords = ['build', 'pep517', 'package', 'packaging']
+authors = [
+  { name = 'Filipe Laíns', email = 'lains@riseup.net' },
+]
+classifiers = [
+  'Development Status :: 4 - Beta',
+  'Programming Language :: Python'
+]
+
+dependencies = [
+  'tomli>=1.0.0',
+  'packaging',
+  'pep621>=0.4.0',
+  'backports.cached-property ; python_version < "3.8"',
+]
+
+[project.optional-dependencies]
+test = [
+  'wheel',
+  'pytest>=3.9.1',
+  'pytest-cov',
+  'pytest-mock',
+]
+docs = [
+  'furo>=2021.04.11b34',
+  'sphinx~=3.0',
+  'sphinx-autodoc-typehints>=1.10',
+]
+
+[project.scripts]
+trampolim = 'trampolim.__main__:entrypoint'
+
+[project.urls]
+homepage = 'https://github.com/FFY00/trampolim'
+repository = 'https://github.com/FFY00/trampolim'
+documentation = 'https://trampolim.readthedocs.io'
+changelog = 'https://trampolim.readthedocs.io/en/latest/changelog.html'

@@ -1,0 +1,15 @@
+'validate-pyproject' is licensed under the MPL-2.0 license; see the LICENSE.txt file for details.
+
+A few extra files, derived from other opensource projects are collocated in
+this code base ('tests/examples' and 'tests/invalid-examples') exclusively for
+testing purposes during development:
+
+- 'atoml/pyproject.toml' from https://github.com/forstming/atoml, licensed under MIT
+- 'flit/pyproject.toml' from https://github.com/takluyver/flit, licensed under BSD-3-Clause
+- 'pdm/pyproject.toml' from https://github.com/pdm-project/pdm, licensed under MIT
+- 'trampolim/pyproject.toml' from https://github.com/FFY00/trampolim, licensed under MIT
+
+These files are not part of the 'validate-pyproject' project and not meant
+for distribution (as part of the 'validate-pyproject' software package).
+The original licenses for each one of these files can be found inside the
+respective directory under 'tests/examples'.

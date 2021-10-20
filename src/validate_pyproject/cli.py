@@ -24,7 +24,7 @@ T = TypeVar("T", bound="CliParams")
 
 try:
     from tomli import loads
-except ImportError:
+except ImportError:  # pragma: no cover
     try:
         from toml import loads
     except ImportError as ex:

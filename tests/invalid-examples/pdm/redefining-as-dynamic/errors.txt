@@ -1,0 +1,1 @@
+You cannot provided a value for `project.classifiers` and list it under `project.dynamic` at the same time
