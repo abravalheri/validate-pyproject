@@ -37,7 +37,7 @@ else:  # pragma: no cover
 
 
 T = TypeVar("T", bound=Mapping)
-TOP_LEVEL_SCHEMA_FILE = "pep518"
+TOP_LEVEL_SCHEMA_FILE = "pep517_518"
 PROJECT_TABLE_SCHEMA_FILE = "pep621_project"
 
 NOT_SAFE_FOR_EMBEDDING = ["$schema"]
