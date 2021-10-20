@@ -4,22 +4,22 @@
 
 import argparse
 import io
+import json
 import logging
 import sys
 from contextlib import contextmanager
 from itertools import chain
-from os import pathsep
-from pathlib import Path
 from textwrap import dedent, wrap
-from typing import Dict, List, NamedTuple, Optional, Sequence
+from typing import Dict, List, NamedTuple, Sequence, Type, TypeVar
+
+from fastjsonschema import JsonSchemaValueException
 
 from . import __version__
 from .api import Validator, plugin_id
 from .types import Plugin
 
 _logger = logging.getLogger(__package__)
-
-DEFAULT_PROFILE = "best_effort"
+T = TypeVar("T", bound="CliParams")
 
 
 try:
@@ -84,13 +84,19 @@ META: Dict[str, dict] = {
         const=logging.DEBUG,
         help="set logging level to DEBUG",
     ),
+    "dump_json": dict(
+        flags=("--dump-json",),
+        action="store_true",
+        help="Print the JSON equivalent to the given TOML",
+    ),
 }
 
 
 class CliParams(NamedTuple):
     input_file: io.TextIOBase
     plugins: List[Plugin]
-    loglevel: int
+    loglevel: int = logging.WARNING
+    dump_json: bool = False
 
 
 def __meta__(plugins: Sequence[Plugin]) -> Dict[str, dict]:
@@ -99,7 +105,9 @@ def __meta__(plugins: Sequence[Plugin]) -> Dict[str, dict]:
 
 
 @critical_logging()
-def parse_args(args: Sequence[str], plugins: Sequence[Plugin]) -> CliParams:
+def parse_args(
+    args: Sequence[str], plugins: Sequence[Plugin], params_class: Type[T] = CliParams
+) -> T:
     """Parse command line parameters
 
     Args:
@@ -108,7 +116,10 @@ def parse_args(args: Sequence[str], plugins: Sequence[Plugin]) -> CliParams:
     Returns: command line parameters namespace
     """
     description = "Validate a given TOML file"
-    epilog = "The following plugins are available:\n" + _plugins_help(plugins)
+    if plugins:
+        epilog = f"The following plugins are available:\n{plugins_help(plugins)}"
+    else:
+        epilog = ""
 
     parser = argparse.ArgumentParser(
         description=description, epilog=epilog, formatter_class=Formatter
@@ -118,10 +129,10 @@ def parse_args(args: Sequence[str], plugins: Sequence[Plugin]) -> CliParams:
 
     parser.set_defaults(loglevel=logging.WARNING)
     params = vars(parser.parse_args(args))
-    enabled = params.pop("enabled", ())
-    disabled = params.pop("disabled", ())
+    enabled = params.pop("enable", ())
+    disabled = params.pop("disable", ())
     params["plugins"] = select_plugins(plugins, enabled, disabled)
-    return CliParams(**params)
+    return params_class(**params)
 
 
 def select_plugins(
@@ -149,8 +160,20 @@ def setup_logging(loglevel: int):
 def exceptisons2exit():
     try:
         yield
+    except JsonSchemaValueException as ex:
+        error_msg = [f"Schema: {ex}"]
+        if ex.value:
+            error_msg.append(f"Given value:\n{json.dumps(ex.value, indent=2)}")
+        if ex.rule:
+            error_msg.append(f"Offending rule: {json.dumps(ex.rule, indent=2)}")
+        if ex.definition:
+            error_msg.append(f"Definition:\n{json.dumps(ex.definition, indent=2)}")
+
+        _logger.error("\n\n".join(error_msg) + "\n")
+        _logger.debug("Please check the following information:", exc_info=True)
+        raise SystemExit(1)
     except Exception as ex:
-        _logger.error(f"{ex.__class__.__name__}: {ex}")
+        _logger.error(f"{ex.__class__.__name__}: {ex}\n")
         _logger.debug("Please check the following information:", exc_info=True)
         raise SystemExit(1)
 
@@ -171,7 +194,12 @@ def run(args: Sequence[str] = ()):
     setup_logging(params.loglevel)
     validator = Validator(plugins=params.plugins)
     toml_equivalent = loads(params.input_file.read())
-    return validator(toml_equivalent)
+    validator(toml_equivalent)
+    if params.dump_json:
+        print(json.dumps(toml_equivalent, indent=2))
+    else:
+        print("Valid file")
+    return 0
 
 
 main = exceptisons2exit()(run)
@@ -186,27 +214,7 @@ class Formatter(argparse.RawTextHelpFormatter):
         return list(chain.from_iterable(wrap(x, width) for x in text.splitlines()))
 
 
-def guess_profile(profile: Optional[str], file_name: str, available: List[str]) -> str:
-    if profile:
-        return profile
-
-    name = Path(file_name).name
-    if name in available:
-        # Optimize for the easy case
-        _logger.info(f"Profile not explicitly set, {name!r} inferred.")
-        return name
-
-    fname = file_name.replace(pathsep, "/")
-    for name in available:
-        if fname.endswith(name):
-            _logger.info(f"Profile not explicitly set, {name!r} inferred.")
-            return name
-
-    _logger.warning(f"Profile not explicitly set, using {DEFAULT_PROFILE!r}.")
-    return DEFAULT_PROFILE
-
-
-def _plugins_help(plugins: Sequence[Plugin]) -> str:
+def plugins_help(plugins: Sequence[Plugin]) -> str:
     return "\n".join(_format_plugin_help(p) for p in plugins)
 
 

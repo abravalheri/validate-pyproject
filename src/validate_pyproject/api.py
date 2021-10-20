@@ -6,10 +6,12 @@ import logging
 import sys
 from functools import reduce
 from itertools import chain
-from typing import List, Mapping, Optional, Sequence, Tuple, TypeVar, cast
+from types import MappingProxyType
+from typing import Dict, List, Mapping, Optional, Sequence, TypeVar, cast
 
 import fastjsonschema
 
+from . import format
 from .extra_validations import EXTRA_VALIDATIONS
 from .types import FormatValidationFn, Plugin, Schema, ValidationFn
 
@@ -43,7 +45,13 @@ NOT_SAFE_FOR_EMBEDDING = ["$schema"]
 expected to be present only in the top-level definition.
 """
 
-FORMAT_FUNCTIONS: Tuple[FormatValidationFn] = ()
+FORMAT_FUNCTIONS: Mapping[str, FormatValidationFn] = MappingProxyType(
+    {
+        fn.__name__.replace("_", "-"): fn
+        for fn in format.__dict__.values()
+        if callable(fn)
+    }
+)
 
 _logger = logging.getLogger(__name__)
 _chain_iter = chain.from_iterable
@@ -51,11 +59,11 @@ _chain_iter = chain.from_iterable
 
 def load(name: str, package: str = __package__, ext: str = ".json") -> Schema:
     """Load the schema from a JSON Schema file"""
-    return Schema(json.loads(read_text(__package__, f"{name}.{ext}")))
+    return Schema(json.loads(read_text(__package__, f"{name}{ext}")))
 
 
 def plugin_id(plugin: Plugin):
-    return f"{plugin.__module__}.{plugin.__qualname__}"
+    return f"{plugin.__module__}.{plugin.__class__.__qualname__}"
 
 
 def clean(schema: Schema) -> Schema:
@@ -71,9 +79,10 @@ def combine(self, plugins: Sequence[Plugin] = ()) -> Schema:
     """
     overall_schema = load(TOP_LEVEL_SCHEMA_FILE)
     project_table_schema = load(PROJECT_TABLE_SCHEMA_FILE)
-    overall_schema["properties"]["project"] = clean(project_table_schema)
+    overall_properties = overall_schema["properties"]
+    overall_properties["project"] = clean(project_table_schema)
 
-    tool_properties = overall_schema["tool"].setdefault("properties", {})
+    tool_properties = overall_properties["tool"].setdefault("properties", {})
 
     for plugin in plugins:
         pid, tool, schema = plugin_id(plugin), plugin.tool_name, plugin.tool_schema
@@ -90,14 +99,14 @@ class Validator:
     def __init__(
         self,
         plugins: Sequence[Plugin] = (),
-        format_validators: Sequence[FormatValidationFn] = FORMAT_FUNCTIONS,
+        format_validators: Mapping[str, FormatValidationFn] = FORMAT_FUNCTIONS,
         extra_validations: Sequence[ValidationFn] = EXTRA_VALIDATIONS,
     ):
         self.plugins = tuple(plugins)  # force immutability / read only
         self._cache: Optional[ValidationFn] = None
         self._schema: Optional[Schema] = None
-        self._format_validators: Optional[List[FormatValidationFn]] = None
-        self._in_format_validators = list(format_validators)
+        self._format_validators: Optional[Dict[str, FormatValidationFn]] = None
+        self._in_format_validators = dict(format_validators)
         self._extra_validations: Optional[List[ValidationFn]] = None
         self._in_extra_validations = list(extra_validations)
 
@@ -105,26 +114,27 @@ class Validator:
     def schema(self) -> Schema:
         if self._schema is None:
             self._schema = combine(self.plugins)
-        return cast(Schema, self._schema)
+        return self._schema
 
     @property
     def extra_validations(self) -> List[ValidationFn]:
         if self._extra_validations is None:
             from_plugins = _chain_iter(p.extra_validations for p in self.plugins)
             self._extra_validations = [*self._in_extra_validations, *from_plugins]
-        return cast(List[ValidationFn], self._extra_validations)
+        return self._extra_validations
 
     @property
-    def format_validators(self) -> List[FormatValidationFn]:
+    def format_validators(self) -> Dict[str, FormatValidationFn]:
         if self._format_validators is None:
-            from_plugins = _chain_iter(p.format_validators for p in self.plugins)
-            self._format_validators = [*self._in_format_validators, *from_plugins]
-        return cast(List[FormatValidationFn], self._format_validators)
+            formats = _chain_iter(p.format_validators.items() for p in self.plugins)
+            formats = chain(self._in_format_validators.items(), formats)
+            self._format_validators = dict(formats)
+        return self._format_validators
 
     def __call__(self, pyproject: T) -> T:
         if self._cache is None:
             kw = {"formats": self.format_validators}
             self._cache = cast(ValidationFn, fastjsonschema.compile(self.schema, **kw))
 
-        cast(ValidationFn, self._cache)(pyproject)
+        self._cache(pyproject)
         return reduce(lambda acc, fn: fn(acc), self.extra_validations, pyproject)

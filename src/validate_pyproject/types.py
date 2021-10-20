@@ -1,4 +1,5 @@
 import sys
+from types import MappingProxyType
 from typing import Callable, Mapping, NewType, Sequence, TypeVar
 
 T = TypeVar("T", bound=Mapping)
@@ -22,7 +23,7 @@ else:  # pragma: no cover
 class Plugin(Protocol):
     tool_name: str
     help_text: str
-    format_validators: Sequence[FormatValidationFn] = ()
+    format_validators: Mapping[str, FormatValidationFn] = MappingProxyType({})
     extra_validations: Sequence[ValidationFn] = ()
 
     @property

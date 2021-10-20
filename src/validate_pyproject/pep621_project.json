@@ -14,7 +14,7 @@
     "version": {
       "type": "string",
       "description": "The version of the project as supported by PEP 440.",
-      "$comment": "pep440"
+      "format": "pep440"
     },
     "description": {
       "type": "string",
@@ -114,9 +114,12 @@
       "$comment": "https://pypi.org/classifiers/"
     },
     "urls": {
-      "type": "array",
-      "items": {"type": "string", "format": "url"},
-      "description": "URLs associated with the project in the form `label => value`."
+      "type": "object",
+      "description": "URLs associated with the project in the form `label => value`.",
+      "additionalProperties": false,
+      "patternProperties": {
+        "^.+$": {"type": "string", "format": "url"}
+      }
     },
     "scripts": {
       "description": "Instruct the installer to create command-line wrappers for the given entry points.",
@@ -131,8 +134,10 @@
     "entry-points": {
       "description": "Instruct the installer to expose the given modules/functions via `entry-point` discovery mechanism (useful for plugins).",
       "$comment": "https://packaging.python.org/specifications/entry-points/",
+      "propertyNames": {"format": "python-entrypoint-group"},
+      "additionalProperties": false,
       "patternProperties": {
-        "^\\w+(\\.\\w+)*$": {
+        "^.+$": {
           "$comment": "Entry-point group (regex taken from https://packaging.python.org/specifications/entry-points/)",
           "AllOf": [{"$ref": "/schema/project/entry-point-group"}]
         }
@@ -146,11 +151,12 @@
     "optional-dependencies": {
       "type": "object",
       "description": "Optional dependency for the project",
+      "propertyNames": {"format": "pep508-identifier"},
+      "additionalProperties": false,
       "patternProperties": {
-        "^([A-Z0-9]|[A-Z0-9][A-Z0-9._-]*[A-Z0-9])$": {
+        "^.+$": {
           "type": "array",
-          "items": {"$ref": "/schema/project/dependency"},
-          "$comment": "The regex is taken from PEP 508 definition of identifier/name"
+          "items": {"$ref": "/schema/project/dependency"}
         }
       }
     },
@@ -204,13 +210,14 @@
     "entry-point-group": {
       "$id": "/schema/project/entry-point-group",
       "type": "object",
+      "$comment": "https://packaging.python.org/specifications/entry-points/",
+      "propertyNames": {"format": "python-entrypoint-name"},
       "additionalProperties": false,
-      "$comment": "Keys should be the entry-point name (recommended `[\\w.-]+` - https://packaging.python.org/specifications/entry-points/ - TODO: should we make it mandatory?)",
       "patternProperties": {
-        "^[^\\[\\s=]([^=]*[^\\s=])?$": {
+        "^.+$": {
           "type": "string",
           "description": "Pointer to a Python object. It is either in the form `importable.module`, or `importable.module:object.attr`.",
-          "format": "python-entry-point",
+          "format": "python-entrypoint-reference",
           "$comment": "https://packaging.python.org/specifications/entry-points/"
         }
       }

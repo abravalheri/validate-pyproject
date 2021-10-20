@@ -41,14 +41,18 @@ def validate_project_dynamic(pyproject: T) -> T:
     dynamic = project_table.get("dynamic", [])
     # we need to ensure `version` (`name` is already mandatory in the JSON Schema)
     if "version" not in pyproject and "version" not in dynamic:
-        msg = "You need to provide a value for `version` or list it under `dynamic`"
-        raise MissingStaticOrDynamic(msg, "data.project.version")
+        msg = "You need to provide a value for `project.version` or "
+        msg += "list it under `project.dynamic`"
+        name = "data.project.version"
+        raise MissingStaticOrDynamic(msg, name=name, rule="PEP 621")
 
     for field in dynamic:
         if field in project_table:
-            msg = f"You cannot provided a value for `{field}` and "
-            msg += "list it under `dynamic` at the same time"
-            raise RedefiningStaticFieldAsDynamic(msg, f"data.project.{field}")
+            msg = f"You cannot provided a value for `project.{field}` and "
+            msg += "list it under `project.dynamic` at the same time"
+            name = f"data.project.{field}"
+            value = {field: project_table[field], "...": " # ...", "dynamic": dynamic}
+            raise RedefiningStaticFieldAsDynamic(msg, value, name, rule="PEP 621")
 
     return pyproject
 
