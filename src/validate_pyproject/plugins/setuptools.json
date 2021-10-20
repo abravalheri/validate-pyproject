@@ -1,0 +1,168 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+
+  "$id": "https://ini2toml.readthedocs.io/en/stable/setuptools_pep621.html/schema/pyproject/tool/setuptools",
+  "description": "Partial data structure for the `pyproject.toml` according to PEP 518 (missing PEP 621)",
+
+  "type": "object",
+  "properties": {
+    "platforms": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "provides": {
+      "description": "Package and virtual package names contained within this package (not supported by pip)",
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "obsoletes": {
+      "description": "Packages which this package renders obsolete (not supported by pip)",
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "zip-safe": {
+      "type": "boolean"
+    },
+    "script-files": {
+      "description": "Legacy way of defining scripts (entry-points are preferred).",
+      "type": "array",
+      "items": {"type": "string"},
+      "$comment": "TODO: is this field deprecated/should be removed?"
+    },
+    "eager-resources": {
+      "description": "Resources that should be extracted together, if any of them is needed, or if any C extensions included in the project are imported.",
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "packages": {
+      "OneOf": [
+        {
+          "type": "array",
+          "items": {"type": "string", "format": "python-module-name"}
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "patternProperties": {
+            "^(find|finda-namespace)$": {
+              "type": "object",
+              "$comment": "https://setuptools.pypa.io/en/latest/userguide/package_discovery.html",
+              "properties": {
+                "where": {
+                  "type": "string",
+                  "description": "Directory to be searched for packages (Unix-style relative path)"
+                },
+                "exclude": {
+                  "type": "array",
+                  "description": "Exclude packages that match the values listed in this field. Can container shell-style wildcards",
+                  "items": {"type": "string"}
+                },
+                "include": {
+                  "type": "array",
+                  "description": "Restrict the found packages to just the ones listed in this field. Can container shell-style wildcards",
+                  "items": {"type": "string"}
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "package-dir": {
+      "type": "object",
+      "format": "python-module-name"
+    },
+    "package-data": {
+      "type": "object",
+      "format": "python-module-name",
+      "AnyOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "*": {"type": "array", "items": {"type": "string"}}
+          }
+        },
+        {
+          "additionalProperties": false,
+          "propertyNames": {"format": "python-module-name"},
+          "patternProperties": {
+            "^.*$": {"type": "array", "items": {"type": "string"}}
+          }
+        }
+      ]
+    },
+    "include-package-data": {
+      "description": "Automatically include any data files inside the package directories that are specified by `MANIFEST.in`",
+      "type": "boolean",
+      "$comment": "https://setuptools.pypa.io/en/latest/userguide/datafiles.html"
+    },
+    "exclude-package-data": {
+      "description": "Mapping from package names to lists of glob patterns that should be excluded from the package directories",
+      "type": "object",
+      "additionalProperties": false,
+      "propertyNames": {"format": "python-module-names"},
+      "patternProperties": {
+          "^.*$": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "namespace_packages": {
+      "type": "array",
+      "items": {"type": "string", "format": "python-module-name"},
+      "$comment": "https://setuptools.pypa.io/en/latest/userguide/package_discovery.html"
+    },
+    "py_modules": {
+      "description": "Modules that setuptools will manipulate",
+      "type": "array",
+      "items": {"type": "string", "format": "python-module-name"},
+      "$comment": "TODO: clarify the relationship with `packages`"
+    },
+    "dynamic": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "description": "A version dynamically loaded must comply with PEP 440.",
+          "OneOf": [
+            {"$ref": "/schema/pyproject/tool/setuptools/attr-directive"},
+            {"$ref": "/schema/pyproject/tool/setuptools/file-directive"}
+          ]
+        },
+        "classifiers": {"$ref": "/schema/pyproject/tool/setuptools/file-directive"},
+        "description": {"$ref": "/schema/pyproject/tool/setuptools/file-directive"},
+        "readme": {"$ref": "/schema/pyproject/tool/setuptools/file-directive"},
+        "entry-points": {"$ref": "/schema/pyproject/tool/setuptools/file-directive"},
+        "scripts": {"$ref": "/schema/pyproject/tool/setuptools/file-directive"},
+        "gui-scripts": {"$ref": "/schema/pyproject/tool/setuptools/file-directive"}
+      }
+    },
+    "commands": {
+      "type": "object",
+      "$comment": "TODO: what else can we specify? Should this table even exist?"
+    }
+  },
+
+  "$defs": {
+    "file-directive": {
+      "$id": "/schema/pyproject/tool/setuptools/file-directive",
+      "description": "Value is read from a file (or list of files and then concatenated)",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "file": {
+          "OneOf": [
+            {"type": "string"},
+            {"type": "array", "items": {"type": "string"}}
+          ]
+        }
+      }
+    },
+    "attr-directive": {
+      "$id": "/schema/pyproject/tool/setuptools/attr-directive",
+      "description": "Value is read from a module attribute. Supports callables and iterables; unsupported types are cast via str()",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "attr": {"type": "string"}
+      }
+    }
+  }
+}
