@@ -1,0 +1,21 @@
+{
+  "*.py": {
+    "autoformat": true,
+    "textwidth": 88
+  },
+  "src/validate_pyproject/*/__init__.py" : {
+    "alternate": "tests/test_{basename}.py",
+    "type": "source"
+  },
+  "src/validate_pyproject/*.py" : {
+    "alternate": "tests/{dirname}/test_{basename}.py",
+    "type": "source"
+  },
+  "tests/**/test_*.py" : {
+    "alternate": [
+      "src/validate_pyproject/{dirname}/{basename}.py",
+      "src/validate_pyproject/{dirname}/{basename}/__init__.py"
+    ],
+    "type": "test"
+  }
+}
