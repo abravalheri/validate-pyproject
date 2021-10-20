@@ -61,7 +61,7 @@ _logger = logging.getLogger(__name__)
 _chain_iter = chain.from_iterable
 
 
-def load(name: str, package: str = __package__, ext: str = ".json") -> Schema:
+def load(name: str, package: str = __package__, ext: str = ".schema.json") -> Schema:
     """Load the schema from a JSON Schema file"""
     return Schema(json.loads(read_text(__package__, f"{name}{ext}")))
 
