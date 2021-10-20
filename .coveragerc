@@ -2,7 +2,8 @@
 [run]
 branch = True
 source = validate_pyproject
-# omit = bad_file.py
+omit =
+    */validate_pyproject/__main__.py
 
 [paths]
 source =
