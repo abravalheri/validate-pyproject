@@ -4,7 +4,6 @@ Retrieve JSON schemas for validating dicts representing a ``pyproject.toml`` fil
 import json
 import logging
 import sys
-from collections import defaultdict
 from enum import Enum
 from functools import reduce
 from itertools import chain
@@ -51,12 +50,6 @@ else:  # pragma: no cover
 
 
 T = TypeVar("T", bound=Mapping)
-RefHandler = Mapping[str, Callable[[str], Schema]]
-""":mod:`fastjsonschema` allows passing a dict-like object to load external schema
-``$ref``s. This object should map the URI schema (e.g. ``http``, ``https``, ``ftp``) to
-a function that receives the schema URI and returns the schema (as parsed JSON).
-"""
-
 AllPlugins = Enum("AllPlugins", "ALL_PLUGINS")
 ALL_PLUGINS = AllPlugins.ALL_PLUGINS
 
@@ -160,13 +153,34 @@ class SchemaRegistry(Mapping[str, Schema]):
         return len(self._schemas)
 
 
-class ForcedUriHandler(defaultdict):
-    """This object is used to force :mod:`fastjsonschema` to always look in the local
-    registry instead of using :mod:`urllib` to download schemas.
+class RefHandler(Mapping[str, Callable[[str], Schema]]):
+    """:mod:`fastjsonschema` allows passing a dict-like object to load external schema
+    ``$ref``s. Such objects map the URI schema (e.g. ``http``, ``https``, ``ftp``)
+    into a function that receives the schema URI and returns the schema (as parsed JSON)
+    (otherwise :mod:`urllib` is used and the URI is assumed to be a valid URL).
+    This class will ensure all the URIs are loaded from the local registry.
     """
 
+    def __init__(self, registry: Mapping[str, Schema]):
+        self._uri_schemas = ["http", "https"]
+        self._registry = registry
+
     def __contains__(self, key) -> bool:
+        if not isinstance(key, str):
+            return False
+        if key not in self._uri_schemas:
+            self._uri_schemas.append(key)
         return True
+
+    def __iter__(self) -> Iterator[str]:
+        return iter(self._uri_schemas)
+
+    def __len__(self):
+        return len(self._uri_schemas)
+
+    def __getitem__(self, key: str) -> Callable[[str], Schema]:
+        """All the references should be retrieved from the registry"""
+        return self._registry.__getitem__
 
 
 class Validator:
@@ -192,7 +206,7 @@ class Validator:
             self.plugins = tuple(plugins)  # force immutability / read only
 
         self._schema_registry = SchemaRegistry(self.plugins)
-        self.handlers: RefHandler = ForcedUriHandler(lambda *_: self.__getitem__)
+        self.handlers = RefHandler(self._schema_registry)
 
     @property
     def schema(self) -> Schema:
