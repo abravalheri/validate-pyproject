@@ -188,10 +188,13 @@
     }
   },
   "required": ["name"],
-  "OneOf": [
-    {"required": ["version"], "$comment": "Core metadata specifies only `name` and `version` as mandatory, but `name` MUST be static in PEP 621."},
-    {"properties": {"dynamic": {"contains": {"const": "version"}}}}
-  ],
+  "if": {
+    "not": {"required": ["version"]}
+  },
+  "then": {
+    "properties": {"dynamic": {"contains": {"const": "version"}}},
+    "$comment": "Core metadata specifies only `name` and `version` as mandatory, but `name` MUST be static in PEP 621."
+  },
 
   "$defs": {
     "author": {
