@@ -28,7 +28,7 @@ def parser_spec(plugins: Sequence[types.Plugin]) -> Dict[str, dict]:
 def run(args: Sequence[str] = ()):
     args = args or sys.argv[1:]
     plugins = list_plugins_from_entry_points()
-    params = cli.parse_args(args, plugins, parser_spec, CliParams)
+    params = cli.parse_args(args, plugins, parser_spec, CliParams)  # type: ignore
     cli.setup_logging(params.loglevel)
     validator = api.Validator(plugins=params.plugins)
     code = FJS.compile_to_code(validator.schema, validator.handlers, validator.formats)

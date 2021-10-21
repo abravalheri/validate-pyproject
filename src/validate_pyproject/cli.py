@@ -20,7 +20,7 @@ from .plugins import list_from_entry_points as list_plugins_from_entry_points
 from .types import Plugin
 
 _logger = logging.getLogger(__package__)
-T = TypeVar("T", bound="NamedTuple")
+T = TypeVar("T", bound=NamedTuple)
 
 
 try:
