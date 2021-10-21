@@ -1,0 +1,68 @@
+/**
+ * The code in this module is mostly borrowed/adapted from PyScaffold and was originally
+ * published under the MIT license
+ * The original PyScaffold license can be found in 'NOTICE.txt'
+ */
+.row-odd td {
+  background-color: #f3f6f6 !important;
+}
+
+article .align-center:not(table) {
+  display: block;
+}
+
+dl:not([class]) dt {
+  color: var(--color-brand-content);
+}
+
+ol > li::marker {
+  /* font-weight: bold; */
+  color: var(--color-foreground-muted);
+}
+
+blockquote {
+  background-color: var(--color-sidebar-background);
+  border-left: solid 0.2rem var(--color-foreground-border);
+  padding-left: 1rem;
+}
+
+blockquote p:first-child {
+  margin-top: 0.1rem;
+}
+
+blockquote p:last-child {
+  margin-bottom: 0.1rem;
+}
+
+.mobile-header,
+.mobile-header.scrolled {
+  border-bottom: solid 1px var(--color-background-border);
+  box-shadow: none;
+}
+
+.section[id$="package"] h1 {
+  color: var(--color-brand-content);
+}
+
+.section[id^="module"] h2 {
+  color: var(--color-brand-primary);
+  background-color: var(--color-brand-muted);
+  border-top: solid 0.2rem var(--color-brand-primary);
+  padding: 0.2rem 0.5rem;
+  /* font-family: var(--font-stack--monospace); */
+}
+
+.section[id^="module"] h2:last-child {
+  display: none;
+}
+
+.sidebar-tree .current-page > .reference {
+    background: var(--color-brand-muted);
+}
+
+.py.class,
+.py.exception,
+.py.function,
+.py.data {
+  border-top: solid 0.2rem var(--color-brand-muted);
+}
