@@ -12,7 +12,9 @@
     "It considers only ``setuptools`` `parameters",
     "<https://setuptools.pypa.io/en/latest/userguide/declarative_config.html>`_",
     "that can currently be configured via ``setup.cfg`` and are not covered by PEP 621",
-    "but intentionally excludes ``dependency_links`` and ``setup_requires``."
+    "but intentionally excludes ``dependency_links`` and ``setup_requires``.",
+    "NOTE: ``scripts`` was renamed to ``script-files`` to avoid confusion with",
+    "entry-point based scripts (defined in PEP 621)."
   ],
 
   "type": "object",
@@ -76,27 +78,18 @@
       ]
     },
     "package-dir": {
-      "type": "object",
+      "type": "string",
       "format": "python-module-name"
     },
     "package-data": {
       "type": "object",
-      "format": "python-module-name",
-      "AnyOf": [
-        {
-          "additionalProperties": false,
-          "properties": {
-            "*": {"type": "array", "items": {"type": "string"}}
-          }
-        },
-        {
-          "additionalProperties": false,
-          "propertyNames": {"format": "python-module-name"},
-          "patternProperties": {
-            "^.*$": {"type": "array", "items": {"type": "string"}}
-          }
-        }
-      ]
+      "additionalProperties": false,
+      "propertyNames": {
+        "AnyOf": [{"format": "python-module-name"}, {"const": "*"}]
+      },
+      "patternProperties": {
+        "^.*$": {"type": "array", "items": {"type": "string"}}
+      }
     },
     "include-package-data": {
       "$$description": [

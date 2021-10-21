@@ -31,7 +31,7 @@
     "readme": {
       "$$description": [
         "`Full/detailed description of the project in the form of a README",
-        "<https://www.python.org/dev/peps/pep-0621/#readme>_",
+        "<https://www.python.org/dev/peps/pep-0621/#readme>`_",
         "with meaning similar to the one defined in `core metadata's Description",
         "<https://packaging.python.org/specifications/core-metadata/#description>`_"
       ],
@@ -97,7 +97,8 @@
       ]
     },
     "license": {
-      "title": "`Project license <https://www.python.org/dev/peps/pep-0621/#license>`_",
+      "description":
+        "`Project license <https://www.python.org/dev/peps/pep-0621/#license>`_.",
       "OneOf": [
         {
           "properties": {
@@ -187,7 +188,7 @@
         "Instruct the installer to expose the given modules/functions via",
         "``entry-point`` discovery mechanism (useful for plugins).",
         "More information available in the `Python packaging guide",
-        "<https://packaging.python.org/specifications/entry-points/>_`."
+        "<https://packaging.python.org/specifications/entry-points/>`_."
       ],
       "propertyNames": {"format": "python-entrypoint-group"},
       "additionalProperties": false,
@@ -241,14 +242,18 @@
   },
   "required": ["name"],
   "if": {
-    "description": "When version is not statically defined in the ``version`` field",
-    "not": {"required": ["version"]}
+    "not": {
+      "required": ["version"],
+      "$$description": ["version is statically defined in the ``version`` field"]
+    }
   },
   "then": {
-    "properties": {"dynamic": {"contains": {"const": "version"}}},
-    "$$description": [
-      "version should be listed in ``dynamic``"
-    ]
+    "properties": {
+      "dynamic": {
+        "contains": {"const": "version"},
+        "$$description": ["version should be listed in ``dynamic``"]
+      }
+    }
   },
 
   "definitions": {
