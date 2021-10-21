@@ -9,7 +9,7 @@ The following JSON schemas are used in ``validate-pyproject``.
 ``pyproject.toml``
 ==================
 
-.. literalinclude:: ../src/validate_pyproject/pep517_518.schema.json
+.. literalinclude:: ../src/validate_pyproject/pyproject_toml.schema.json
 
 ``project`` table
 =================
