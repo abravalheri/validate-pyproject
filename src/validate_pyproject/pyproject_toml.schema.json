@@ -53,6 +53,8 @@
       "required": ["requires"]
     },
 
+    "project": {"$ref": "https://www.python.org/dev/peps/pep-0621/"},
+
     "tool": {
       "type": "object"
     }

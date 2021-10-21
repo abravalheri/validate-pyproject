@@ -3,7 +3,7 @@ from types import MappingProxyType
 from typing import Callable, Mapping, NewType, TypeVar
 
 T = TypeVar("T", bound=Mapping)
-Schema = NewType("Schema", dict)
+Schema = NewType("Schema", Mapping)  # let's assume it is immutable
 ValidationFn = Callable[[T], T]
 """Custom validation function.
 It should receive as input a mapping corresponding to the whole
