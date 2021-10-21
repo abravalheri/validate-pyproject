@@ -78,15 +78,28 @@
       ]
     },
     "package-dir": {
-      "type": "string",
-      "format": "python-module-name"
-    },
-    "package-data": {
+      "$$description": [
+        "Mapping from package to directory names.",
+        "The empty string (as key) signs that all packages are contained inside",
+        "the given directory"
+      ],
       "type": "object",
       "additionalProperties": false,
-      "propertyNames": {
-        "AnyOf": [{"format": "python-module-name"}, {"const": "*"}]
-      },
+      "propertyNames": {"format": "python-module-name-or-empty"},
+      "patternProperties": {
+        "^.*$": {"type": "string" }
+      }
+    },
+    "package-data": {
+      "$$description": [
+        "Mapping from package names to lists of glob patterns.",
+        "Usually this option is not needed when using ``include-package-data = true``",
+        "For more information on how to include data files, check ``setuptools`` `docs",
+        "<https://setuptools.pypa.io/en/latest/userguide/datafiles.html>`_."
+      ],
+      "type": "object",
+      "additionalProperties": false,
+      "propertyNames": {"format": "python-module-name-or-star"},
       "patternProperties": {
         "^.*$": {"type": "array", "items": {"type": "string"}}
       }
@@ -108,7 +121,7 @@
       ],
       "type": "object",
       "additionalProperties": false,
-      "propertyNames": {"format": "python-module-names"},
+      "propertyNames": {"format": "python-module-name"},
       "patternProperties": {
           "^.*$": {"type": "array", "items": {"type": "string"}}
       }

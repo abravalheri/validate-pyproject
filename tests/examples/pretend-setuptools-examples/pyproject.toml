@@ -28,9 +28,9 @@ dependencies = [
 [tool.setuptools]
 zip-safe = false
 include-package-data = true
-exclude-package-data = ["pkg1.*"]
+exclude-package-data = { "pkg1" = ["*.yaml"] }
 package-dir = {"" = "src"} # all the packages under the src folder
-platforms = "any"
+platforms = ["any"]
 
 [tool.setuptools.packages]
 find-namespace = { where = "src", exclude = ["tests"] }

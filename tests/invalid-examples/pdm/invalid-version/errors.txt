@@ -1,1 +1,1 @@
-data.project.version must be string
+version must be string

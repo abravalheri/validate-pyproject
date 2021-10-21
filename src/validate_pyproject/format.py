@@ -135,6 +135,20 @@ def python_identifier(value: str) -> bool:
     return value.isidentifier()
 
 
+def python_module_name(value: str) -> bool:
+    if value.startswith(".") or value.endswith("."):
+        return False
+    return all(python_identifier(m) for m in value.split("."))
+
+
+def python_module_name_or_empty(value: str) -> bool:
+    return isinstance(value, str) and len(value) == 0 or python_module_name(value)
+
+
+def python_module_name_or_star(value: str) -> bool:
+    return value == "*" or python_module_name(value)
+
+
 def python_entrypoint_group(value: str) -> bool:
     return ENTRYPOINT_GROUP_REGEX.match(value) is not None
 
