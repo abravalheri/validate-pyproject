@@ -6,7 +6,7 @@ The following sections represent the schemas used in ``validate-pyproject``.
 You can also have a look on the raw JSON files in :doc:`json-schemas`.
 
 .. _pyproject.toml:
-.. jsonschema:: ../src/validate_pyproject/pyproject_toml.schema.json.schema.json
+.. jsonschema:: ../src/validate_pyproject/pyproject_toml.schema.json
 
 
 .. _project_table:
