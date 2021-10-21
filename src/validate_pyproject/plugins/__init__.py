@@ -44,7 +44,8 @@ def iterate_entry_points(group=ENTRYPOINT_GROUP) -> Iterable[EntryPoint]:
 def load_from_entry_point(entry_point: EntryPoint) -> Plugin:
     """Carefully load the plugin, raising a meaningful message in case of errors"""
     try:
-        return entry_point.load()
+        cls = entry_point.load()
+        return cls()
     except Exception as ex:
         raise ErrorLoadingPlugin(entry_point=entry_point) from ex
 
