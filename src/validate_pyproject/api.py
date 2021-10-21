@@ -110,7 +110,8 @@ class Validator:
         self._schema: Optional[Schema] = None
         self._format_validators: Optional[Dict[str, FormatValidationFn]] = None
         self._in_format_validators = dict(format_validators)
-        self._extra_validations: Optional[List[ValidationFn]] = None
+        # REMOVED: Plugins can no longer specify extra validations
+        # >>> self._extra_validations: Optional[List[ValidationFn]] = None
         self._in_extra_validations = list(extra_validations)
 
         if plugins is ALL_PLUGINS:
@@ -128,10 +129,12 @@ class Validator:
 
     @property
     def extra_validations(self) -> List[ValidationFn]:
-        if self._extra_validations is None:
-            from_plugins = _chain_iter(p.extra_validations for p in self.plugins)
-            self._extra_validations = [*self._in_extra_validations, *from_plugins]
-        return self._extra_validations
+        # REMOVED: Plugins can no longer specify extra validations
+        # (it is too complicated to embed them)
+        # >>> if self._extra_validations is None:
+        # >>>     from_plugins = _chain_iter(p.extra_validations for p in self.plugins)
+        # >>>     self._extra_validations = [*self._in_extra_validations, *from_plugins]
+        return self._in_extra_validations
 
     @property
     def format_validators(self) -> Dict[str, FormatValidationFn]:

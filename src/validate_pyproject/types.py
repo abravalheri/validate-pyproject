@@ -1,6 +1,6 @@
 import sys
 from types import MappingProxyType
-from typing import Callable, Mapping, NewType, Sequence, TypeVar
+from typing import Callable, Mapping, NewType, TypeVar
 
 T = TypeVar("T", bound=Mapping)
 Schema = NewType("Schema", dict)
@@ -30,7 +30,6 @@ class Plugin(Protocol):
     tool_name: str
     help_text: str
     format_validators: Mapping[str, FormatValidationFn] = MappingProxyType({})
-    extra_validations: Sequence[ValidationFn] = ()
 
     @property
     def tool_schema(self) -> Schema:
