@@ -230,4 +230,7 @@ def _flatten_str(text: str) -> str:
 
 
 def _format_plugin_help(plugin: Plugin) -> str:
-    return f'- "{plugin_id(plugin)}": {_flatten_str(plugin.help_text)}.'
+    help_text = ""
+    if hasattr(plugin, "help_text") and plugin.help_text:
+        help_text = f": {_flatten_str(plugin.help_text)}"
+    return f'- "{plugin_id(plugin)}"{help_text}'

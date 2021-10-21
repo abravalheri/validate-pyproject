@@ -139,7 +139,11 @@ class Validator:
     @property
     def format_validators(self) -> Dict[str, FormatValidationFn]:
         if self._format_validators is None:
-            formats = _chain_iter(p.format_validators.items() for p in self.plugins)
+            formats = _chain_iter(
+                p.format_validators.items()
+                for p in self.plugins
+                if hasattr(p, "format_validators")
+            )
             formats = chain(self._in_format_validators.items(), formats)
             self._format_validators = dict(formats)
         return self._format_validators
