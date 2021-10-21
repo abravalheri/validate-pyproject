@@ -17,7 +17,13 @@ FormatValidationFn = Callable[[str], bool]
 if sys.version_info[:2] >= (3, 7):  # pragma: no cover
     from typing import Protocol
 else:  # pragma: no cover
-    from collections.abc import ABC as Protocol
+    try:
+        from typing_extensions import Protocol
+    except ImportError:
+        # Since we don't really need Protocol as an implementation, just for type check,
+        # we can use something else in its place in the case we are in an old version of
+        # Python.
+        from collections.abc import ABC as Protocol
 
 
 class Plugin(Protocol):
