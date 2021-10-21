@@ -3,6 +3,9 @@
     "autoformat": true,
     "textwidth": 88
   },
+  "*.json": {
+    "textwidth": 88
+  },
   "src/validate_pyproject/*/__init__.py" : {
     "alternate": "tests/test_{basename}.py",
     "type": "source"

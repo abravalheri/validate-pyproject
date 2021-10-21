@@ -1,6 +1,9 @@
 # The code in this module is mostly borrowed/adapted from PyScaffold and was originally
 # published under the MIT license
 # The original PyScaffold license can be found in 'NOTICE.txt'
+"""
+.. _entry point: https://setuptools.readthedocs.io/en/latest/userguide/entry_point.html
+"""
 
 import sys
 from textwrap import dedent
@@ -21,13 +24,10 @@ ENTRYPOINT_GROUP = "validate_pyproject.tool_validator"
 
 def iterate_entry_points(group=ENTRYPOINT_GROUP) -> Iterable[EntryPoint]:
     """Produces a generator yielding an EntryPoint object for each plugin registered
-    via `setuptools`_ entry point mechanism.
+    via ``setuptools`` `entry point`_ mechanism.
 
     This method can be used in conjunction with :obj:`load_from_entry_point` to filter
     the plugins before actually loading them.
-
-
-    .. _setuptools: https://setuptools.readthedocs.io/en/latest/userguide/entry_point.html
     """  # noqa
     entries = entry_points()
     if hasattr(entries, "select"):
@@ -54,16 +54,14 @@ def list_from_entry_points(
     filtering: Callable[[EntryPoint], bool] = lambda _: True,
 ) -> List[Plugin]:
     """Produces a list of plugin objects for each plugin registered
-    via `setuptools`_ entry point mechanism.
+    via ``setuptools`` `entry point`_ mechanism.
 
     Args:
-        group: name of the setuptools' entry_point group where plugins is being
+        group: name of the setuptools' entry point group where plugins is being
             registered
         filtering: function returning a boolean deciding if the entry point should be
             loaded and included (or not) in the final list. A ``True`` return means the
             plugin should be included.
-
-    .. _setuptools: https://setuptools.pypa.io/en/latest/userguide/entry_point.html
     """  # noqa
     return [
         load_from_entry_point(e) for e in iterate_entry_points(group) if filtering(e)

@@ -1,8 +1,19 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema",
 
-  "$id": "https://ini2toml.readthedocs.io/en/stable/setuptools_pep621.html/schema/pyproject/tool/setuptools",
-  "description": "Partial data structure for the `pyproject.toml` according to PEP 518 (missing PEP 621)",
+  "$id": "https://setuptools.pypa.io/en/latest/references/keywords.html",
+  "title": "``tool.setuptools`` table",
+  "$$description": [
+    "Please notice for the time being the ``setuptools`` project does not specify",
+    "a way of configuring builds via ``pyproject.toml``.",
+    "Therefore this schema should be taken just as a *\"thought experiment\"* on how",
+    "this *might be done*, by following the principles established in",
+    "`ini2toml <https://ini2toml.readthedocs.io/en/latest/setuptools_pep621.html>`_.",
+    "It considers only ``setuptools`` `parameters",
+    "<https://setuptools.pypa.io/en/latest/userguide/declarative_config.html>`_",
+    "that can currently be configured via ``setup.cfg`` and are not covered by PEP 621",
+    "but intentionally excludes ``dependency_links`` and ``setup_requires``."
+  ],
 
   "type": "object",
   "properties": {
@@ -11,12 +22,18 @@
       "items": {"type": "string"}
     },
     "provides": {
-      "description": "Package and virtual package names contained within this package (not supported by pip)",
+      "$$description": [
+        "Package and virtual package names contained within this package",
+        "**(not supported by pip)**"
+      ],
       "type": "array",
       "items": {"type": "string"}
     },
     "obsoletes": {
-      "description": "Packages which this package renders obsolete (not supported by pip)",
+      "$$description": [
+        "Packages which this package renders obsolete",
+        "**(not supported by pip)**"
+      ],
       "type": "array",
       "items": {"type": "string"}
     },
@@ -30,42 +47,32 @@
       "$comment": "TODO: is this field deprecated/should be removed?"
     },
     "eager-resources": {
-      "description": "Resources that should be extracted together, if any of them is needed, or if any C extensions included in the project are imported.",
+      "$$description": [
+        "Resources that should be extracted together, if any of them is needed,",
+        "or if any C extensions included in the project are imported."
+      ],
       "type": "array",
       "items": {"type": "string"}
     },
     "packages": {
+      "$$description": [
+        "Packages that should be included in the distribution.",
+        "It can be given either as a list of package identifiers",
+        "or as a ``dict``-like structure with a single key, either",
+        "``find`` or ``find-namespace``, which will be correspond to a dynamic call to",
+        "``setuptools.find_packages`` or ``setuptools.find_namespace_packages``",
+        "functions (respectively). The ``find/find-namespace`` key is",
+        "associated with a nested ``dict``-like structure that can contain the",
+        "``where``, ``include`` and ``exclude`` keys, mimicking the arguments of the",
+        "corresponding functions."
+      ],
       "OneOf": [
         {
+          "title": "Array of Python package identifiers",
           "type": "array",
           "items": {"type": "string", "format": "python-module-name"}
         },
-        {
-          "type": "object",
-          "additionalProperties": false,
-          "patternProperties": {
-            "^(find|finda-namespace)$": {
-              "type": "object",
-              "$comment": "https://setuptools.pypa.io/en/latest/userguide/package_discovery.html",
-              "properties": {
-                "where": {
-                  "type": "string",
-                  "description": "Directory to be searched for packages (Unix-style relative path)"
-                },
-                "exclude": {
-                  "type": "array",
-                  "description": "Exclude packages that match the values listed in this field. Can container shell-style wildcards",
-                  "items": {"type": "string"}
-                },
-                "include": {
-                  "type": "array",
-                  "description": "Restrict the found packages to just the ones listed in this field. Can container shell-style wildcards",
-                  "items": {"type": "string"}
-                }
-              }
-            }
-          }
-        }
+        {"$ref": "#/definitions/find-directive"}
       ]
     },
     "package-dir": {
@@ -92,12 +99,20 @@
       ]
     },
     "include-package-data": {
-      "description": "Automatically include any data files inside the package directories that are specified by `MANIFEST.in`",
-      "type": "boolean",
-      "$comment": "https://setuptools.pypa.io/en/latest/userguide/datafiles.html"
+      "$$description": [
+        "Automatically include any data files inside the package directories",
+        "that are specified by ``MANIFEST.in``",
+        "For more information on how to include data files, check ``setuptools`` `docs",
+        "<https://setuptools.pypa.io/en/latest/userguide/datafiles.html>`_."
+      ],
+      "type": "boolean"
     },
     "exclude-package-data": {
-      "description": "Mapping from package names to lists of glob patterns that should be excluded from the package directories",
+      "$$description": [
+        "Mapping from package names to lists of glob patterns that should be excluded",
+        "For more information on how to include data files, check ``setuptools`` `docs",
+        "<https://setuptools.pypa.io/en/latest/userguide/datafiles.html>`_."
+      ],
       "type": "object",
       "additionalProperties": false,
       "propertyNames": {"format": "python-module-names"},
@@ -114,36 +129,47 @@
       "description": "Modules that setuptools will manipulate",
       "type": "array",
       "items": {"type": "string", "format": "python-module-name"},
-      "$comment": "TODO: clarify the relationship with `packages`"
+      "$comment": "TODO: clarify the relationship with ``packages``"
     },
     "dynamic": {
       "type": "object",
+      "description": "Instructions for loading PEP 621-related metadata dynamically",
       "properties": {
         "version": {
-          "description": "A version dynamically loaded must comply with PEP 440.",
+          "$$description": [
+            "A version dynamically loaded via either the ``attr:`` or ``file:``",
+            "directives. Please make sure the given file or attribute respects PEP 440."
+          ],
           "OneOf": [
-            {"$ref": "/schema/pyproject/tool/setuptools/attr-directive"},
-            {"$ref": "/schema/pyproject/tool/setuptools/file-directive"}
+            {"$ref": "#/definitions/attr-directive"},
+            {"$ref": "#/definitions/file-directive"}
           ]
         },
-        "classifiers": {"$ref": "/schema/pyproject/tool/setuptools/file-directive"},
-        "description": {"$ref": "/schema/pyproject/tool/setuptools/file-directive"},
-        "readme": {"$ref": "/schema/pyproject/tool/setuptools/file-directive"},
-        "entry-points": {"$ref": "/schema/pyproject/tool/setuptools/file-directive"},
-        "scripts": {"$ref": "/schema/pyproject/tool/setuptools/file-directive"},
-        "gui-scripts": {"$ref": "/schema/pyproject/tool/setuptools/file-directive"}
+        "classifiers": {"$ref": "#/definitions/file-directive"},
+        "description": {"$ref": "#/definitions/file-directive"},
+        "readme": {"$ref": "#/definitions/file-directive"},
+        "entry-points": {"$ref": "#/definitions/file-directive"},
+        "scripts": {"$ref": "#/definitions/file-directive"},
+        "gui-scripts": {"$ref": "#/definitions/file-directive"}
       }
     },
     "commands": {
       "type": "object",
+      "$$description": [
+        "The ``tools.setuptools.commands`` subtables can be used to store default",
+        "arguments for ``distlib``-like commands, in a similar way to what can be done",
+        "in ``setup.cfg`` files."
+      ],
       "$comment": "TODO: what else can we specify? Should this table even exist?"
     }
   },
 
-  "$defs": {
+  "definitions": {
     "file-directive": {
-      "$id": "/schema/pyproject/tool/setuptools/file-directive",
-      "description": "Value is read from a file (or list of files and then concatenated)",
+      "$id": "#/definitions/file-directive",
+      "title": "'file:' directive",
+      "description":
+        "Value is read from a file (or list of files and then concatenated)",
       "type": "object",
       "additionalProperties": false,
       "properties": {
@@ -156,12 +182,54 @@
       }
     },
     "attr-directive": {
-      "$id": "/schema/pyproject/tool/setuptools/attr-directive",
-      "description": "Value is read from a module attribute. Supports callables and iterables; unsupported types are cast via str()",
+      "title": "'attr:' directive",
+      "$id": "#/definitions/attr-directive",
+      "$$description": [
+        "Value is read from a module attribute. Supports callables and iterables;",
+        "unsupported types are cast via ``str()``"
+      ],
       "type": "object",
       "additionalProperties": false,
       "properties": {
         "attr": {"type": "string"}
+      }
+    },
+    "find-directive": {
+      "$id": "#/definitions/find-directive",
+      "title": "'find:' or 'find-namespace:' directive",
+      "type": "object",
+      "additionalProperties": false,
+      "patternProperties": {
+        "^find(-namespace)?$": {
+          "type": "object",
+          "$$description": [
+            "Dynamic `package discovery",
+            "<https://setuptools.pypa.io/en/latest/userguide/package_discovery.html>`_."
+          ],
+          "properties": {
+            "where": {
+              "type": "string",
+              "description":
+                "Directory to be searched for packages (Unix-style relative path)"
+            },
+            "exclude": {
+              "type": "array",
+              "$$description": [
+                "Exclude packages that match the values listed in this field.",
+                "Can container shell-style wildcards (e.g. ``'pkg.*'``)"
+              ],
+              "items": {"type": "string"}
+            },
+            "include": {
+              "type": "array",
+              "$$description": [
+                "Restrict the found packages to just the ones listed in this field.",
+                "Can container shell-style wildcards (e.g. ``'pkg.*'``)"
+              ],
+              "items": {"type": "string"}
+            }
+          }
+        }
       }
     }
   }

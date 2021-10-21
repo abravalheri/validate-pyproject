@@ -1,8 +1,15 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema",
 
-  "$id": "https://www.python.org/dev/peps/pep-0518/schema/pyproject",
-  "description": "Partial data structure for the `pyproject.toml` according to PEP 518 (missing PEP 621)",
+  "$id": "https://www.python.org/dev/peps/pep-0517/",
+  "title": "Data structure for ``pyproject.toml`` files",
+  "$$description": [
+    "PEP 517 defines a build-system independent format for source trees",
+    "while PEP 518 provides a way of specifying the minimum system requirements",
+    "for Python projects.",
+    "Please notice the ``project`` table (as defined in  PEP 621) is not included",
+    "in this schema and should be considered separately."
+  ],
 
   "type": "object",
   "additionalProperties": false,
@@ -16,20 +23,27 @@
       "properties": {
         "requires": {
           "type": "array",
-          "description": "List dependencies (PEP 508) required to execute the build system",
-          "$comment": "The dependency graph MUST NOT contain cycles",
+          "$$description": [
+            "List of dependencies in the PEP 508 format required to execute the build",
+            "system. Please notice that the resulting dependency graph",
+            "**MUST NOT contain cycles**"
+          ],
           "items": {
             "type": "string"
           }
         },
         "build-backend": {
           "type": "string",
-          "description": "Python object that will be used to perform the build according to PEP 517",
+          "description":
+            "Python object that will be used to perform the build according to PEP 517",
           "format": "pep517-backend-reference"
         },
         "backend-path": {
           "type": "array",
-          "description": "List of directories to be prepended to `sys.path` when loading the back-end, and running its hooks",
+          "$$description": [
+            "List of directories to be prepended to ``sys.path`` when loading the",
+            "back-end, and running its hooks"
+          ],
           "items": {
             "type": "string",
             "$comment": "Should be a path (TODO: enforce it with format?)"
