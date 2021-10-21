@@ -9,9 +9,21 @@ from enum import Enum
 from functools import reduce
 from itertools import chain
 from types import MappingProxyType
-from typing import Dict, List, Mapping, Optional, Sequence, Tuple, TypeVar, Union, cast
+from typing import (
+    Callable,
+    Dict,
+    Iterator,
+    List,
+    Mapping,
+    Optional,
+    Sequence,
+    Tuple,
+    TypeVar,
+    Union,
+    cast,
+)
 
-import fastjsonschema
+import fastjsonschema as FJS
 
 from . import errors, format
 from .extra_validations import EXTRA_VALIDATIONS
@@ -39,6 +51,12 @@ else:  # pragma: no cover
 
 
 T = TypeVar("T", bound=Mapping)
+RefHandler = Mapping[str, Callable[[str], Schema]]
+""":mod:`fastjsonschema` allows passing a dict-like object to load external schema
+``$ref``s. This object should map the URI schema (e.g. ``http``, ``https``, ``ftp``) to
+a function that receives the schema URI and returns the schema (as parsed JSON).
+"""
+
 AllPlugins = Enum("AllPlugins", "ALL_PLUGINS")
 ALL_PLUGINS = AllPlugins.ALL_PLUGINS
 
@@ -61,66 +79,89 @@ def load(name: str, package: str = __package__, ext: str = ".schema.json") -> Sc
     """Load the schema from a JSON Schema file.
     The returned dict-like object is immutable.
     """
-    return Schema(MappingProxyType(json.loads(read_text(__package__, f"{name}{ext}"))))
+    return Schema(MappingProxyType(json.loads(read_text(package, f"{name}{ext}"))))
 
 
 def plugin_id(plugin: Plugin):
     return f"{plugin.__module__}.{plugin.__class__.__qualname__}"
 
 
-def ensure_compatible_schema(
-    reference: str, schema: Schema, required_version: str
-) -> Schema:
-    if "$id" not in schema:
-        raise errors.SchemaMissingId(reference)
-    version = schema.get("$schema")
-    if version and version != required_version:
-        raise errors.InvalidSchemaVersion(reference, version, required_version)
-    return schema
+class SchemaRegistry(Mapping[str, Schema]):
+    """Repository of parsed JSON Schemas used for validating a ``pyproject.toml``.
 
+    During instantiation the schemas equivalent to PEP 517, PEP 518 and PEP 621
+    will be combined with the schemas for the ``tool`` subtables provided by the
+    plugins.
 
-def combine(plugins: Sequence[Plugin] = ()) -> Tuple[Schema, Dict[str, Schema]]:
-    """Retrieve a schema that validates ``pyproject.toml`` by aggregating the
-    standard schemas and the ones provided by plugins.
-
-    It returns a tuple with two elements, being the first the main schema against which
-    ``pyproject.toml`` should be validated and the second a "registry" of secondary
-    schemas referenced by the main one in the form of a ``$id`` => ``Schema`` dict.
-
-    Please notice that all schemas provided by plugins should have a top level ``$id``.
+    Since this object work as a mapping between each schema ``$id`` and the schema
+    itself, all schemas provided by plugins **MUST** have a top level ``$id``.
     """
-    overall_schema = dict(load(TOP_LEVEL_SCHEMA))  # Make it mutable
-    schema_version = overall_schema["$schema"]
-    overall_properties = overall_schema["properties"]
-    tool_properties = overall_properties["tool"].setdefault("properties", {})
 
-    # Add PEP 621
-    project_table_schema = load(PROJECT_TABLE_SCHEMA)
-    ensure_compatible_schema(PROJECT_TABLE_SCHEMA, project_table_schema, schema_version)
-    overall_properties["project"] = {"$ref": project_table_schema["$id"]}
-    registry = {project_table_schema["$id"]: project_table_schema}
+    def __init__(self, plugins: Sequence[Plugin] = ()):
+        self._schemas: Dict[str, Tuple[str, str, Schema]] = {}
+        # (which part of the TOML, who defines, schema)
 
-    # Add tools using Plugins
+        top_level = dict(load(TOP_LEVEL_SCHEMA))  # Make it mutable
+        self._spec_version = top_level["$schema"]
+        top_properties = top_level["properties"]
+        tool_properties = top_properties["tool"].setdefault("properties", {})
 
-    for plugin in plugins:
-        pid, tool, schema = plugin_id(plugin), plugin.tool_name, plugin.tool_schema
-        if tool in tool_properties:
-            _logger.warning(f"{pid} overwrites `tool.{tool}` schema")
-        else:
-            _logger.info(f"{pid} defines `tool.{tool}` schema")
-        sid = ensure_compatible_schema(tool, schema, schema_version)["$id"]
-        if sid in registry:
+        # Add PEP 621
+        project_table_schema = load(PROJECT_TABLE_SCHEMA)
+        self._ensure_compatibility(PROJECT_TABLE_SCHEMA, project_table_schema)
+        sid = project_table_schema["$id"]
+        top_level["project"] = {"$ref": sid}
+        self._schemas = {sid: ("project", f"{__name__} - PEP621", project_table_schema)}
+
+        # Add tools using Plugins
+
+        for plugin in plugins:
+            pid, tool, schema = plugin_id(plugin), plugin.tool_name, plugin.tool_schema
+            if tool in tool_properties:
+                _logger.warning(f"{pid} overwrites `tool.{tool}` schema")
+            else:
+                _logger.info(f"{pid} defines `tool.{tool}` schema")
+            sid = self._ensure_compatibility(tool, schema)["$id"]
+            tool_properties[tool] = {"$ref": sid}
+            self._schemas[sid] = (f"tool.{tool}", pid, schema)
+
+        self._main_id = sid = top_level["$id"]
+        main_schema = Schema(MappingProxyType(top_level))  # make it immutable
+        self._schemas[sid] = ("<$ROOT>", f"{__name__} - PEP517/518", main_schema)
+
+    @property
+    def spec_version(self) -> str:
+        """Version of the JSON Schema spec in use"""
+        return self._spec_version
+
+    @property
+    def main(self) -> Schema:
+        """Top level schema for validating a ``pyproject.toml`` file"""
+        return self._schemas[self._main_id][-1]
+
+    def _ensure_compatibility(self, reference: str, schema: Schema) -> Schema:
+        if "$id" not in schema:
+            raise errors.SchemaMissingId(reference)
+        version = schema.get("$schema")
+        if version and version != self.spec_version:
+            raise errors.InvalidSchemaVersion(reference, version, self.spec_version)
+        sid = schema["$id"]
+        if sid in self._schemas:
             raise errors.SchemaWithDuplicatedId(sid)
-        tool_properties[tool] = {"$ref": sid}
-        registry[sid] = schema
+        return schema
 
-    main_schema = Schema(MappingProxyType(overall_schema))  # make it immutable
-    registry[main_schema["$id"]] = main_schema
-    return main_schema, registry  # make it immutable
+    def __getitem__(self, key: str) -> Schema:
+        return self._schemas[key][-1]
+
+    def __iter__(self) -> Iterator[str]:
+        return iter(self._schemas)
+
+    def __len__(self) -> int:
+        return len(self._schemas)
 
 
 class ForcedUriHandler(defaultdict):
-    """This object is used to force ``fastjsonschema`` to always look in the local
+    """This object is used to force :mod:`fastjsonschema` to always look in the local
     registry instead of using :mod:`urllib` to download schemas.
     """
 
@@ -150,8 +191,13 @@ class Validator:
         else:
             self.plugins = tuple(plugins)  # force immutability / read only
 
-        self.main_schema, self._schema_registry = combine(self.plugins)
-        self._handlers = ForcedUriHandler(lambda _: self.__getitem__)
+        self._schema_registry = SchemaRegistry(self.plugins)
+        self.handlers: RefHandler = ForcedUriHandler(lambda *_: self.__getitem__)
+
+    @property
+    def schema(self) -> Schema:
+        """Top level ``pyproject.toml`` JSON Schema"""
+        return self._schema_registry.main
 
     @property
     def extra_validations(self) -> List[ValidationFn]:
@@ -163,7 +209,8 @@ class Validator:
         return self._in_extra_validations
 
     @property
-    def format_validators(self) -> Dict[str, FormatValidationFn]:
+    def formats(self) -> Dict[str, FormatValidationFn]:
+        """Mapping between JSON Schema formats and functions that validates them"""
         if self._format_validators is None:
             formats = _chain_iter(
                 p.format_validators.items()
@@ -180,9 +227,8 @@ class Validator:
 
     def __call__(self, pyproject: T) -> T:
         if self._cache is None:
-            kw = {"formats": self.format_validators, "handlers": self._handlers}
-            schema = self.main_schema
-            self._cache = cast(ValidationFn, fastjsonschema.compile(schema, **kw))
+            compiled = FJS.compile(self.schema, self.handlers, self.formats)
+            self._cache = cast(ValidationFn, compiled)
 
         self._cache(pyproject)
         return reduce(lambda acc, fn: fn(acc), self.extra_validations, pyproject)
