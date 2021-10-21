@@ -35,7 +35,7 @@
         "with meaning similar to the one defined in `core metadata's Description",
         "<https://packaging.python.org/specifications/core-metadata/#description>`_"
       ],
-      "OneOf": [
+      "oneOf": [
         {
           "type": "string",
           "$$description": [
@@ -47,9 +47,9 @@
         },
         {
           "type": "object",
-          "AllOf": [
+          "allOf": [
             {
-              "AnyOf": [
+              "anyOf": [
                 {
                   "properties": {
                     "file": {
@@ -59,7 +59,8 @@
                         "of the project."
                       ]
                     }
-                  }
+                  },
+                  "required": ["file"]
                 },
                 {
                   "properties": {
@@ -67,7 +68,8 @@
                       "type": "string",
                       "description": "Full text describing the project."
                     }
-                  }
+                  },
+                  "required": ["text"]
                 }
               ]
             },
@@ -82,7 +84,8 @@
                   ],
                   "$comment": "TODO: add regex pattern or format?"
                 }
-              }
+              },
+              "required": ["content-type"]
             }
           ]
         }
@@ -99,7 +102,7 @@
     "license": {
       "description":
         "`Project license <https://www.python.org/dev/peps/pep-0621/#license>`_.",
-      "OneOf": [
+      "oneOf": [
         {
           "properties": {
             "file": {
@@ -109,7 +112,8 @@
                 "project."
               ]
             }
-          }
+          },
+          "required": ["file"]
         },
         {
           "properties": {
@@ -121,7 +125,8 @@
                 "<https://packaging.python.org/specifications/core-metadata/#license>`_."
               ]
             }
-          }
+          },
+          "required": ["text"]
         }
       ]
     },

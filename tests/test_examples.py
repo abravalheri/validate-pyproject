@@ -32,10 +32,19 @@ def invalid_examples():
     return [str(f.relative_to(INVALID)) for f in INVALID.glob("**/*.toml")]
 
 
+def _error_file(p: Path) -> Path:
+    try:
+        files = (p.with_name("errors.txt"), p.with_suffix(".errors.txt"))
+        return next(f for f in files if f.exists())
+    except StopIteration:
+        raise FileNotFoundError(f"No error file found for {p}")
+
+
 @pytest.mark.parametrize("example", invalid_examples())
 def test_invalid_examples_api(example):
-    expected_error = (INVALID / example).with_name("errors.txt").read_text("utf-8")
-    toml_equivalent = toml.load(INVALID / example)
+    example_file = INVALID / example
+    expected_error = _error_file(example_file).read_text("utf-8")
+    toml_equivalent = toml.load(example_file)
     validator = api.Validator()
     with pytest.raises(JsonSchemaValueException) as exc_info:
         validator(toml_equivalent)
@@ -47,9 +56,10 @@ def test_invalid_examples_api(example):
 @pytest.mark.parametrize("example", invalid_examples())
 def test_invalid_examples_cli(example, caplog):
     caplog.set_level(logging.DEBUG)
-    expected_error = (INVALID / example).with_name("errors.txt").read_text("utf-8")
+    example_file = INVALID / example
+    expected_error = _error_file(example_file).read_text("utf-8")
     with pytest.raises(SystemExit) as exc_info:
-        cli.main(["-i", str(INVALID / example)])
+        cli.main(["-i", str(example_file)])
     assert exc_info.value.args == (1,)
     for error in expected_error.splitlines():
         assert error in caplog.text

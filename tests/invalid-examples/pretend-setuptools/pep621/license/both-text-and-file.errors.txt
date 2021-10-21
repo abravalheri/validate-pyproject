@@ -1,0 +1,1 @@
+data.license must be valid exactly by one of oneOf definition

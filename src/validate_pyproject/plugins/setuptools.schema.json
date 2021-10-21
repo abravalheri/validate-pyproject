@@ -68,7 +68,7 @@
         "``where``, ``include`` and ``exclude`` keys, mimicking the arguments of the",
         "corresponding functions."
       ],
-      "OneOf": [
+      "oneOf": [
         {
           "title": "Array of Python package identifiers",
           "type": "array",
@@ -146,7 +146,7 @@
             "A version dynamically loaded via either the ``attr:`` or ``file:``",
             "directives. Please make sure the given file or attribute respects PEP 440."
           ],
-          "OneOf": [
+          "oneOf": [
             {"$ref": "#/definitions/attr-directive"},
             {"$ref": "#/definitions/file-directive"}
           ]
@@ -180,7 +180,7 @@
       "additionalProperties": false,
       "properties": {
         "file": {
-          "OneOf": [
+          "oneOf": [
             {"type": "string"},
             {"type": "array", "items": {"type": "string"}}
           ]
