@@ -10,7 +10,7 @@ import sys
 from contextlib import contextmanager
 from itertools import chain
 from textwrap import dedent, wrap
-from typing import Dict, List, NamedTuple, Sequence, Type, TypeVar
+from typing import Callable, Dict, List, NamedTuple, Sequence, Type, TypeVar
 
 from fastjsonschema import JsonSchemaValueException
 
@@ -20,7 +20,7 @@ from .plugins import list_from_entry_points as list_plugins_from_entry_points
 from .types import Plugin
 
 _logger = logging.getLogger(__package__)
-T = TypeVar("T", bound="CliParams")
+T = TypeVar("T", bound="NamedTuple")
 
 
 try:
@@ -109,6 +109,7 @@ def __meta__(plugins: Sequence[Plugin]) -> Dict[str, dict]:
 def parse_args(
     args: Sequence[str],
     plugins: Sequence[Plugin],
+    get_parser_spec: Callable[[Sequence[Plugin]], Dict[str, dict]] = __meta__,
     params_class: Type[T] = CliParams,  # type: ignore[assignment]
 ) -> T:
     """Parse command line parameters
@@ -120,14 +121,14 @@ def parse_args(
     """
     description = "Validate a given TOML file"
     if plugins:
-        epilog = f"The following plugins are available:\n{plugins_help(plugins)}"
+        epilog = f"The following plugins are available:\n\n{plugins_help(plugins)}"
     else:
         epilog = ""
 
     parser = argparse.ArgumentParser(
         description=description, epilog=epilog, formatter_class=Formatter
     )
-    for cli_opts in __meta__(plugins).values():
+    for cli_opts in get_parser_spec(plugins).values():
         parser.add_argument(*cli_opts.pop("flags", ()), **cli_opts)
 
     parser.set_defaults(loglevel=logging.WARNING)
@@ -218,7 +219,7 @@ class Formatter(argparse.RawTextHelpFormatter):
 
 
 def plugins_help(plugins: Sequence[Plugin]) -> str:
-    return "\n".join(_format_plugin_help(p) for p in plugins)
+    return "\n\n".join(_format_plugin_help(p) for p in plugins)
 
 
 def _flatten_str(text: str) -> str:
