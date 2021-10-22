@@ -135,11 +135,14 @@ VALIDATION_FN_CALL = re.compile(VALIDATION_FN_CALL_PATTERN, re.M | re.I)
 
 
 def _fix_generated_code(code: str) -> str:
-    # Make sure we can pass custom_formats down the function stack
+    # Currently fastjsonschema relies on a global variable for custom_formats,
+    # but that is not compatible with creating a static file,
+    # so we need to patch the compiled code and add a second argument for the function
+    # definitions and function calls
     code = VALIDATION_FN_DEF.sub(r"\1def validate\2(data, custom_formats):", code)
     code = VALIDATION_FN_CALL.sub(r"validate\1(\2, custom_formats)", code)
 
-    # Replace the pickled regexes with calls to `re.compile`
+    # Replace the pickled regexes with calls to `re.compile` (better to read)
     match = PICKLED_PATTERNS_REGEX.search(code)
     if match:
         import ast
