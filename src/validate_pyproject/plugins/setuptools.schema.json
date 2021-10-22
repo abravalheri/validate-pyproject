@@ -29,7 +29,7 @@
         "**(not supported by pip)**"
       ],
       "type": "array",
-      "items": {"type": "string"}
+      "items": {"type": "string", "format": "pep508-identifier"}
     },
     "obsoletes": {
       "$$description": [
@@ -37,9 +37,11 @@
         "**(not supported by pip)**"
       ],
       "type": "array",
-      "items": {"type": "string"}
+      "items": {"type": "string", "format": "pep508-identifier"}
     },
     "zip-safe": {
+      "description":
+        "Whether the project can be safely installed and run from a zip file.",
       "type": "boolean"
     },
     "script-files": {
