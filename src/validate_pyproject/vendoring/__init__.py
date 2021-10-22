@@ -86,8 +86,9 @@ def copy_module(name: str, output_dir: Path, replacements: Dict[str, str]) -> Pa
 def write_main(
     file_path: Path, schema: types.Schema, replacements: Dict[str, str]
 ) -> Path:
-    file_path.touch()
-    # TODO write from template
+    code = api.read_text(__name__, "main_file.template")
+    code = replace_text(code, replacements)
+    file_path.write_text(code, "UTF-8")
     return file_path
 
 
@@ -129,10 +130,14 @@ PICKLED_PATTERNS = r"^REGEX_PATTERNS = pickle.loads\((.*)\)$"
 PICKLED_PATTERNS_REGEX = re.compile(PICKLED_PATTERNS, re.M)
 VALIDATION_FN_DEF_PATTERN = r"^([\t ])*def\s*validate(_[\w_]+)?\(data\):"
 VALIDATION_FN_DEF = re.compile(VALIDATION_FN_DEF_PATTERN, re.M | re.I)
+VALIDATION_FN_CALL_PATTERN = r"(?!def\s+)\bvalidate([_\w]+)\(([_\w]+)\)"
+VALIDATION_FN_CALL = re.compile(VALIDATION_FN_CALL_PATTERN, re.M | re.I)
 
 
 def _fix_generated_code(code: str) -> str:
+    # Make sure we can pass custom_formats down the function stack
     code = VALIDATION_FN_DEF.sub(r"\1def validate\2(data, custom_formats):", code)
+    code = VALIDATION_FN_CALL.sub(r"validate\1(\2, custom_formats)", code)
 
     # Replace the pickled regexes with calls to `re.compile`
     match = PICKLED_PATTERNS_REGEX.search(code)
