@@ -14,7 +14,7 @@ FormatValidationFn = Callable[[str], bool]
 """Should return ``True`` when the input string satisfies the format"""
 
 
-if sys.version_info[:2] >= (3, 7):  # pragma: no cover
+if sys.version_info[:2] >= (3, 8):  # pragma: no cover
     from typing import Protocol
 else:  # pragma: no cover
     try:

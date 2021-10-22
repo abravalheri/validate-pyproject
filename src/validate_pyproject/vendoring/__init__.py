@@ -11,9 +11,11 @@ import fastjsonschema as FJS
 from .. import api, dist_name, types
 
 if sys.version_info[:2] >= (3, 8):
-    # TODO: Import directly (no need for conditional) when `python_requires = >= 3.8`
     from importlib import metadata as _M  # pragma: no cover
+    from re import Pattern
 else:
+    from typing import Pattern
+
     import importlib_metadata as _M  # pragma: no cover
 
 
@@ -174,7 +176,7 @@ def _find_and_load_licence(files: Optional[Sequence[_M.PackagePath]]) -> str:
         raise
 
 
-def _repr_regex(regex: re.Pattern) -> str:
+def _repr_regex(regex: Pattern) -> str:
     # Unfortunately using `pprint.pformat` is causing errors
     all_flags = ("A", "I", "DEBUG", "L", "M", "S", "X")
     flags = " | ".join(f"re.{f}" for f in all_flags if regex.flags & getattr(re, f))
