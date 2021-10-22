@@ -39,10 +39,10 @@ META: Dict[str, dict] = {
     "replacements": dict(
         flags=("-R", "--replacements"),
         default="{}",
-        metavar="REPLACEMENTS_JSON",
         type=lambda x: ensure_dict("replacements", json.loads(x)),
-        help="JSON representing a map between strings that should be replaced "
-        "in the generated files and their replacement, for example: \n"
+        help="JSON string (don't forget to quote) representing a map between strings "
+        "that should be replaced in the generated files and their replacement, "
+        "for example: \n"
         '-R \'{"from packaging import": "from .._vendor.packaging import"}\'',
     ),
 }
@@ -72,11 +72,8 @@ def parser_spec(plugins: Sequence[types.Plugin]) -> Dict[str, dict]:
 
 
 def run(args: Sequence[str] = ()):
-    if args:
-        cmd = f"python -m {cli.__package__}.{__package__} " + arg_join(args)
-    else:
-        cmd = arg_join(sys.argv)
-        args = sys.argv[1:]
+    args = args if args else sys.argv[1:]
+    cmd = f"python -m {cli.__package__}.{__package__} " + arg_join(args)
     plugins = list_plugins_from_entry_points()
     desc = 'Generate files for "vendoring" `validate-pyproject`'
     prms = cli.parse_args(args, plugins, desc, parser_spec, CliParams)  # type: ignore
