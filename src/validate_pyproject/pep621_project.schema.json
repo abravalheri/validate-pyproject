@@ -155,7 +155,11 @@
     },
     "classifiers": {
       "type": "array",
-      "items": {"type": "string"},
+      "items": {
+        "type": "string",
+        "format": "trove-classifier",
+        "description": "`PyPI classifier <https://pypi.org/classifiers/>`_."
+      },
       "$$description": [
         "`Trove classifiers <https://pypi.org/classifiers/>`_",
         "which apply to the project."
@@ -166,10 +170,7 @@
       "description": "URLs associated with the project in the form ``label => value``.",
       "additionalProperties": false,
       "patternProperties": {
-        "^.+$": {
-          "type": "string",
-          "format": "url"
-        }
+        "^.+$": {"type": "string", "format": "url"}
       }
     },
     "scripts": {

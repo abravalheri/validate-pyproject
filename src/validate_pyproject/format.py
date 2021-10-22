@@ -110,6 +110,33 @@ def pep517_backend_reference(value: str) -> bool:
 
 
 # -------------------------------------------------------------------------------------
+# Classifiers - PEP 301
+
+
+try:
+    from trove_classifiers import classifiers as _trove_classifiers
+
+    def trove_classifier(value: str) -> bool:
+        return value in _trove_classifiers
+
+
+except ImportError:
+
+    class _TroveClassifier:
+        def __init__(self):
+            self._warned = False
+            self.__name__ = "trove-classifier"
+
+        def __call__(self, value: str) -> bool:
+            if self._warned is False:
+                self._warned = True
+                _logger.warning("Install ``trove-classifiers`` to ensure validation.")
+            return True
+
+    trove_classifier = _TroveClassifier()
+
+
+# -------------------------------------------------------------------------------------
 # Non-PEP related
 
 
