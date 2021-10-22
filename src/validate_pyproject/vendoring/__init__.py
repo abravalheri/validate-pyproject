@@ -1,3 +1,4 @@
+import logging
 import os
 import re
 import sys
@@ -14,6 +15,9 @@ if sys.version_info[:2] >= (3, 8):
     from importlib import metadata as _M  # pragma: no cover
 else:
     import importlib_metadata as _M  # pragma: no cover
+
+
+_logger = logging.getLogger(__name__)
 
 
 TEXT_REPLACEMENTS = MappingProxyType(
@@ -150,7 +154,16 @@ def _fix_generated_code(code: str) -> str:
 def _find_and_load_licence(files: Optional[Sequence[_M.PackagePath]]) -> str:
     if files is None:
         raise ImportError("Could not find LICENSE for package")
-    return next(f for f in files if f.stem.upper() == "LICENSE").read_text("UTF-8")
+    try:
+        return next(f for f in files if f.stem.upper() == "LICENSE").read_text("UTF-8")
+    except FileNotFoundError:
+        msg = (
+            "Please make sure to install `validate-pyproject` and `fastjsonschema` "
+            "in a NON-EDITABLE way. This is necessary due to the issue #112 in "
+            "python/importlib_metadata."
+        )
+        _logger.warning(msg)
+        raise
 
 
 def _repr_regex(regex: re.Pattern) -> str:

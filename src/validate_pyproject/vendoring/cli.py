@@ -73,7 +73,7 @@ def parser_spec(plugins: Sequence[types.Plugin]) -> Dict[str, dict]:
 
 def run(args: Sequence[str] = ()):
     args = args if args else sys.argv[1:]
-    cmd = f"python -m {cli.__package__}.{__package__} " + arg_join(args)
+    cmd = f"python -m {__package__} " + arg_join(args)
     plugins = list_plugins_from_entry_points()
     desc = 'Generate files for "vendoring" `validate-pyproject`'
     prms = cli.parse_args(args, plugins, desc, parser_spec, CliParams)  # type: ignore
