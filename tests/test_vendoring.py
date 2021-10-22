@@ -23,7 +23,7 @@ def _vendoring_checks(path: Path):
         "fastjsonschema_exceptions.py": "class JsonSchemaValueException",
         "fastjsonschema_validations.py": "def validate(",
         "extra_validations.py": "def validate",
-        "format.py": "def pep508(",
+        "formats.py": "def pep508(",
         "NOTICE": "The relevant copyright notes and licenses are included bellow",
     }
     for file, content in files.items():

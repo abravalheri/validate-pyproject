@@ -2,7 +2,7 @@ from itertools import chain
 
 import pytest
 
-from validate_pyproject import format
+from validate_pyproject import formats
 
 _chain_iter = chain.from_iterable
 
@@ -78,7 +78,7 @@ ENTRYPOINT_EXAMPLES = {
     "example", _chain_iter(v.keys() for v in ENTRYPOINT_EXAMPLES.values())
 )
 def test_entrypoint_group(example):
-    assert format.python_entrypoint_group(example)
+    assert formats.python_entrypoint_group(example)
 
 
 @pytest.mark.parametrize(
@@ -88,12 +88,12 @@ def test_entrypoint_group(example):
     ),
 )
 def test_entrypoint_name(example):
-    assert format.python_entrypoint_name(example)
+    assert formats.python_entrypoint_name(example)
 
 
 @pytest.mark.parametrize("example", [" invalid", "=invalid", "[invalid]", "[invalid"])
 def test_entrypoint_invalid_name(example):
-    assert format.python_entrypoint_name(example) is False
+    assert formats.python_entrypoint_name(example) is False
 
 
 @pytest.mark.parametrize(
@@ -104,39 +104,39 @@ def test_entrypoint_invalid_name(example):
     ),
 )
 def test_entrypoint_references(example):
-    assert format.python_entrypoint_reference(example)
-    assert format.pep517_backend_reference(example)
-    assert format.pep517_backend_reference(example.replace(":", "."))
+    assert formats.python_entrypoint_reference(example)
+    assert formats.pep517_backend_reference(example)
+    assert formats.pep517_backend_reference(example.replace(":", "."))
 
 
 def test_entrypoint_references_with_extras():
     example = "test.module:func [invalid"
-    assert format.python_entrypoint_reference(example) is False
+    assert formats.python_entrypoint_reference(example) is False
 
     example = "test.module:func [valid]"
-    assert format.python_entrypoint_reference(example)
-    assert format.pep517_backend_reference(example) is False
+    assert formats.python_entrypoint_reference(example)
+    assert formats.pep517_backend_reference(example) is False
 
     example = "test.module:func [valid, extras]"
-    assert format.python_entrypoint_reference(example)
+    assert formats.python_entrypoint_reference(example)
 
     example = "test.module:func [??inva#%@!lid??]"
-    assert format.python_entrypoint_reference(example) is False
+    assert formats.python_entrypoint_reference(example) is False
 
 
 @pytest.mark.parametrize("example", ["module" "invalid-module"])
 def test_invalid_entrypoint_references(example):
-    assert format.python_entrypoint_reference(example) is False
+    assert formats.python_entrypoint_reference(example) is False
 
 
 @pytest.mark.parametrize("example", ["λ", "a", "_"])
 def test_valid_python_identifier(example):
-    assert format.python_identifier(example)
+    assert formats.python_identifier(example)
 
 
 @pytest.mark.parametrize("example", ["a.b", "x+y", " a", "☺"])
 def test_invalid_python_identifier(example):
-    assert format.python_identifier(example) is False
+    assert formats.python_identifier(example) is False
 
 
 @pytest.mark.parametrize(
@@ -156,7 +156,7 @@ def test_invalid_python_identifier(example):
     ],
 )
 def test_valid_pep440(example):
-    assert format.pep440(example)
+    assert formats.pep440(example)
 
 
 @pytest.mark.parametrize(
@@ -168,7 +168,7 @@ def test_valid_pep440(example):
     ],
 )
 def test_invalid_pep440(example):
-    assert format.pep440(example) is False
+    assert formats.pep440(example) is False
 
 
 @pytest.mark.parametrize(
@@ -181,7 +181,7 @@ def test_invalid_pep440(example):
     ],
 )
 def test_valid_pep508_versionspec(example):
-    assert format.pep508_versionspec(example)
+    assert formats.pep508_versionspec(example)
 
 
 @pytest.mark.parametrize(
@@ -196,7 +196,7 @@ def test_valid_pep508_versionspec(example):
     ],
 )
 def test_invalid_pep508_versionspec(example):
-    assert format.pep508_versionspec(example) is False
+    assert formats.pep508_versionspec(example) is False
 
 
 @pytest.mark.parametrize(
@@ -210,7 +210,7 @@ def test_invalid_pep508_versionspec(example):
     ],
 )
 def test_valid_url(example):
-    assert format.url(example)
+    assert formats.url(example)
 
 
 @pytest.mark.parametrize(
@@ -223,4 +223,4 @@ def test_valid_url(example):
     ],
 )
 def test_invalid_url(example):
-    assert format.url(example) is False
+    assert formats.url(example) is False

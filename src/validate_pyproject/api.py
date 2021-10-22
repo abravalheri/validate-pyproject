@@ -24,7 +24,7 @@ from typing import (
 
 import fastjsonschema as FJS
 
-from . import errors, format
+from . import errors, formats
 from .extra_validations import EXTRA_VALIDATIONS
 from .types import FormatValidationFn, Plugin, Schema, ValidationFn
 
@@ -59,7 +59,7 @@ PROJECT_TABLE_SCHEMA = "pep621_project"
 FORMAT_FUNCTIONS: Mapping[str, FormatValidationFn] = MappingProxyType(
     {
         fn.__name__.replace("_", "-"): fn
-        for fn in format.__dict__.values()
+        for fn in formats.__dict__.values()
         if callable(fn) and not fn.__name__.startswith("_")
     }
 )

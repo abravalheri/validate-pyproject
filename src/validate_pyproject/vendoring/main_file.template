@@ -2,7 +2,7 @@ from functools import reduce
 from types import MappingProxyType
 from typing import Any, Callable, Mapping
 
-from . import format
+from . import formats
 from .extra_validations import EXTRA_VALIDATIONS
 from .fastjsonschema_exceptions import JsonSchemaException, JsonSchemaValueException
 from .fastjsonschema_validations import validate as _validate
@@ -19,7 +19,7 @@ __all__ = [
 FORMAT_FUNCTIONS: Mapping[str, Callable[[str], bool]] = MappingProxyType(
     {
         fn.__name__.replace("_", "-"): fn
-        for fn in format.__dict__.values()
+        for fn in formats.__dict__.values()
         if callable(fn) and not fn.__name__.startswith("_")
     }
 )
