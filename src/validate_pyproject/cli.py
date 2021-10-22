@@ -109,6 +109,7 @@ def __meta__(plugins: Sequence[Plugin]) -> Dict[str, dict]:
 def parse_args(
     args: Sequence[str],
     plugins: Sequence[Plugin],
+    description: str = "Validate a given TOML file",
     get_parser_spec: Callable[[Sequence[Plugin]], Dict[str, dict]] = __meta__,
     params_class: Type[T] = CliParams,  # type: ignore[assignment]
 ) -> T:
@@ -119,7 +120,6 @@ def parse_args(
 
     Returns: command line parameters namespace
     """
-    description = "Validate a given TOML file"
     if plugins:
         epilog = f"The following plugins are available:\n\n{plugins_help(plugins)}"
     else:
