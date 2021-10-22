@@ -5,8 +5,8 @@ from typing import Dict, List, NamedTuple, Sequence
 
 import fastjsonschema as FJS
 
-from . import api, cli, types
-from .plugins import list_from_entry_points as list_plugins_from_entry_points
+from .. import api, cli, types
+from ..plugins import list_from_entry_points as list_plugins_from_entry_points
 
 _logger = logging.getLogger(__package__)
 
