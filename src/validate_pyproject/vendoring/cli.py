@@ -1,12 +1,13 @@
+import json
 import logging
 import sys
 from pathlib import Path
-from typing import Dict, List, NamedTuple, Sequence
+from types import MappingProxyType
+from typing import Any, Dict, List, Mapping, NamedTuple, Sequence
 
-import fastjsonschema as FJS
-
-from .. import api, cli, types
+from .. import cli, types
 from ..plugins import list_from_entry_points as list_plugins_from_entry_points
+from . import vendorify
 
 _logger = logging.getLogger(__package__)
 
@@ -17,13 +18,36 @@ META: Dict[str, dict] = {
         type=Path,
         help="Path to the directory where the files for embedding will be generated",
     ),
+    "main_file": dict(
+        flags=("-M", "--main-file"),
+        default="__init__.py",
+        help="Name of the file that will contain the main `validate` function"
+        "(default: `__init__.py`)",
+    ),
+    "replacements": dict(
+        flags=("-R", "--replacements"),
+        metavar="REPLACEMENTS_JSON",
+        type=lambda x: ensure_dict("replacements", json.loads(x)),
+        help="JSON representing a map between strings that should be replaced "
+        "in the generated files and their replacement "
+        '(e.g. `-R \'{"from packaging import": "from .._vendor.packaging import"}\')',
+    ),
 }
+
+
+def ensure_dict(name: str, value: Any) -> dict:
+    if not isinstance(value, dict):
+        msg = f"`{value.__class__.__name__}` given (value = {value!r})."
+        raise ValueError(f"`{name}` should be a dict. {msg}")
+    return value
 
 
 class CliParams(NamedTuple):
     plugins: List[types.Plugin]
-    loglevel: int = logging.WARNING
     output_dir: Path = Path(".")
+    main_file: str = "__init__.py"
+    replacements: Mapping[str, str] = MappingProxyType({})
+    loglevel: int = logging.WARNING
 
 
 def parser_spec(plugins: Sequence[types.Plugin]) -> Dict[str, dict]:
@@ -40,9 +64,7 @@ def run(args: Sequence[str] = ()):
     desc = 'Generate files for "vendoring" `validate-pyproject`'
     params = cli.parse_args(args, plugins, desc, parser_spec, CliParams)  # type: ignore
     cli.setup_logging(params.loglevel)
-    validator = api.Validator(plugins=params.plugins)
-    code = FJS.compile_to_code(validator.schema, validator.handlers, validator.formats)
-    print(code)
+    vendorify(params.output_dir, params.main_file, params.plugins, params.replacements)
     return 0
 
 

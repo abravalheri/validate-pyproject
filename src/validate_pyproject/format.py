@@ -60,19 +60,16 @@ def pep508_identifier(name: str) -> bool:
 
 try:
     try:
-        from packaging.requirements import InvalidRequirement, Requirement
+        from packaging import requirements as _req
     except ImportError:  # pragma: no cover
         # let's try setuptools vendored version
-        from setuptools._vendor.packaging.requirements import (  # type: ignore
-            InvalidRequirement,
-            Requirement,
-        )
+        from setuptools._vendor.packaging import requirements as _req  # type: ignore
 
     def pep508(value: str) -> bool:
         try:
-            Requirement(value)
+            _req.Requirement(value)
             return True
-        except InvalidRequirement:
+        except _req.InvalidRequirement:
             return False
 
 
