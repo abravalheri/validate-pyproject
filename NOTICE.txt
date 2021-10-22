@@ -1,4 +1,9 @@
-'validate-pyproject' is licensed under the MPL-2.0 license; see the LICENSE.txt file for details.
+'validate-pyproject' is licensed under the MPL-2.0 license, with the following
+copyright notice:
+
+  Copyright (c) 2021, Anderson Bravalheri
+
+see the LICENSE.txt file for details.
 
 A few extra files, derived from other opensource projects are collocated in
 this code base ('tests/examples' and 'tests/invalid-examples') exclusively for
