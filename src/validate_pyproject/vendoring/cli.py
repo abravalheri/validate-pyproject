@@ -9,28 +9,41 @@ from .. import cli, types
 from ..plugins import list_from_entry_points as list_plugins_from_entry_points
 from . import vendorify
 
+if sys.platform == "win32":  # pragma: no cover
+    from subprocess import list2cmdline as arg_join
+elif sys.version_info[:2] >= (3, 8):  # pragma: no cover
+    from shlex import join as arg_join
+else:  # pragma: no cover
+    from shlex import quote
+
+    def arg_join(args: Sequence[str]) -> str:
+        return " ".join(quote(x) for x in args)
+
+
 _logger = logging.getLogger(__package__)
 
 META: Dict[str, dict] = {
     "output_dir": dict(
-        flags=("-o", "--output-dir"),
+        flags=("-O", "--output-dir"),
         default=".",
         type=Path,
-        help="Path to the directory where the files for embedding will be generated",
+        help="Path to the directory where the files for embedding will be generated "
+        "(default: current working directory)",
     ),
     "main_file": dict(
         flags=("-M", "--main-file"),
         default="__init__.py",
         help="Name of the file that will contain the main `validate` function"
-        "(default: `__init__.py`)",
+        "(default: `%(default)s`)",
     ),
     "replacements": dict(
         flags=("-R", "--replacements"),
+        default="{}",
         metavar="REPLACEMENTS_JSON",
         type=lambda x: ensure_dict("replacements", json.loads(x)),
         help="JSON representing a map between strings that should be replaced "
-        "in the generated files and their replacement "
-        '(e.g. `-R \'{"from packaging import": "from .._vendor.packaging import"}\')',
+        "in the generated files and their replacement, for example: \n"
+        '-R \'{"from packaging import": "from .._vendor.packaging import"}\'',
     ),
 }
 
@@ -59,12 +72,16 @@ def parser_spec(plugins: Sequence[types.Plugin]) -> Dict[str, dict]:
 
 
 def run(args: Sequence[str] = ()):
-    args = args or sys.argv[1:]
+    if args:
+        cmd = f"python -m {cli.__package__}.{__package__} " + arg_join(args)
+    else:
+        cmd = arg_join(sys.argv)
+        args = sys.argv[1:]
     plugins = list_plugins_from_entry_points()
     desc = 'Generate files for "vendoring" `validate-pyproject`'
-    params = cli.parse_args(args, plugins, desc, parser_spec, CliParams)  # type: ignore
-    cli.setup_logging(params.loglevel)
-    vendorify(params.output_dir, params.main_file, params.plugins, params.replacements)
+    prms = cli.parse_args(args, plugins, desc, parser_spec, CliParams)  # type: ignore
+    cli.setup_logging(prms.loglevel)
+    vendorify(prms.output_dir, prms.main_file, cmd, prms.plugins, prms.replacements)
     return 0
 
 

@@ -1,0 +1,28 @@
+from functools import reduce
+from typing import Mapping, Callable, Any
+from types import MappingProxyType
+
+from . import format
+from .extra_validations import EXTRA_VALIDATIONS
+from .fastjsonschema_validations import validate as _validate
+
+
+__all__ = ["validate", "FORMAT_FUNCTIONS", "EXTRA_VALIDATIONS"]
+
+
+FORMAT_FUNCTIONS: Mapping[str, Callable[[str], bool]] = MappingProxyType(
+    {
+        fn.__name__.replace("_", "-"): fn
+        for fn in format.__dict__.values()
+        if callable(fn) and not fn.__name__.startswith("_")
+    }
+)
+
+
+def validate(data: Any) -> bool:
+    """Validate the given ``data`` object using JSON Schema
+    This function raises ``JsonSchemaValueException`` if ``data`` is invalid.
+    """
+    _validate(data, custom_formats=FORMAT_FUNCTIONS)
+    reduce(lambda acc, fn: fn(acc), EXTRA_VALIDATIONS, data)
+    return True

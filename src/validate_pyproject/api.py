@@ -60,7 +60,7 @@ FORMAT_FUNCTIONS: Mapping[str, FormatValidationFn] = MappingProxyType(
     {
         fn.__name__.replace("_", "-"): fn
         for fn in format.__dict__.values()
-        if callable(fn)
+        if callable(fn) and not fn.__name__.startswith("_")
     }
 )
 
