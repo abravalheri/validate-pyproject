@@ -4,6 +4,7 @@ branch = True
 source = validate_pyproject
 omit =
     */validate_pyproject/__main__.py
+    */validate_pyproject/**/__main__.py
 
 [paths]
 source =
