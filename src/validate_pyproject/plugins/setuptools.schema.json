@@ -168,7 +168,7 @@
     "commands": {
       "type": "object",
       "$$description": [
-        "The ``tools.setuptools.commands`` subtables can be used to store default",
+        "The ``tool.setuptools.commands`` subtables can be used to store default",
         "arguments for ``distlib``-like commands, in a similar way to what can be done",
         "in ``setup.cfg`` files."
       ],
