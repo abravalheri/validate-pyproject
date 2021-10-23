@@ -127,7 +127,9 @@
       ],
       "type": "object",
       "additionalProperties": false,
-      "propertyNames": {"format": "python-module-name"},
+      "propertyNames": {
+        "oneOf": [{"format": "python-module-name"}, {"const": "*"}]
+      },
       "patternProperties": {
           "^.*$": {"type": "array", "items": {"type": "string"}}
       }
@@ -164,15 +166,6 @@
         "scripts": {"$ref": "#/definitions/file-directive"},
         "gui-scripts": {"$ref": "#/definitions/file-directive"}
       }
-    },
-    "commands": {
-      "type": "object",
-      "$$description": [
-        "The ``tool.setuptools.commands`` subtables can be used to store default",
-        "arguments for ``distlib``-like commands, in a similar way to what can be done",
-        "in ``setup.cfg`` files."
-      ],
-      "$comment": "TODO: what else can we specify? Should this table even exist?"
     }
   },
 

@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+
+  "$id": "https://docs.python.org/3/install/",
+  "title": "``tool.distutils`` table",
+  "$$description": [
+    "Originally, ``distutils`` allowed developers to configure arguments for",
+    "``setup.py`` scripts via `distutils configuration files",
+    "<https://docs.python.org/3/install/#distutils-configuration-files>`_.",
+    "``tool.distutils`` subtables could be used with the same purpose",
+    "(NOT CURRENTLY IMPLEMENTED)."
+  ],
+
+  "type": "object",
+  "properties": {
+    "global": {
+      "type": "object",
+      "description": "Global options applied to all ``distutils`` commands"
+    }
+  },
+  "patternProperties": {
+    ".+": {"type": "object"}
+  },
+  "$comment": "TODO: Is there a practical way of making this schema more specific?"
+}
