@@ -10,15 +10,15 @@ import fastjsonschema as FJS
 
 from .. import api, dist_name, types
 
-if sys.version_info[:2] >= (3, 8):
-    from importlib import metadata as _M  # pragma: no cover
+if sys.version_info[:2] >= (3, 8):  # pragma: no cover
+    from importlib import metadata as _M
     from re import Pattern
-else:
+else:  # pragma: no cover
     from typing import Pattern
 
-    import importlib_metadata as _M  # pragma: no cover
+    import importlib_metadata as _M
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from ..plugins import PluginWrapper  # noqa
 
 
@@ -165,11 +165,11 @@ def _fix_generated_code(code: str) -> str:
 
 
 def _find_and_load_licence(files: Optional[Sequence[_M.PackagePath]]) -> str:
-    if files is None:
+    if files is None:  # pragma: no cover
         raise ImportError("Could not find LICENSE for package")
     try:
         return next(f for f in files if f.stem.upper() == "LICENSE").read_text("UTF-8")
-    except FileNotFoundError:
+    except FileNotFoundError:  # pragma: no cover
         msg = (
             "Please make sure to install `validate-pyproject` and `fastjsonschema` "
             "in a NON-EDITABLE way. This is necessary due to the issue #112 in "

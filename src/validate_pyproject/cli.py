@@ -37,7 +37,7 @@ def critical_logging():
     """Make sure the logging level is set even before parsing the CLI args"""
     try:
         yield
-    except Exception:
+    except Exception:  # pragma: no cover
         if "-vv" in sys.argv or "--very-verbose" in sys.argv:
             setup_logging(logging.DEBUG)
         raise
@@ -122,10 +122,9 @@ def parse_args(
 
     Returns: command line parameters namespace
     """
+    epilog = ""
     if plugins:
         epilog = f"The following plugins are available:\n\n{plugins_help(plugins)}"
-    else:
-        epilog = ""
 
     parser = argparse.ArgumentParser(
         description=description, epilog=epilog, formatter_class=Formatter
@@ -227,8 +226,6 @@ def plugins_help(plugins: Sequence[PluginWrapper]) -> str:
 
 
 def _flatten_str(text: str) -> str:
-    if not text:
-        return text
     text = " ".join(x.strip() for x in dedent(text).splitlines()).strip()
     text = text.rstrip(".,;").strip()
     return (text[0].lower() + text[1:]).strip()
@@ -237,5 +234,5 @@ def _flatten_str(text: str) -> str:
 def _format_plugin_help(plugin: PluginWrapper) -> str:
     help_text = plugin.help_text
     if help_text:
-        help_text = f": {_flatten_str(plugin.help_text)}"
+        help_text = f": {_flatten_str(help_text)}"
     return f'- "{plugin.tool}"{help_text}'
