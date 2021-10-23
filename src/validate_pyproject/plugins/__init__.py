@@ -53,11 +53,11 @@ def iterate_entry_points(group=ENTRYPOINT_GROUP) -> Iterable[EntryPoint]:
     the plugins before actually loading them.
     """  # noqa
     entries = entry_points()
-    if hasattr(entries, "select"):
+    if hasattr(entries, "select"):  # pragma: no cover
         # The select method was introduced in importlib_metadata 3.9 (and Python 3.10)
         # and the previous dict interface was declared deprecated
         entries_ = entries.select(group=group)  # type: ignore
-    else:
+    else:  # pragma: no cover
         # TODO: Once Python 3.10 becomes the oldest version supported, this fallback and
         #       conditional statement can be removed.
         entries_ = (plugin for plugin in entries.get(group, []))
