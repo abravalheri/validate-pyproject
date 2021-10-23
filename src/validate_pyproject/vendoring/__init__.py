@@ -4,7 +4,7 @@ import re
 import sys
 from pathlib import Path
 from types import MappingProxyType
-from typing import Dict, Mapping, Optional, Sequence, Union
+from typing import TYPE_CHECKING, Dict, Mapping, Optional, Sequence, Union
 
 import fastjsonschema as FJS
 
@@ -17,6 +17,9 @@ else:
     from typing import Pattern
 
     import importlib_metadata as _M  # pragma: no cover
+
+if TYPE_CHECKING:
+    from ..plugins import PluginWrapper  # noqa
 
 
 _logger = logging.getLogger(__name__)
@@ -33,7 +36,7 @@ def vendorify(
     output_dir: Union[str, os.PathLike] = ".",
     main_file: str = "__init__.py",
     original_cmd: str = "",
-    plugins: Union[api.AllPlugins, Sequence[types.Plugin]] = api.ALL_PLUGINS,
+    plugins: Union[api.AllPlugins, Sequence["PluginWrapper"]] = api.ALL_PLUGINS,
     text_replacements: Mapping[str, str] = TEXT_REPLACEMENTS,
 ) -> Path:
     """Populate the given ``output_dir`` with all files necessary to perform

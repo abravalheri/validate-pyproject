@@ -5,7 +5,8 @@ from pathlib import Path
 from types import MappingProxyType
 from typing import Any, Dict, List, Mapping, NamedTuple, Sequence
 
-from .. import cli, types
+from .. import cli
+from ..plugins import PluginWrapper
 from ..plugins import list_from_entry_points as list_plugins_from_entry_points
 from . import vendorify
 
@@ -56,14 +57,14 @@ def ensure_dict(name: str, value: Any) -> dict:
 
 
 class CliParams(NamedTuple):
-    plugins: List[types.Plugin]
+    plugins: List[PluginWrapper]
     output_dir: Path = Path(".")
     main_file: str = "__init__.py"
     replacements: Mapping[str, str] = MappingProxyType({})
     loglevel: int = logging.WARNING
 
 
-def parser_spec(plugins: Sequence[types.Plugin]) -> Dict[str, dict]:
+def parser_spec(plugins: Sequence[PluginWrapper]) -> Dict[str, dict]:
     common = ("version", "enable", "disable", "verbose", "very_verbose")
     cli_spec = cli.__meta__(plugins)
     meta = {k: v.copy() for k, v in META.items()}

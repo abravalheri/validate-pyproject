@@ -15,9 +15,9 @@ from typing import Callable, Dict, List, NamedTuple, Sequence, Type, TypeVar
 from fastjsonschema import JsonSchemaValueException
 
 from . import __version__
-from .api import Validator, plugin_id
+from .api import Validator
+from .plugins import PluginWrapper
 from .plugins import list_from_entry_points as list_plugins_from_entry_points
-from .types import Plugin
 
 _logger = logging.getLogger(__package__)
 T = TypeVar("T", bound=NamedTuple)
@@ -95,22 +95,24 @@ META: Dict[str, dict] = {
 
 class CliParams(NamedTuple):
     input_file: io.TextIOBase
-    plugins: List[Plugin]
+    plugins: List[PluginWrapper]
     loglevel: int = logging.WARNING
     dump_json: bool = False
 
 
-def __meta__(plugins: Sequence[Plugin]) -> Dict[str, dict]:
+def __meta__(plugins: Sequence[PluginWrapper]) -> Dict[str, dict]:
     """'Hyper parameters' to instruct :mod:`argparse` how to create the CLI"""
-    return {k: v.copy() for k, v in META.items()}
+    meta = {k: v.copy() for k, v in META.items()}
+    meta["enable"]["choices"] = set([p.tool for p in plugins])
+    return meta
 
 
 @critical_logging()
 def parse_args(
     args: Sequence[str],
-    plugins: Sequence[Plugin],
+    plugins: Sequence[PluginWrapper],
     description: str = "Validate a given TOML file",
-    get_parser_spec: Callable[[Sequence[Plugin]], Dict[str, dict]] = __meta__,
+    get_parser_spec: Callable[[Sequence[PluginWrapper]], Dict[str, dict]] = __meta__,
     params_class: Type[T] = CliParams,  # type: ignore[assignment]
 ) -> T:
     """Parse command line parameters
@@ -140,13 +142,15 @@ def parse_args(
 
 
 def select_plugins(
-    plugins: Sequence[Plugin], enabled: Sequence[str] = (), disabled: Sequence[str] = ()
-) -> List[Plugin]:
+    plugins: Sequence[PluginWrapper],
+    enabled: Sequence[str] = (),
+    disabled: Sequence[str] = (),
+) -> List[PluginWrapper]:
     available = list(plugins)
     if enabled:
-        available = [p for p in available if plugin_id(p) in enabled]
+        available = [p for p in available if p.tool in enabled]
     if disabled:
-        available = [p for p in available if plugin_id(p) not in disabled]
+        available = [p for p in available if p.tool not in disabled]
     return available
 
 
@@ -193,7 +197,7 @@ def run(args: Sequence[str] = ()):
           (for example  ``["--verbose", "setup.cfg"]``).
     """
     args = args or sys.argv[1:]
-    plugins: List[Plugin] = list_plugins_from_entry_points()
+    plugins: List[PluginWrapper] = list_plugins_from_entry_points()
     params: CliParams = parse_args(args, plugins)
     setup_logging(params.loglevel)
     validator = Validator(plugins=params.plugins)
@@ -218,7 +222,7 @@ class Formatter(argparse.RawTextHelpFormatter):
         return list(chain.from_iterable(wrap(x, width) for x in text.splitlines()))
 
 
-def plugins_help(plugins: Sequence[Plugin]) -> str:
+def plugins_help(plugins: Sequence[PluginWrapper]) -> str:
     return "\n\n".join(_format_plugin_help(p) for p in plugins)
 
 
@@ -230,8 +234,8 @@ def _flatten_str(text: str) -> str:
     return (text[0].lower() + text[1:]).strip()
 
 
-def _format_plugin_help(plugin: Plugin) -> str:
-    help_text = ""
-    if hasattr(plugin, "help_text") and plugin.help_text:
+def _format_plugin_help(plugin: PluginWrapper) -> str:
+    help_text = plugin.help_text
+    if help_text:
         help_text = f": {_flatten_str(plugin.help_text)}"
-    return f'- "{plugin_id(plugin)}"{help_text}'
+    return f'- "{plugin.tool}"{help_text}'

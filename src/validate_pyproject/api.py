@@ -9,10 +9,10 @@ from functools import reduce
 from itertools import chain
 from types import MappingProxyType
 from typing import (
+    TYPE_CHECKING,
     Callable,
     Dict,
     Iterator,
-    List,
     Mapping,
     Optional,
     Sequence,
@@ -26,7 +26,10 @@ import fastjsonschema as FJS
 
 from . import errors, formats
 from .extra_validations import EXTRA_VALIDATIONS
-from .types import FormatValidationFn, Plugin, Schema, ValidationFn
+from .types import FormatValidationFn, Schema, ValidationFn
+
+if TYPE_CHECKING:
+    from .plugins import PluginWrapper  # noqa
 
 if sys.version_info[:2] >= (3, 7):  # pragma: no cover
     # TODO: Import directly (no need for conditional) when `python_requires = >= 3.7`
@@ -75,8 +78,8 @@ def load(name: str, package: str = __package__, ext: str = ".schema.json") -> Sc
     return Schema(MappingProxyType(json.loads(read_text(package, f"{name}{ext}"))))
 
 
-def plugin_id(plugin: Plugin):
-    return f"{plugin.__module__}.{plugin.__class__.__qualname__}"
+def load_builtin_plugin(name: str) -> Schema:
+    return load(name, f"{__package__}.plugins")
 
 
 class SchemaRegistry(Mapping[str, Schema]):
@@ -90,7 +93,7 @@ class SchemaRegistry(Mapping[str, Schema]):
     itself, all schemas provided by plugins **MUST** have a top level ``$id``.
     """
 
-    def __init__(self, plugins: Sequence[Plugin] = ()):
+    def __init__(self, plugins: Sequence["PluginWrapper"] = ()):
         self._schemas: Dict[str, Tuple[str, str, Schema]] = {}
         # (which part of the TOML, who defines, schema)
 
@@ -109,9 +112,9 @@ class SchemaRegistry(Mapping[str, Schema]):
         # Add tools using Plugins
 
         for plugin in plugins:
-            pid, tool, schema = plugin_id(plugin), plugin.tool_name, plugin.tool_schema
-            if tool in tool_properties:
-                _logger.warning(f"{pid} overwrites `tool.{tool}` schema")
+            pid, tool, schema = plugin.id, plugin.tool, plugin.schema
+            if plugin.tool in tool_properties:
+                _logger.warning(f"{plugin.id} overwrites `tool.{plugin.tool}` schema")
             else:
                 _logger.info(f"{pid} defines `tool.{tool}` schema")
             sid = self._ensure_compatibility(tool, schema)["$id"]
@@ -186,26 +189,25 @@ class RefHandler(Mapping[str, Callable[[str], Schema]]):
 class Validator:
     def __init__(
         self,
-        plugins: Union[Sequence[Plugin], AllPlugins] = ALL_PLUGINS,
+        plugins: Union[Sequence["PluginWrapper"], AllPlugins] = ALL_PLUGINS,
         format_validators: Mapping[str, FormatValidationFn] = FORMAT_FUNCTIONS,
         extra_validations: Sequence[ValidationFn] = EXTRA_VALIDATIONS,
     ):
         self._cache: Optional[ValidationFn] = None
         self._schema: Optional[Schema] = None
-        self._format_validators: Optional[Dict[str, FormatValidationFn]] = None
-        self._in_format_validators = dict(format_validators)
-        # REMOVED: Plugins can no longer specify extra validations
-        # >>> self._extra_validations: Optional[List[ValidationFn]] = None
-        self._in_extra_validations = list(extra_validations)
+
+        # Let's make the following options readonly
+        self._format_validators = MappingProxyType(format_validators)
+        self._extra_validations = tuple(extra_validations)
 
         if plugins is ALL_PLUGINS:
             from .plugins import list_from_entry_points
 
-            self.plugins = tuple(list_from_entry_points())
+            self._plugins = tuple(list_from_entry_points())
         else:
-            self.plugins = tuple(plugins)  # force immutability / read only
+            self._plugins = tuple(plugins)  # force immutability / read only
 
-        self._schema_registry = SchemaRegistry(self.plugins)
+        self._schema_registry = SchemaRegistry(self._plugins)
         self.handlers = RefHandler(self._schema_registry)
 
     @property
@@ -214,25 +216,13 @@ class Validator:
         return self._schema_registry.main
 
     @property
-    def extra_validations(self) -> List[ValidationFn]:
-        # REMOVED: Plugins can no longer specify extra validations
-        # (it is too complicated to embed them)
-        # >>> if self._extra_validations is None:
-        # >>>     from_plugins = _chain_iter(p.extra_validations for p in self.plugins)
-        # >>>     self._extra_validations = [*self._in_extra_validations, *from_plugins]
-        return self._in_extra_validations
+    def extra_validations(self) -> Sequence[ValidationFn]:
+        """List of extra validation functions that run after the JSON Schema check"""
+        return self._extra_validations
 
     @property
-    def formats(self) -> Dict[str, FormatValidationFn]:
+    def formats(self) -> Mapping[str, FormatValidationFn]:
         """Mapping between JSON Schema formats and functions that validates them"""
-        if self._format_validators is None:
-            formats = _chain_iter(
-                p.format_validators.items()
-                for p in self.plugins
-                if hasattr(p, "format_validators")
-            )
-            formats = chain(self._in_format_validators.items(), formats)
-            self._format_validators = dict(formats)
         return self._format_validators
 
     def __getitem__(self, schema_id: str) -> Schema:

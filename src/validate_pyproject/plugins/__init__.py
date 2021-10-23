@@ -6,6 +6,8 @@
 """
 
 import sys
+from dataclasses import dataclass
+from string import Template
 from textwrap import dedent
 from typing import Callable, Iterable, List, Optional
 
@@ -19,7 +21,28 @@ else:  # pragma: no cover
     from importlib_metadata import EntryPoint, entry_points
 
 
-ENTRYPOINT_GROUP = "validate_pyproject.tool_validator"
+ENTRYPOINT_GROUP = "validate_pyproject.tool_schema"
+
+
+@dataclass
+class PluginWrapper:
+    tool: str
+    load_fn: Plugin
+
+    @property
+    def id(self):
+        return f"{self.load_fn.__module__}.{self.load_fn.__name__}"
+
+    @property
+    def schema(self):
+        return self.load_fn(self.tool)
+
+    @property
+    def help_text(self) -> str:
+        tpl = self.load_fn.__doc__
+        if not tpl:
+            return ""
+        return Template(tpl).safe_substitute(tool=self.tool, id=self.id)
 
 
 def iterate_entry_points(group=ENTRYPOINT_GROUP) -> Iterable[EntryPoint]:
@@ -41,11 +64,11 @@ def iterate_entry_points(group=ENTRYPOINT_GROUP) -> Iterable[EntryPoint]:
     return sorted(entries_, key=lambda e: e.name)
 
 
-def load_from_entry_point(entry_point: EntryPoint) -> Plugin:
+def load_from_entry_point(entry_point: EntryPoint) -> PluginWrapper:
     """Carefully load the plugin, raising a meaningful message in case of errors"""
     try:
-        cls = entry_point.load()
-        return cls()
+        fn = entry_point.load()
+        return PluginWrapper(entry_point.name, fn)
     except Exception as ex:
         raise ErrorLoadingPlugin(entry_point=entry_point) from ex
 
@@ -53,7 +76,7 @@ def load_from_entry_point(entry_point: EntryPoint) -> Plugin:
 def list_from_entry_points(
     group: str = ENTRYPOINT_GROUP,
     filtering: Callable[[EntryPoint], bool] = lambda _: True,
-) -> List[Plugin]:
+) -> List[PluginWrapper]:
     """Produces a list of plugin objects for each plugin registered
     via ``setuptools`` `entry point`_ mechanism.
 
