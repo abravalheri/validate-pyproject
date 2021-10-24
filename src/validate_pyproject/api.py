@@ -29,7 +29,7 @@ from . import errors, formats
 from .extra_validations import EXTRA_VALIDATIONS
 from .types import FormatValidationFn, Schema, ValidationFn
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from .plugins import PluginWrapper  # noqa
 
 if sys.version_info[:2] >= (3, 7):  # pragma: no cover
@@ -142,8 +142,8 @@ class SchemaRegistry(Mapping[str, Schema]):
         if sid in self._schemas:
             raise errors.SchemaWithDuplicatedId(sid)
         version = schema.get("$schema")
-        if version and version != self._spec_version:
-            raise errors.InvalidSchemaVersion(reference, version, self._spec_version)
+        if version and version != self.spec_version:
+            raise errors.InvalidSchemaVersion(reference, version, self.spec_version)
         return schema
 
     def __getitem__(self, key: str) -> Schema:
@@ -169,11 +169,10 @@ class RefHandler(Mapping[str, Callable[[str], Schema]]):
         self._registry = registry
 
     def __contains__(self, key) -> bool:
-        if not isinstance(key, str):
-            return False
-        if key not in self._uri_schemas:
+        return_val = isinstance(key, str)
+        if return_val and key not in self._uri_schemas:
             self._uri_schemas.append(key)
-        return True
+        return return_val
 
     def __iter__(self) -> Iterator[str]:
         return iter(self._uri_schemas)
