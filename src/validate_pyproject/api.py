@@ -98,7 +98,7 @@ class SchemaRegistry(Mapping[str, Schema]):
         self._schemas: Dict[str, Tuple[str, str, Schema]] = {}
         # (which part of the TOML, who defines, schema)
 
-        top_level = load(TOP_LEVEL_SCHEMA)  # Make it mutable
+        top_level = cast(dict, load(TOP_LEVEL_SCHEMA))  # Make it mutable
         self._spec_version = top_level["$schema"]
         top_properties = top_level["properties"]
         tool_properties = top_properties["tool"].setdefault("properties", {})
@@ -123,7 +123,8 @@ class SchemaRegistry(Mapping[str, Schema]):
             self._schemas[sid] = (f"tool.{tool}", pid, schema)
 
         self._main_id = sid = top_level["$id"]
-        self._schemas[sid] = ("<$ROOT>", f"{__name__} - PEP517/518", top_level)
+        main_schema = Schema(top_level)
+        self._schemas[sid] = ("<$ROOT>", f"{__name__} - PEP517/518", main_schema)
 
     @property
     def spec_version(self) -> str:
