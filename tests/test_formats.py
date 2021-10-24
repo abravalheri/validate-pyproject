@@ -1,3 +1,4 @@
+import logging
 from itertools import chain
 
 import pytest
@@ -94,6 +95,13 @@ def test_entrypoint_name(example):
 @pytest.mark.parametrize("example", [" invalid", "=invalid", "[invalid]", "[invalid"])
 def test_entrypoint_invalid_name(example):
     assert formats.python_entrypoint_name(example) is False
+
+
+@pytest.mark.parametrize("example", ["val[id", "also valid"])
+def test_entrypoint_name_not_recommended(example, caplog):
+    caplog.set_level(logging.WARNING)
+    assert formats.python_entrypoint_name(example) is True
+    assert "does not follow recommended pattern" in caplog.text
 
 
 @pytest.mark.parametrize(
@@ -216,6 +224,8 @@ def test_valid_url(example):
 @pytest.mark.parametrize(
     "example",
     [
+        "",
+        42,
         "p@python.org",
         "python.org",
         "http:python.org",
@@ -224,3 +234,28 @@ def test_valid_url(example):
 )
 def test_invalid_url(example):
     assert formats.url(example) is False
+
+
+@pytest.mark.parametrize(
+    "example",
+    [
+        "ab",
+        "ab.c.d",
+        "abc._d.λ",
+    ],
+)
+def test_valid_module_name(example):
+    assert formats.python_module_name(example) is True
+
+
+@pytest.mark.parametrize(
+    "example",
+    [
+        "-",
+        " ",
+        "ab-cd",
+        ".example",
+    ],
+)
+def test_invalid_module_name(example):
+    assert formats.python_module_name(example) is False

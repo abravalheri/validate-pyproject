@@ -117,7 +117,7 @@ try:
         return value in _trove_classifiers
 
 
-except ImportError:
+except ImportError:  # pragma: no cover
 
     class _TroveClassifier:
         def __init__(self):
