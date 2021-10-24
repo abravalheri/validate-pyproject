@@ -5,6 +5,8 @@ JSON Schemas
 ============
 
 The following JSON schemas are used in ``validate-pyproject``.
+Automatically generated documentation is also available on the
+:doc:`schemas` page.
 
 ``pyproject.toml``
 ==================

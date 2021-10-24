@@ -50,7 +50,8 @@ META: Dict[str, dict] = {
         version=f"{__package__} {__version__}",
     ),
     "input_file": dict(
-        flags=("-i", "--input-file"),
+        dest="input_file",
+        nargs="?",
         default="-",
         type=argparse.FileType("r"),
         help="TOML file to be verified (`stdin` by default)",

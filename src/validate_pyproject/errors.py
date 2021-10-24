@@ -1,6 +1,10 @@
 from textwrap import dedent
 
-from fastjsonschema import JsonSchemaDefinitionException
+from fastjsonschema import (
+    JsonSchemaDefinitionException,
+    JsonSchemaException,
+    JsonSchemaValueException,
+)
 
 
 class InvalidSchemaVersion(JsonSchemaDefinitionException):
@@ -37,3 +41,13 @@ class SchemaWithDuplicatedId(JsonSchemaDefinitionException):
     def __init__(self, schema_id: str):
         msg = dedent(self.__doc__ or "").strip()
         super().__init__(msg.format(schema_id=schema_id))
+
+
+__all__ = [
+    "InvalidSchemaVersion",
+    "JsonSchemaDefinitionException",
+    "JsonSchemaException",
+    "JsonSchemaValueException",
+    "SchemaMissingId",
+    "SchemaWithDuplicatedId",
+]

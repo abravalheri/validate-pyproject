@@ -18,7 +18,7 @@ def test_examples_api(example):
 
 @pytest.mark.parametrize("example", examples())
 def test_examples_cli(example):
-    assert cli.run(["--dump-json", "-i", str(EXAMPLES / example)]) == 0  # no errors
+    assert cli.run(["--dump-json", str(EXAMPLES / example)]) == 0  # no errors
 
 
 @pytest.mark.parametrize("example", invalid_examples())
@@ -40,7 +40,7 @@ def test_invalid_examples_cli(example, caplog):
     example_file = INVALID / example
     expected_error = error_file(example_file).read_text("utf-8")
     with pytest.raises(SystemExit) as exc_info:
-        cli.main(["-i", str(example_file)])
+        cli.main([str(example_file)])
     assert exc_info.value.args == (1,)
     for error in expected_error.splitlines():
         assert error in caplog.text

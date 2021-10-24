@@ -70,7 +70,7 @@ class TestEnable:
 
     @pytest.mark.parametrize("tool, other_tool", zip(TOOLS, reversed(TOOLS)))
     def test_parse(self, valid_example, tool, other_tool):
-        params = parse_args(["-i", str(valid_example), "-E", tool])
+        params = parse_args([str(valid_example), "-E", tool])
         assert len(params.plugins) == 1
         assert params.plugins[0].tool == tool
 
@@ -81,16 +81,16 @@ class TestEnable:
             assert schema["properties"]["zip-safe"]["type"] == "boolean"
 
     def test_valid(self, valid_example):
-        assert cli.main(["-i", str(valid_example), "-E", "setuptools"]) == 0
+        assert cli.main([str(valid_example), "-E", "setuptools"]) == 0
 
     def test_invalid(self, invalid_example):
         print(invalid_example.read_text())
         with pytest.raises(JsonSchemaValueException):
-            cli.run(["-i", str(invalid_example), "-E", "setuptools"])
+            cli.run([str(invalid_example), "-E", "setuptools"])
 
     def test_invalid_not_enabled(self, invalid_example):
         # When the plugin is not enabled, the validator should ignore the tool
-        assert cli.main(["-i", str(invalid_example), "-E", "distutils"]) == 0
+        assert cli.main([str(invalid_example), "-E", "distutils"]) == 0
 
 
 class TestDisable:
@@ -98,33 +98,33 @@ class TestDisable:
 
     @pytest.mark.parametrize("tool, other_tool", zip(TOOLS, reversed(TOOLS)))
     def test_parse(self, valid_example, tool, other_tool):
-        params = parse_args(["-i", str(valid_example), "-D", tool])
+        params = parse_args([str(valid_example), "-D", tool])
         assert len(params.plugins) == 1
         assert params.plugins[0].tool == other_tool
 
     def test_valid(self, valid_example):
-        assert cli.run(["-i", str(valid_example), "-D", "distutils"]) == 0
+        assert cli.run([str(valid_example), "-D", "distutils"]) == 0
 
     def test_invalid(self, invalid_example):
         print(invalid_example.read_text())
         with pytest.raises(JsonSchemaValueException):
-            cli.run(["-i", str(invalid_example), "-D", "distutils"])
+            cli.run([str(invalid_example), "-D", "distutils"])
 
     def test_invalid_disabled(self, invalid_example):
         # When the plugin is disabled, the validator should ignore the tool
-        assert cli.main(["-i", str(invalid_example), "-D", "setuptools"]) == 0
+        assert cli.main([str(invalid_example), "-D", "setuptools"]) == 0
 
 
 class TestOutput:
     def test_valid(self, capsys, valid_example):
-        cli.main(["-i", str(valid_example)])
+        cli.main([str(valid_example)])
         captured = capsys.readouterr()
         assert "valid" in captured.out.lower()
 
     def test_invalid(self, caplog, invalid_example):
         caplog.set_level(logging.DEBUG)
         with pytest.raises(SystemExit):
-            cli.main(["-i", str(invalid_example)])
+            cli.main([str(invalid_example)])
         captured = caplog.text.lower()
         assert "data.zip-safe must be boolean" in captured
         assert "offending rule" in captured

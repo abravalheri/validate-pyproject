@@ -15,12 +15,14 @@ Contents
 
    Overview <readme>
    Schemas <schemas>
+   FAQ <faq>
 
 .. toctree::
    :caption: Project
    :maxdepth: 2
 
    Contributions & Help <contributing>
+   Developer Guide <dev-guide>
    License <license>
    Authors <authors>
    Changelog <changelog>
