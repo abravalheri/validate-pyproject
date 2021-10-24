@@ -22,7 +22,8 @@ from typing import (
     cast,
 )
 
-import fastjsonschema as FJS
+from fastjsonschema.draft07 import CodeGeneratorDraft07
+from fastjsonschema.ref_resolver import RefResolver
 
 from . import errors, formats
 from .extra_validations import EXTRA_VALIDATIONS
@@ -209,6 +210,14 @@ class Validator:
         self._schema_registry = SchemaRegistry(self._plugins)
         self.handlers = RefHandler(self._schema_registry)
 
+        # Only needed while issue #129 of fastjsonschema is not solved
+        self._gen: Optional[CodeGeneratorDraft07] = None
+        self._resolver: Optional[RefResolver] = None
+
+    @property
+    def registry(self) -> SchemaRegistry:
+        return self._schema_registry
+
     @property
     def schema(self) -> Schema:
         """Top level ``pyproject.toml`` JSON Schema"""
@@ -224,14 +233,30 @@ class Validator:
         """Mapping between JSON Schema formats and functions that validates them"""
         return self._format_validators
 
+    @property
+    def _generator(self):
+        # Only needed while issue #129 of fastjsonschema is not solved
+        if self._gen is None:
+            self._resolver = RefResolver("", self.schema, {}, handlers=self.handlers)
+            formats = dict(self.formats)
+            self._gen = CodeGeneratorDraft07(self.schema, self._resolver, formats)
+        return self._gen
+
     def __getitem__(self, schema_id: str) -> Schema:
         """Retrieve a schema from registry"""
         return self._schema_registry[schema_id]
 
     def __call__(self, pyproject: T) -> T:
         if self._cache is None:
-            compiled = FJS.compile(self.schema, self.handlers, dict(self.formats))
-            self._cache = cast(ValidationFn, compiled)
+            # Only needed while issue #129 of fastjsonschema is not solved
+            generator = self._generator
+            state = generator.global_state
+            exec(generator.func_code, state)
+            resolver = cast(RefResolver, self._resolver)
+            self._cache = cast(ValidationFn, state[resolver.get_scope_name()])
+            # Once the issue is solved we can use the `fastjsonschema.compile`
+            # >>> compiled = FJS.compile(self.schema, self.handlers, dict(self.formats))
+            # >>> self._cache = cast(ValidationFn, compiled)
 
         self._cache(pyproject)
         return reduce(lambda acc, fn: fn(acc), self.extra_validations, pyproject)

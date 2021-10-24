@@ -50,7 +50,7 @@ def vendorify(
     replacements = {**TEXT_REPLACEMENTS, **text_replacements}
 
     validator = api.Validator(plugins)
-    code = FJS.compile_to_code(validator.schema, validator.handlers, validator.formats)
+    code = _compile_to_code(validator)
     code = replace_text(_fix_generated_code(code), replacements)
     (out / "fastjsonschema_validations.py").write_text(code, "UTF-8")
 
@@ -62,6 +62,17 @@ def vendorify(
     (out / "__init__.py").touch()
 
     return out
+
+
+def _compile_to_code(validator: api.Validator):
+    # This function is only needed while issue #129 of fastjsonschema is not solved
+    # once it is solved we can use `fastjsonschema.compile_to_code` directly
+    generator = validator._generator
+    return (
+        f'VERSION = "{FJS.VERSION}"\n'
+        + f"{generator.global_state_code}\n"
+        + generator.func_code
+    )
 
 
 def replace_text(text: str, replacements: Dict[str, str]) -> str:
