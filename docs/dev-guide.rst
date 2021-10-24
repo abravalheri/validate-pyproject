@@ -64,7 +64,14 @@ specify which ``tool`` subtable it would be checking:
 
 
     def your_plugin(tool_name: str) -> dict:
-        return {"type": "object", "properties": {"your-config-field": {"type": "string"}}}
+        return {
+            "$id": "https://your-urn-or-url",  # $id is mandatory
+            "type": "object",
+            "description": "Your tool configuration description",
+            "properties": {
+                "your-config-field": {"type": "string", "format": "python-module-name"}
+            },
+        }
 
 
     available_plugins = [
