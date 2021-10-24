@@ -39,7 +39,7 @@ zip-safe = false
 [tool.setuptools.dynamic]
 version = {attr = "project.__version__"}
 
-[tool.setuptools.command.bdist-rpm]
+[tool.distutils.bdist_rpm]
 doc-files = "docs extras AUTHORS INSTALL LICENSE README.rst"
 install-script = "scripts/rpm-install.sh"
 

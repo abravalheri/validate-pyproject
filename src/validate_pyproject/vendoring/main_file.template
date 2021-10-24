@@ -1,6 +1,5 @@
 from functools import reduce
-from types import MappingProxyType
-from typing import Any, Callable, Mapping
+from typing import Any, Callable, Dict
 
 from . import formats
 from .extra_validations import EXTRA_VALIDATIONS
@@ -16,13 +15,11 @@ __all__ = [
 ]
 
 
-FORMAT_FUNCTIONS: Mapping[str, Callable[[str], bool]] = MappingProxyType(
-    {
-        fn.__name__.replace("_", "-"): fn
-        for fn in formats.__dict__.values()
-        if callable(fn) and not fn.__name__.startswith("_")
-    }
-)
+FORMAT_FUNCTIONS: Dict[str, Callable[[str], bool]] = {
+    fn.__name__.replace("_", "-"): fn
+    for fn in formats.__dict__.values()
+    if callable(fn) and not fn.__name__.startswith("_")
+}
 
 
 def validate(data: Any) -> bool:

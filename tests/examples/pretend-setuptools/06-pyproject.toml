@@ -43,8 +43,8 @@ where = "src"
 "myproj.bash" = ["*.sh"]
 "myproj.yaml" = ["*.yml"]
 
-[tool.setuptools.commands.sdist]
+[tool.distutils.sdist]
 formats = "gztar"
 
-[tool.setuptools.commands.bdist_wheel]
+[tool.distutils.bdist_wheel]
 universal = true

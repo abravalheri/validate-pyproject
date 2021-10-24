@@ -75,7 +75,7 @@ def load(name: str, package: str = __package__, ext: str = ".schema.json") -> Sc
     """Load the schema from a JSON Schema file.
     The returned dict-like object is immutable.
     """
-    return Schema(MappingProxyType(json.loads(read_text(package, f"{name}{ext}"))))
+    return Schema(json.loads(read_text(package, f"{name}{ext}")))
 
 
 def load_builtin_plugin(name: str) -> Schema:
@@ -97,7 +97,7 @@ class SchemaRegistry(Mapping[str, Schema]):
         self._schemas: Dict[str, Tuple[str, str, Schema]] = {}
         # (which part of the TOML, who defines, schema)
 
-        top_level = dict(load(TOP_LEVEL_SCHEMA))  # Make it mutable
+        top_level = load(TOP_LEVEL_SCHEMA)  # Make it mutable
         self._spec_version = top_level["$schema"]
         top_properties = top_level["properties"]
         tool_properties = top_properties["tool"].setdefault("properties", {})
@@ -122,8 +122,7 @@ class SchemaRegistry(Mapping[str, Schema]):
             self._schemas[sid] = (f"tool.{tool}", pid, schema)
 
         self._main_id = sid = top_level["$id"]
-        main_schema = Schema(MappingProxyType(top_level))  # make it immutable
-        self._schemas[sid] = ("<$ROOT>", f"{__name__} - PEP517/518", main_schema)
+        self._schemas[sid] = ("<$ROOT>", f"{__name__} - PEP517/518", top_level)
 
     @property
     def spec_version(self) -> str:
@@ -131,19 +130,19 @@ class SchemaRegistry(Mapping[str, Schema]):
         return self._spec_version
 
     @property
-    def main(self) -> Schema:
+    def main(self) -> str:
         """Top level schema for validating a ``pyproject.toml`` file"""
-        return self._schemas[self._main_id][-1]
+        return self._main_id
 
     def _ensure_compatibility(self, reference: str, schema: Schema) -> Schema:
         if "$id" not in schema:
             raise errors.SchemaMissingId(reference)
-        version = schema.get("$schema")
-        if version and version != self.spec_version:
-            raise errors.InvalidSchemaVersion(reference, version, self.spec_version)
         sid = schema["$id"]
         if sid in self._schemas:
             raise errors.SchemaWithDuplicatedId(sid)
+        version = schema.get("$schema")
+        if version and version != self._spec_version:
+            raise errors.InvalidSchemaVersion(reference, version, self._spec_version)
         return schema
 
     def __getitem__(self, key: str) -> Schema:
@@ -213,7 +212,7 @@ class Validator:
     @property
     def schema(self) -> Schema:
         """Top level ``pyproject.toml`` JSON Schema"""
-        return self._schema_registry.main
+        return Schema({"$ref": self._schema_registry.main})
 
     @property
     def extra_validations(self) -> Sequence[ValidationFn]:
@@ -231,7 +230,7 @@ class Validator:
 
     def __call__(self, pyproject: T) -> T:
         if self._cache is None:
-            compiled = FJS.compile(self.schema, self.handlers, self.formats)
+            compiled = FJS.compile(self.schema, self.handlers, dict(self.formats))
             self._cache = cast(ValidationFn, compiled)
 
         self._cache(pyproject)

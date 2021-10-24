@@ -18,6 +18,7 @@
   ],
 
   "type": "object",
+  "additionalProperties": false,
   "properties": {
     "platforms": {
       "type": "array",

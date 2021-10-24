@@ -29,5 +29,5 @@ platforms = ["any"]
 [tool.setuptools.packages.find]
 include = ["pkg", "pkg.*"]
 
-[tool.setuptools.commands.build_ext]
+[tool.distutils.build_ext]
 inplace = true

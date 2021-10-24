@@ -235,4 +235,4 @@ def _format_plugin_help(plugin: PluginWrapper) -> str:
     help_text = plugin.help_text
     if help_text:
         help_text = f": {_flatten_str(help_text)}"
-    return f'- "{plugin.tool}"{help_text}'
+    return f'* "{plugin.tool}"{help_text}'
