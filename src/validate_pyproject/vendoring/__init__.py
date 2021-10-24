@@ -77,8 +77,7 @@ def _compile_to_code(validator: api.Validator):
 
 def replace_text(text: str, replacements: Dict[str, str]) -> str:
     for orig, subst in replacements.items():
-        if subst != orig:
-            text = text.replace(orig, subst)
+        text = text.replace(orig, subst)
     return text
 
 
