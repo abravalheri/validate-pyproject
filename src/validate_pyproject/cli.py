@@ -222,7 +222,7 @@ class Formatter(argparse.RawTextHelpFormatter):
 
 
 def plugins_help(plugins: Sequence[PluginWrapper]) -> str:
-    return "\n\n".join(_format_plugin_help(p) for p in plugins)
+    return "\n".join(_format_plugin_help(p) for p in plugins)
 
 
 def _flatten_str(text: str) -> str:
@@ -233,6 +233,5 @@ def _flatten_str(text: str) -> str:
 
 def _format_plugin_help(plugin: PluginWrapper) -> str:
     help_text = plugin.help_text
-    if help_text:
-        help_text = f": {_flatten_str(help_text)}"
+    help_text = f": {_flatten_str(help_text)}" if help_text else ""
     return f'* "{plugin.tool}"{help_text}'
