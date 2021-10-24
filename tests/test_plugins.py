@@ -45,7 +45,6 @@ def test_list_from_entry_points():
     # Should return a list with all the plugins registered in the entrypoints
     pluging_list = plugins.list_from_entry_points()
     orig_len = len(pluging_list)
-    assert all(callable(e.load_fn) for e in pluging_list)
     plugin_names = " ".join(e.tool for e in pluging_list)
     for example in EXISTING:
         assert example in plugin_names

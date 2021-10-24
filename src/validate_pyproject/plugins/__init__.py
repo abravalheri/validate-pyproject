@@ -6,7 +6,6 @@
 """
 
 import sys
-from dataclasses import dataclass
 from string import Template
 from textwrap import dedent
 from typing import Callable, Iterable, List, Optional
@@ -24,22 +23,26 @@ else:  # pragma: no cover
 ENTRYPOINT_GROUP = "validate_pyproject.tool_schema"
 
 
-@dataclass
 class PluginWrapper:
-    tool: str
-    load_fn: Plugin
+    def __init__(self, tool: str, load_fn: Plugin):
+        self._tool = tool
+        self._load_fn = load_fn
 
     @property
     def id(self):
-        return f"{self.load_fn.__module__}.{self.load_fn.__name__}"
+        return f"{self._load_fn.__module__}.{self._load_fn.__name__}"
+
+    @property
+    def tool(self):
+        return self._tool
 
     @property
     def schema(self):
-        return self.load_fn(self.tool)
+        return self._load_fn(self.tool)
 
     @property
     def help_text(self) -> str:
-        tpl = self.load_fn.__doc__
+        tpl = self._load_fn.__doc__
         if not tpl:
             return ""
         return Template(tpl).safe_substitute(tool=self.tool, id=self.id)
