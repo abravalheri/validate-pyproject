@@ -47,11 +47,12 @@ The most modern version of JSON Schema supported by :pypi:`fastjsonschema` is Dr
 It is not as bad as it may sound, it even supports `if-then-else`_-style conditions…
 
 
-Why the schemas use URLs that do not point for themselves?
-==========================================================
+Why the URLs used as ``$id`` do not point to the schemas themselves?
+====================================================================
 
-According to the JSON Schema, the `$id keyword`_ doesn't have to be the address
-of the schemas themselves:
+According to the JSON Schema, the `$id keyword`_ is just a unique identifier
+to differentiate between schemas and is not required to match a real URL.
+The text of the standard says:
 
     Note that this URI is an identifier and not necessarily a network locator.
     In the case of a network-addressable URL, a schema need not be downloadable
