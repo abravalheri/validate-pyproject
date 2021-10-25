@@ -84,6 +84,9 @@ linux_mac_task:
       container: {image: "python:3.8-buster"}
     - name: test (Linux - 3.9)
       container: {image: "python:3.9-buster"}
+    - name: test (Linux - 3.10)
+      allow_failures: true  # Some packages (e.g. Sphinx) might still have some problems
+      container: {image: "python:3.10-buster"}
     - name: test (Linux - Anaconda)
       container: {image: "continuumio/anaconda3:2021.05"}
       extra_install_script:
@@ -195,3 +198,19 @@ coverage_task:
       - python --version
       - pre-commit --version
       - cat .pre-commit-config.yaml
+
+
+linkcheck_task:
+  name: linkcheck (Linux - 3.9)
+  # only_if: $CIRRUS_BRANCH == 'master'
+  allow_failures: true
+  clone_script: *clone
+  container: {image: "python:3.9-buster"}
+  depends_on:
+    - test (Linux - 3.9)
+  pip_cache: *pip-cache
+  tox_install_script:
+    - python -m pip install --upgrade pip setuptools tox
+  prepare_script: *prepare
+  linkcheck_script:
+    - python -m tox -e linkcheck -- -q
