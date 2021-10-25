@@ -72,6 +72,9 @@ extensions = [
     "sphinx.ext.ifconfig",
     "sphinx.ext.mathjax",
     "sphinx.ext.napoleon",
+    "sphinx.ext.extlinks",
+    "sphinx_copybutton",
+    "sphinxemoji.sphinxemoji",
     "sphinx-jsonschema",
     "sphinxarg.ext",
 ]
@@ -108,6 +111,7 @@ except ImportError:
 # General information about the project.
 project = dist_name
 copyright = "2021, Anderson Bravalheri"
+repository = "https://github.com/abravalheri/validate-pyproject"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -318,6 +322,12 @@ intersphinx_mapping = {
     "scipy": ("https://docs.scipy.org/doc/scipy/reference", None),
     "setuptools": ("https://setuptools.pypa.io/en/stable/", None),
     "pyscaffold": ("https://pyscaffold.org/en/stable", None),
+}
+extlinks = {
+    "issue": (f"{repository}/issues/%s", "issue #%s"),
+    "pr": (f"{repository}/pull/%s", "PR #%s"),
+    "discussion": (f"{repository}/discussions/%s", "discussion #%s"),
+    "pypi": ("https://pypi.org/project/%s", "``%s``"),
 }
 
 print(f"loading configurations for {project} {version} ...", file=sys.stderr)

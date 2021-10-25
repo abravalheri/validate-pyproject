@@ -18,7 +18,7 @@ in :doc:`json-schemas`.
 ``tool`` table
 ==============
 
-According to PEP 518, tools can define their own configuration inside
+According to :pep:`518`, tools can define their own configuration inside
 ``pyproject.toml`` by using custom subtables under ``tool``.
 
 In ``validate-pyproject``, schemas for these subtables can be specified

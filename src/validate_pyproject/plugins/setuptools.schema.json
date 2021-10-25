@@ -11,10 +11,10 @@
     "`ini2toml <https://ini2toml.readthedocs.io/en/latest/setuptools_pep621.html>`_.",
     "It considers only ``setuptools`` `parameters",
     "<https://setuptools.pypa.io/en/latest/userguide/declarative_config.html>`_",
-    "that can currently be configured via ``setup.cfg`` and are not covered by PEP 621",
+    "that can currently be configured via ``setup.cfg`` and are not covered by :pep:`621`",
     "but intentionally excludes ``dependency_links`` and ``setup_requires``.",
     "NOTE: ``scripts`` was renamed to ``script-files`` to avoid confusion with",
-    "entry-point based scripts (defined in PEP 621)."
+    "entry-point based scripts (defined in :pep:`621`)."
   ],
 
   "type": "object",
@@ -149,12 +149,12 @@
     },
     "dynamic": {
       "type": "object",
-      "description": "Instructions for loading PEP 621-related metadata dynamically",
+      "description": "Instructions for loading :pep:`621`-related metadata dynamically",
       "properties": {
         "version": {
           "$$description": [
             "A version dynamically loaded via either the ``attr:`` or ``file:``",
-            "directives. Please make sure the given file or attribute respects PEP 440."
+            "directives. Please make sure the given file or attribute respects :pep:`440`."
           ],
           "oneOf": [
             {"$ref": "#/definitions/attr-directive"},

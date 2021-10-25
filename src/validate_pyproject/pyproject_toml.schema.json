@@ -4,10 +4,10 @@
   "$id": "https://www.python.org/dev/peps/pep-0517/",
   "title": "Data structure for ``pyproject.toml`` files",
   "$$description": [
-    "PEP 517 defines a build-system independent format for source trees",
-    "while PEP 518 provides a way of specifying the minimum system requirements",
+    ":pep:`517` defines a build-system independent format for source trees",
+    "while :pep:`518` provides a way of specifying the minimum system requirements",
     "for Python projects.",
-    "Please notice the ``project`` table (as defined in  PEP 621) is not included",
+    "Please notice the ``project`` table (as defined in  :pep:`621`) is not included",
     "in this schema and should be considered separately."
   ],
 
@@ -24,7 +24,7 @@
         "requires": {
           "type": "array",
           "$$description": [
-            "List of dependencies in the PEP 508 format required to execute the build",
+            "List of dependencies in the :pep:`508` format required to execute the build",
             "system. Please notice that the resulting dependency graph",
             "**MUST NOT contain cycles**"
           ],
@@ -35,7 +35,7 @@
         "build-backend": {
           "type": "string",
           "description":
-            "Python object that will be used to perform the build according to PEP 517",
+            "Python object that will be used to perform the build according to :pep:`517`",
           "format": "pep517-backend-reference"
         },
         "backend-path": {

@@ -4,5 +4,6 @@
 furo>=2021.10.9
 sphinx>=3.2.1
 sphinx-argparse>=0.3.1
+sphinx-copybutton
 sphinx-jsonschema>=1.16.11
-# sphinx_rtd_theme
+sphinxemoji

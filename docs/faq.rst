@@ -19,7 +19,7 @@ widespread usage among several programming language communities, means that a
 bigger number of people can easily understand the schemas and modify them if
 necessary.
 
-Additionally, `PEP 518`_ already includes a JSON Schema representation, which
+Additionally, :pep:`518` already includes a JSON Schema representation, which
 suggests that it can be used at the same time as specification language and
 validation tool.
 
@@ -62,5 +62,4 @@ of the schemas themselves:
 .. _if-then-else: https://json-schema.org/understanding-json-schema/reference/conditionals.html
 .. _issue: https://github.com/pypa/setuptools/issues/2671
 .. _JSON Schema: https://json-schema.org/
-.. _PEP 518: https://www.python.org/dev/peps/pep-0518/
 .. _$id keyword: https://json-schema.org/draft/2020-12/json-schema-core.html#rfc.section.8.2.1

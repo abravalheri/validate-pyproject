@@ -5,7 +5,7 @@
   "title": "``project`` table",
   "$$description": [
     "Data structure for the **project** table inside ``pyproject.toml``",
-    "(as defined in PEP 621)"
+    "(as defined in :pep:`621`)"
   ],
 
   "type": "object",
@@ -18,7 +18,7 @@
     },
     "version": {
       "type": "string",
-      "description": "The version of the project as supported by PEP 440.",
+      "description": "The version of the project as supported by :pep:`440`.",
       "format": "pep440"
     },
     "description": {
@@ -78,7 +78,7 @@
                 "content-type" : {
                   "type": "string",
                   "$$description": [
-                    "Content-type (RFC 1341) of the full description",
+                    "Content-type (:rfc:`1341`) of the full description",
                     "(e.g. ``text/markdown``). The ``charset`` parameter is assumed",
                     "UTF-8 when not present."
                   ],
@@ -253,7 +253,7 @@
       "$$description": ["version is statically defined in the ``version`` field"]
     },
     "$$comment": [
-      "According to PEP 621:",
+      "According to :pep:`621`:",
       "    If the core metadata specification lists a field as \"Required\", then",
       "    the metadata MUST specify the field statically or list it in dynamic",
       "In turn, `core metadata`_ defines:",
@@ -284,7 +284,7 @@
           "type": "string",
           "$$description": [
             "MUST be a valid email name, i.e. whatever can be put as a name, before an",
-            "email, in `RFC #822 <https://datatracker.ietf.org/doc/html/rfc822>`_."
+            "email, in :rfc:`822`."
           ]
         },
         "email": {
