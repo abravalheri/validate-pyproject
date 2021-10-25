@@ -1,18 +1,6 @@
 .. These are examples of badges you might want to add to your README:
    please update the URLs accordingly
 
-    .. image:: https://api.cirrus-ci.com/github/abravalheri/validate-pyproject.svg?branch=main
-        :alt: Built Status
-        :target: https://cirrus-ci.com/github/abravalheri/validate-pyproject
-    .. image:: https://readthedocs.org/projects/validate-pyproject/badge/?version=latest
-        :alt: ReadTheDocs
-        :target: https://validate-pyproject.readthedocs.io
-    .. image:: https://img.shields.io/coveralls/github/abravalheri/validate-pyproject/main.svg
-        :alt: Coveralls
-        :target: https://coveralls.io/r/abravalheri/validate-pyproject
-    .. image:: https://img.shields.io/pypi/v/validate-pyproject.svg
-        :alt: PyPI-Server
-        :target: https://pypi.org/project/validate-pyproject/
     .. image:: https://img.shields.io/conda/vn/conda-forge/validate-pyproject.svg
         :alt: Conda-Forge
         :target: https://anaconda.org/conda-forge/validate-pyproject
@@ -26,6 +14,18 @@
 .. image:: https://img.shields.io/badge/-PyScaffold-005CA0?logo=pyscaffold
     :alt: Project generated with PyScaffold
     :target: https://pyscaffold.org/
+.. image:: https://api.cirrus-ci.com/github/abravalheri/validate-pyproject.svg?branch=main
+    :alt: Built Status
+    :target: https://cirrus-ci.com/github/abravalheri/validate-pyproject
+.. image:: https://readthedocs.org/projects/validate-pyproject/badge/?version=latest
+    :alt: ReadTheDocs
+    :target: https://validate-pyproject.readthedocs.io
+.. image:: https://img.shields.io/coveralls/github/abravalheri/validate-pyproject/main.svg
+    :alt: Coveralls
+    :target: https://coveralls.io/r/abravalheri/validate-pyproject
+.. image:: https://img.shields.io/pypi/v/validate-pyproject.svg
+    :alt: PyPI-Server
+    :target: https://pypi.org/project/validate-pyproject/
 
 |
 
