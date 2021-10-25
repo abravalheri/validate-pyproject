@@ -8,8 +8,8 @@
 # serve to show the default.
 
 import os
-import sys
 import shutil
+import sys
 
 # -- Path setup --------------------------------------------------------------
 
@@ -72,18 +72,18 @@ extensions = [
     "sphinx.ext.ifconfig",
     "sphinx.ext.mathjax",
     "sphinx.ext.napoleon",
-    'sphinx-jsonschema',
-    'sphinxarg.ext',
+    "sphinx-jsonschema",
+    "sphinxarg.ext",
 ]
 
 # ----------------------------------
 # JSON Schema settings
 jsonschema_options = {
-    'lift_title': True,
-    'lift_description': True,
-    'lift_definitions': True,
-    'auto_reference': True,
-    'auto_target': True,
+    "lift_title": True,
+    "lift_description": True,
+    "lift_definitions": True,
+    "auto_reference": True,
+    "auto_target": True,
 }
 # ----------------------------------
 
@@ -99,8 +99,14 @@ source_suffix = ".rst"
 # The master toctree document.
 master_doc = "index"
 
+try:
+    from validate_pyproject import __version__, dist_name
+except ImportError:
+    __version__, dist_name = "", "validate-pyproject"
+
+
 # General information about the project.
-project = "validate-pyproject"
+project = dist_name
 copyright = "2021, Anderson Bravalheri"
 
 # The version info for the project you're documenting, acts as replacement for
@@ -111,10 +117,7 @@ copyright = "2021, Anderson Bravalheri"
 # release: The full version, including alpha/beta/rc tags.
 # If you don’t need the separation provided between version and release,
 # just set them both to the same value.
-try:
-    from validate_pyproject import __version__ as version
-except ImportError:
-    version = ""
+version = __version__
 
 if not version or version.lower() == "unknown":
     version = os.getenv("READTHEDOCS_VERSION", "unknown")  # automatically set by RTD
@@ -192,10 +195,10 @@ html_theme_options = {
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
-# html_title = None
+html_title = project
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
-# html_short_title = None
+html_short_title = project
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
@@ -274,7 +277,13 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-    ("index", "user_guide.tex", "validate-pyproject Documentation", "Anderson Bravalheri", "manual")
+    (
+        "index",
+        "user_guide.tex",
+        "validate-pyproject Documentation",
+        "Anderson Bravalheri",
+        "manual",
+    )
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
