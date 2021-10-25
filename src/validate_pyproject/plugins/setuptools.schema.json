@@ -82,9 +82,10 @@
     },
     "package-dir": {
       "$$description": [
-        "Mapping from package to directory names.",
-        "The empty string (as key) signs that all packages are contained inside",
-        "the given directory"
+        ":class:`dict`-like structure mapping from package names to directories where their",
+        "code can be found.",
+        "The empty string (as key) means that all packages are contained inside",
+        "the given directory will be included in the distribution."
       ],
       "type": "object",
       "additionalProperties": false,

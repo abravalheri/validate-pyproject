@@ -15,6 +15,7 @@ Contents
 
    Overview <readme>
    Schemas <schemas>
+   Embedding it in your project <embedding>
    FAQ <faq>
 
 .. toctree::

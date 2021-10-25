@@ -36,7 +36,8 @@ community, none of the ones the original author of this package investigated
   directly without requiring installation.
 
 fastjsonschema_ has no dependency and can generate validation code directly,
-which bypass the need for copying most of the files when "vendoring".
+which bypass the need for copying most of the files when :doc:`"vendoring"
+<embedding>`.
 
 
 Why draft-07 of JSON Schema and not a more modern version?

@@ -60,6 +60,8 @@ files, which, in turn, are also a standardised way of checking if a given data
 structure complies with a certain specification.
 
 
+.. _installation:
+
 Usage
 =====
 
@@ -81,6 +83,8 @@ Now you can use ``validate-pyproject`` as a command line tool:
 
 You can also use ``validate-pyproject`` in your Python scripts or projects:
 
+.. _example-api:
+
 .. code-block:: python
 
     # in your python code
@@ -100,7 +104,7 @@ You can also use ``validate-pyproject`` in your Python scripts or projects:
         print("Invalid Document")
 
 To do so, don't forget to add it to your `virtual environment`_ or specify it as a
-`project dependency`_.
+`project`_ or `library dependency`_.
 
 .. note::
    When you install ``validate-pyproject[all]``, the packages ``tomli``,
@@ -145,13 +149,14 @@ For details and usage information on PyScaffold see https://pyscaffold.org/.
 .. _our docs: https://validate-pyproject.readthedocs.io
 .. _ini2toml: https://ini2toml.readthedocs.io
 .. _JSON Schema: https://json-schema.org/
+.. _library dependency: https://setuptools.pypa.io/en/latest/userguide/dependency_management.html
 .. _PEP 517: https://www.python.org/dev/peps/pep-0517/
 .. _PEP 518: https://www.python.org/dev/peps/pep-0518/
 .. _PEP 621: https://www.python.org/dev/peps/pep-0621/
 .. _pipx: https://pypa.github.io/pipx/
-.. _project dependency: https://packaging.python.org/tutorials/managing-dependencies/
+.. _project: https://packaging.python.org/tutorials/managing-dependencies/
 .. _setuptools: https://setuptools.pypa.io/en/stable/
 .. _used JSON schemas: https://validate-pyproject.readthedocs.io/en/latest/schemas.html
-.. _vendored way: https://validate-pyproject.readthedocs.io/en/latest/vendoring.html
+.. _vendored way: https://validate-pyproject.readthedocs.io/en/latest/embedding.html
 .. _plugins: https://validate-pyproject.readthedocs.io/en/latest/dev-guide.html
 .. _virtual environment: https://realpython.com/python-virtual-environments-a-primer/

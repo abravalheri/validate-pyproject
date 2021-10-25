@@ -22,8 +22,8 @@ According to PEP 518, tools can define their own configuration inside
 ``pyproject.toml`` by using custom subtables under ``tool``.
 
 In ``validate-pyproject``, schemas for these subtables can be specified
-via plugins. The following subtables are defined by *built-in* plugins (i.e.
-plugins that are included in the default distribution of
+via :ref:`plugins`. The following subtables are defined by *built-in* plugins
+(i.e.  plugins that are included in the default distribution of
 ``validate-pyproject``):
 
 .. _tool.setuptools:
