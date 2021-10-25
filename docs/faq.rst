@@ -52,11 +52,14 @@ Why the URLs used as ``$id`` do not point to the schemas themselves?
 
 According to the JSON Schema, the `$id keyword`_ is just a unique identifier
 to differentiate between schemas and is not required to match a real URL.
-The text of the standard says:
+The text on the standard is:
 
     Note that this URI is an identifier and not necessarily a network locator.
     In the case of a network-addressable URL, a schema need not be downloadable
     from its canonical URI.
+
+This information is confirmed in a `similar document submited to the IETF <
+https://datatracker.ietf.org/doc/html/draft-wright-json-schema-01#section-8>`_.
 
 
 .. _if-then-else: https://json-schema.org/understanding-json-schema/reference/conditionals.html
