@@ -16,7 +16,7 @@ How it works
 ``validate-pyproject`` relies mostly on a set of :doc:`specification documents
 <json-schemas>` represented as `JSON Schema`_.
 To run the checks encoded under these schema files ``validate-pyproject``
-uses the fastjsonschema_ package.
+uses the :pypi:`fastjsonschema` package.
 
 This procedure is defined in the :mod:`~validate_pyproject.api` module,
 specifically under the :class:`~validate_pyproject.api.Validator` class.
@@ -119,7 +119,6 @@ Also notice plugins are activated in a specific order, using Python's built-in
 
 
 .. _entry-point: https://setuptools.pypa.io/en/stable/userguide/entry_point.html#entry-points
-.. _fastjsonschema: https://github.com/horejsek/python-fastjsonschema
 .. _JSON Schema: https://json-schema.org/
 .. _Python package: https://packaging.python.org/
 .. _setuptools: https://setuptools.pypa.io/en/stable/

@@ -12,14 +12,13 @@ use the Python API.
 
 Alternatively, if you cannot afford having external dependencies in your
 project you can also opt to *"vendorise"* [#vend1]_ ``validate-pyproject``.
-This can be done automatically via tools such as
-`vendoring <https://pypi.org/project/vendoring/>`_ or
-`vendorize <https://pypi.org/project/vendorize/>`_ and many others others,
-however this technique will copy several files into your project.
+This can be done automatically via tools such as :pypi:`vendoring` or
+:pypi:`vendorize` and many others others, however this technique will copy
+several files into your project.
 
 If you want to keep the amount of files to a minimum,
 ``validate-pyproject`` offers a different solution that consists in generating
-a validation file (thanks to fastjsonschema_'s ability to compile JSON Schemas
+a validation file (thanks to :pypi:`fastjsonschema`'s ability to compile JSON Schemas
 to code) and copying only the strictly necessary Python modules.
 
 After :ref:`installing <installation>` ``validate-pyproject`` this can be done
@@ -54,11 +53,9 @@ code by doing:
 .. [#vend1] The words "vendorise" or "vendoring" in this text refer to the act
    of copying external dependencies to a folder inside your project, so they
    are distributed in the same package and can be used directly without relying
-   on installation tools, such as pip_.
+   on installation tools, such as :pypi:`pip`.
 
 
-.. _fastjsonschema: https://pypi.org/project/fastjsonschema/
-.. _pip: https://pip.pypa.io/
 .. _project: https://packaging.python.org/tutorials/managing-dependencies/
 .. _library dependency: https://setuptools.pypa.io/en/latest/userguide/dependency_management.html
 .. _virtual environment: https://realpython.com/python-virtual-environments-a-primer/

@@ -29,13 +29,13 @@ Why ``fastjsonschema``?
 
 While there are other (more popular) `JSON Schema`_ libraries in the Python
 community, none of the ones the original author of this package investigated
-(other than fastjsonschema_) fulfilled the following requirements:
+(other than :pypi:`fastjsonschema`) fulfilled the following requirements:
 
 - Minimal number of dependencies (ideally 0)
 - Easy to "vendorise", i.e. copy the source code of the package to be used
   directly without requiring installation.
 
-fastjsonschema_ has no dependency and can generate validation code directly,
+:pypi:`fastjsonschema` has no dependency and can generate validation code directly,
 which bypass the need for copying most of the files when :doc:`"vendoring"
 <embedding>`.
 
@@ -43,7 +43,7 @@ which bypass the need for copying most of the files when :doc:`"vendoring"
 Why draft-07 of JSON Schema and not a more modern version?
 ==========================================================
 
-The most modern version of JSON Schema supported by fastjsonschema_ is Draft 07.
+The most modern version of JSON Schema supported by :pypi:`fastjsonschema` is Draft 07.
 It is not as bad as it may sound, it even supports `if-then-else`_-style conditions…
 
 
@@ -58,7 +58,6 @@ of the schemas themselves:
     from its canonical URI.
 
 
-.. _fastjsonschema: https://github.com/horejsek/python-fastjsonschema
 .. _if-then-else: https://json-schema.org/understanding-json-schema/reference/conditionals.html
 .. _issue: https://github.com/pypa/setuptools/issues/2671
 .. _JSON Schema: https://json-schema.org/
