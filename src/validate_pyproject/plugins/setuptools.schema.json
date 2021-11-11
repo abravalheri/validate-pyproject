@@ -136,16 +136,28 @@
           "^.*$": {"type": "array", "items": {"type": "string"}}
       }
     },
-    "namespace_packages": {
+    "namespace-packages": {
       "type": "array",
       "items": {"type": "string", "format": "python-module-name"},
       "$comment": "https://setuptools.pypa.io/en/latest/userguide/package_discovery.html"
     },
-    "py_modules": {
+    "py-modules": {
       "description": "Modules that setuptools will manipulate",
       "type": "array",
       "items": {"type": "string", "format": "python-module-name"},
       "$comment": "TODO: clarify the relationship with ``packages``"
+    },
+    "data-files": {
+      "$$description": [
+        "**DEPRECATED**: dict-like structure where each key represents a directory and",
+        "the value is a list of glob patterns that should be installed in them.",
+        "Please notice this don't work with wheels. See `data files support<",
+        "https://setuptools.pypa.io/en/latest/userguide/datafiles.html>`_"
+      ],
+      "type": "object",
+      "patternProperties": {
+          "^.*$": {"type": "array", "items": {"type": "string"}}
+      }
     },
     "dynamic": {
       "type": "object",
