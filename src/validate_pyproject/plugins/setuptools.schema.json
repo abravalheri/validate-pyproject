@@ -150,8 +150,8 @@
       "$$description": [
         "**DEPRECATED**: dict-like structure where each key represents a directory and",
         "the value is a list of glob patterns that should be installed in them.",
-        "Please notice this don't work with wheels. See `data files support<",
-        "https://setuptools.pypa.io/en/latest/userguide/datafiles.html>`_"
+        "Please notice this don't work with wheels. See `data files support",
+        "<https://setuptools.pypa.io/en/latest/userguide/datafiles.html>`_"
       ],
       "type": "object",
       "patternProperties": {
