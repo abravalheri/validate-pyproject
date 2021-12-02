@@ -23,4 +23,4 @@ package-dir = {"" = "src"} # all the packages under the src folder
 platforms = ["any"]
 
 [tool.setuptools.packages]
-find-namespace = { where = "src", exclude = ["tests"] }
+find = { where = ["src"], exclude = ["tests"], namespaces = true }

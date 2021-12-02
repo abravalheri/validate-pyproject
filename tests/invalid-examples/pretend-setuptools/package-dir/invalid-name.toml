@@ -29,7 +29,7 @@ script-files = [
 ]
 
 [tool.setuptools.packages.find]
-where = "src"
+where = ["src"]
 
 [tool.setuptools.dynamic]
 version = {file = "__version__.txt"}

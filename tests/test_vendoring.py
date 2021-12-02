@@ -122,5 +122,8 @@ def test_invalid_examples_api(tmp_path, vendored_validate, example, vendored):
     with pytest.raises(JsonSchemaValueException) as exc_info:
         vendored_validate(vendored_path, toml_equivalent)
     exception_message = str(exc_info.value)
+    print("rule", "=", exc_info.value.rule)
+    print("rule_definition", "=", exc_info.value.rule_definition)
+    print("definition", "=", exc_info.value.definition)
     for error in expected_error.splitlines():
         assert error in exception_message

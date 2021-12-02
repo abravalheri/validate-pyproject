@@ -63,13 +63,12 @@
       "$$description": [
         "Packages that should be included in the distribution.",
         "It can be given either as a list of package identifiers",
-        "or as a ``dict``-like structure with a single key, either",
-        "``find`` or ``find-namespace``, which will be correspond to a dynamic call to",
-        "``setuptools.find_packages`` or ``setuptools.find_namespace_packages``",
-        "functions (respectively). The ``find/find-namespace`` key is",
-        "associated with a nested ``dict``-like structure that can contain the",
-        "``where``, ``include`` and ``exclude`` keys, mimicking the arguments of the",
-        "corresponding functions."
+        "or as a ``dict``-like structure with a single key ``find``",
+        "which corresponds to a dynamic call to",
+        "``setuptools.config.expand.find_packages`` function.",
+        "The ``find`` key is associated with a nested ``dict``-like structure that can",
+        "contain ``where``, ``include``, ``exclude`` and ``namespaces`` keys,",
+        "mimicking the keyword arguments of the associated function."
       ],
       "oneOf": [
         {
@@ -215,21 +214,23 @@
     },
     "find-directive": {
       "$id": "#/definitions/find-directive",
-      "title": "'find:' or 'find-namespace:' directive",
+      "title": "'find:' directive",
       "type": "object",
       "additionalProperties": false,
-      "patternProperties": {
-        "^find(-namespace)?$": {
+      "properties": {
+        "find": {
           "type": "object",
           "$$description": [
             "Dynamic `package discovery",
             "<https://setuptools.pypa.io/en/latest/userguide/package_discovery.html>`_."
           ],
+          "additionalProperties": false,
           "properties": {
             "where": {
-              "type": "string",
               "description":
-                "Directory to be searched for packages (Unix-style relative path)"
+                "Directories to be searched for packages (Unix-style relative path)",
+              "type": "array",
+              "items": {"type": "string"}
             },
             "exclude": {
               "type": "array",
@@ -246,6 +247,13 @@
                 "Can container shell-style wildcards (e.g. ``'pkg.*'``)"
               ],
               "items": {"type": "string"}
+            },
+            "namespaces": {
+              "type": "boolean",
+              "$$description": [
+                "When ``True``, directories without a ``__init__.py`` file will also",
+                "be scanned for :pep:`420`-style implicit namespaces"
+              ]
             }
           }
         }
