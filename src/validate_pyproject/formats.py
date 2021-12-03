@@ -159,10 +159,14 @@ def python_identifier(value: str) -> bool:
     return value.isidentifier()
 
 
-def python_module_name(value: str) -> bool:
+def python_qualified_identifier(value: str) -> bool:
     if value.startswith(".") or value.endswith("."):
         return False
     return all(python_identifier(m) for m in value.split("."))
+
+
+def python_module_name(value: str) -> bool:
+    return python_qualified_identifier(value)
 
 
 def python_entrypoint_group(value: str) -> bool:

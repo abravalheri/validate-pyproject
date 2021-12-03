@@ -158,6 +158,20 @@
           "^.*$": {"type": "array", "items": {"type": "string"}}
       }
     },
+    "cmdclass": {
+      "$$description": [
+        "Mapping of distutils-style command names to `Command subclasses",
+        "<setuptools.Command>`_, which in turn should be represented by strings",
+        "with a qualified class name (i.e., \"dotted\" form with module), e.g.::\n\n",
+        "    cmdclass = {mycmd = \"pkg.subpkg.module.CommandClass\"}\n\n",
+        "The command class should be a directly defined at the top-level of the",
+        "containing module (no class nesting)."
+      ],
+      "type": "object",
+      "patternProperties": {
+          "^.*$": {"type": "string", "format": "python_qualified_identifier"}
+      }
+    },
     "dynamic": {
       "type": "object",
       "description": "Instructions for loading :pep:`621`-related metadata dynamically",
