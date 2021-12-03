@@ -1,0 +1,1 @@
+cmdclass.sdist must be python-qualified-identifier

@@ -169,7 +169,7 @@
       ],
       "type": "object",
       "patternProperties": {
-          "^.*$": {"type": "string", "format": "python_qualified_identifier"}
+          "^.*$": {"type": "string", "format": "python-qualified-identifier"}
       }
     },
     "dynamic": {
