@@ -188,8 +188,32 @@
         },
         "classifiers": {"$ref": "#/definitions/file-directive"},
         "description": {"$ref": "#/definitions/file-directive"},
-        "readme": {"$ref": "#/definitions/file-directive"},
         "entry-points": {"$ref": "#/definitions/file-directive"},
+        "readme": {
+          "anyOf": [
+            {"$ref": "#/definitions/file-directive"},
+            {"properties": {"content-type": {"type": "string"}}}
+          ],
+          "required": ["file"]
+        },
+        "license": {
+          "type": "string",
+          "$$description": [
+            "PROVISIONAL: A string specifying the license of the package",
+            "(might change with PEP 639)"
+          ],
+          "$comment": "TODO: revise if PEP 639 is accepted. Maybe ``license-expression``?"
+        },
+        "license-files": {
+          "type": "array",
+          "items": {"type": "string"},
+          "$$description": [
+            "PROVISIONAL: List of glob patterns for all license files being distributed.",
+            "(might change with PEP 639)"
+          ],
+          "default": ["LICEN[CS]E*", " COPYING*", " NOTICE*", "AUTHORS*"],
+          "$comment": "TODO: revise if PEP 639 is accepted. Maybe ``license-files.glob``?"
+        }
       }
     }
   },
