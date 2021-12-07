@@ -190,8 +190,6 @@
         "description": {"$ref": "#/definitions/file-directive"},
         "readme": {"$ref": "#/definitions/file-directive"},
         "entry-points": {"$ref": "#/definitions/file-directive"},
-        "scripts": {"$ref": "#/definitions/file-directive"},
-        "gui-scripts": {"$ref": "#/definitions/file-directive"}
       }
     }
   },
