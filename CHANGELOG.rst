@@ -2,6 +2,20 @@
 Changelog
 =========
 
+Version 0.3
+===========
+
+- ``setuptools`` plugin:
+   - Added support for ``readme``, ``license`` and ``license-files`` via ``dynamic``.
+
+     .. warning::
+         ``license`` and ``license-files`` in ``dynamic`` are **PROVISIONAL**
+         they are likely to change depending on :pep:`639`
+
+   - Removed support for ``tool.setuptools.dynamic.{scripts,gui-scripts}``.
+     Dynamic values for ``project.{scripts,gui-scripts}`` are expected to be
+     dynamically derived from ``tool.setuptools.dynamic.entry-points``.
+
 Version 0.2
 ===========
 
