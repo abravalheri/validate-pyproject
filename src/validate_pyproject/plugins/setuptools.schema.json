@@ -233,7 +233,8 @@
             {"type": "array", "items": {"type": "string"}}
           ]
         }
-      }
+      },
+      "required": ["file"]
     },
     "attr-directive": {
       "title": "'attr:' directive",
@@ -246,7 +247,8 @@
       "additionalProperties": false,
       "properties": {
         "attr": {"type": "string"}
-      }
+      },
+      "required": ["attr"]
     },
     "find-directive": {
       "$id": "#/definitions/find-directive",

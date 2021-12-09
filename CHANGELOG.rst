@@ -2,6 +2,13 @@
 Changelog
 =========
 
+Version 0.3.1
+=============
+
+- ``setuptools`` plugin:
+   - Fixed missing ``required`` properties for the ``attr:`` and ``file:``
+     directives (previously empty objects were allowed).
+
 Version 0.3
 ===========
 
