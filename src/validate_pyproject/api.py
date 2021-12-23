@@ -5,7 +5,7 @@ import json
 import logging
 import sys
 from enum import Enum
-from functools import reduce, partial
+from functools import partial, reduce
 from itertools import chain
 from types import MappingProxyType
 from typing import (
