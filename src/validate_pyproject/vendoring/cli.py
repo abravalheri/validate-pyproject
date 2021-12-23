@@ -77,7 +77,7 @@ def run(args: Sequence[str] = ()):
     cmd = f"python -m {__package__} " + arg_join(args)
     plugins = list_plugins_from_entry_points()
     desc = 'Generate files for "vendoring" `validate-pyproject`'
-    prms = cli.parse_args(args, plugins, desc, parser_spec, CliParams)  # type: ignore
+    prms = cli.parse_args(args, plugins, desc, parser_spec, CliParams)
     cli.setup_logging(prms.loglevel)
     vendorify(prms.output_dir, prms.main_file, cmd, prms.plugins, prms.replacements)
     return 0
