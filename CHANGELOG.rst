@@ -2,6 +2,12 @@
 Changelog
 =========
 
+Version 0.3.2
+=============
+
+- Updated ``fastjsonschema`` dependency version.
+- Removed workarounds for ``fastjsonschema``  pre 2.15.2
+
 Version 0.3.1
 =============
 

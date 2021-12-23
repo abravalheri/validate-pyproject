@@ -143,20 +143,9 @@ NOCHECK_HEADERS = (
 )
 PICKLED_PATTERNS = r"^REGEX_PATTERNS = pickle.loads\((.*)\)$"
 PICKLED_PATTERNS_REGEX = re.compile(PICKLED_PATTERNS, re.M)
-VALIDATION_FN_DEF_PATTERN = r"^([\t ])*def\s*validate(_[\w_]+)?\(data\):"
-VALIDATION_FN_DEF = re.compile(VALIDATION_FN_DEF_PATTERN, re.M | re.I)
-VALIDATION_FN_CALL_PATTERN = r"(?!def\s+)\bvalidate([_\w]+)\(([_\w]+)\)"
-VALIDATION_FN_CALL = re.compile(VALIDATION_FN_CALL_PATTERN, re.M | re.I)
 
 
 def _fix_generated_code(code: str) -> str:
-    # Currently fastjsonschema relies on a global variable for custom_formats,
-    # but that is not compatible with creating a static file,
-    # so we need to patch the compiled code and add a second argument for the function
-    # definitions and function calls
-    code = VALIDATION_FN_DEF.sub(r"\1def validate\2(data, custom_formats):", code)
-    code = VALIDATION_FN_CALL.sub(r"validate\1(\2, custom_formats)", code)
-
     # Replace the pickled regexes with calls to `re.compile` (better to read)
     match = PICKLED_PATTERNS_REGEX.search(code)
     if match:

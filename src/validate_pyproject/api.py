@@ -5,7 +5,7 @@ import json
 import logging
 import sys
 from enum import Enum
-from functools import reduce
+from functools import reduce, partial
 from itertools import chain
 from types import MappingProxyType
 from typing import (
@@ -253,10 +253,14 @@ class Validator:
             state = generator.global_state
             exec(generator.func_code, state)
             resolver = cast(RefResolver, self._resolver)
-            self._cache = cast(ValidationFn, state[resolver.get_scope_name()])
+            fn = partial(
+                state[resolver.get_scope_name()], custom_formats=self._format_validators
+            )
+            self._cache = cast(ValidationFn, fn)
             # Once the issue is solved we can use the `fastjsonschema.compile`
             # >>> compiled = FJS.compile(self.schema, self.handlers, dict(self.formats))
-            # >>> self._cache = cast(ValidationFn, compiled)
+            # >>> fn = partial(compiled, custom_formats=self._format_validators)
+            # >>> self._cache = cast(ValidationFn, fn)
 
         self._cache(pyproject)
         return reduce(lambda acc, fn: fn(acc), self.extra_validations, pyproject)
