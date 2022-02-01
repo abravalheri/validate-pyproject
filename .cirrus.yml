@@ -58,10 +58,10 @@ env:
 # ---- Task definitions ----
 
 typecheck_task:
-  name: typecheck (Linux - 3.9)
+  name: typecheck (Linux - 3.10)
   only_if: $TYPE_CHECKING == 'true'
   clone_script: *clone
-  container: {image: "python:3.9-buster"}  # most recent => better type support
+  container: {image: "python:3.9-bullseye"}  # most recent => better type support
   pip_cache: *pip-cache
   mypy_cache:
     folder: .mypy_cache
@@ -77,23 +77,27 @@ linux_mac_task:
   clone_script: *clone
   matrix:
     - name: test (Linux - 3.6)
-      container: {image: "python:3.6-buster"}
+      container: {image: "python:3.6-bullseye"}
+      allow_failures: true  # EoL
     - name: test (Linux - 3.7)
-      container: {image: "python:3.7-buster"}
+      container: {image: "python:3.7-bullseye"}
     - name: test (Linux - 3.8)
-      container: {image: "python:3.8-buster"}
+      container: {image: "python:3.8-bullseye"}
     - name: test (Linux - 3.9)
-      container: {image: "python:3.9-buster"}
+      container: {image: "python:3.9-bullseye"}
     - name: test (Linux - 3.10)
-      container: {image: "python:3.10-buster"}
+      container: {image: "python:3.10-bullseye"}
+    - name: test (Linux - 3.11)
+      container: {image: "python:3.11-rc-bullseye"}
+      allow_failures: true  # Experimental
     - name: test (Linux - Anaconda)
-      container: {image: "continuumio/anaconda3:2021.05"}
+      container: {image: "continuumio/anaconda3:2021.11"}
       extra_install_script:
         - conda install -y -c conda-forge virtualenv build setuptools setuptools-scm pip tox
     - name: test (OS X)
       macos_instance: {image: "big-sur-xcode"}
       env:
-        PYTHON_VERSION: 3.7
+        PYTHON_VERSION: 3.9
         # ^  update when the default version of python in homebrew changes
         PATH: "${HOME}/.local/bin:${HOME}/Library/Python/${PYTHON_VERSION}/bin:/usr/local/opt/python/libexec/bin:${PATH}"
         # ^  add user and homebrew paths
@@ -101,7 +105,7 @@ linux_mac_task:
       brew_cache:
         folder: "$HOME/Library/Caches/Homebrew"
       install_script:
-        - brew install python gnu-tar
+        - brew install python
         - brew cleanup
   <<: *REGULAR_TASK_TEMPLATE
 
@@ -113,12 +117,12 @@ windows_task:
   tools_cache:
     folder: 'C:\tools'
     fingerprint_script:
-      - ps: echo "$env:CIRRUS_OS - nuget v5.10.0 - git 2.32.0.2"
+      - ps: echo "$env:CIRRUS_OS - nuget v6.0.0 - git 2.34.1"
     populate_script:
       - ps: (mkdir 'C:\tools')
       # ^  use parentheses to suppress errors
-      - ps: Invoke-WebRequest -OutFile 'C:\tools\nuget.exe' 'https://dist.nuget.org/win-x86-commandline/v5.10.0/nuget.exe'
-      - ps: nuget install GitForWindows -Version 2.32.0.2 -NonInteractive -OutputDirectory 'C:\tools'
+      - ps: Invoke-WebRequest -OutFile 'C:\tools\nuget.exe' 'https://dist.nuget.org/win-x86-commandline/v6.0.0/nuget.exe'
+      - ps: nuget install GitForWindows -Version 2.34.1 -NonInteractive -OutputDirectory C:\tools
   workaround_git_script:
     - git config --system core.longpaths true  # Fix for windows git checkout problems
   clone_script:
@@ -140,7 +144,7 @@ windows_task:
     PYTHON_HOME: 'C:\Python'
     PYTHON_APPDATA: '%APPDATA%\Python\Python38'
     # ^  update when python version changes
-    GIT_HOME: 'C:\tools\GitForWindows.2.32.0.2\tools'
+    GIT_HOME: 'C:\tools\GitForWindows.2.34.1\tools'
     # ^ update when git version changes
     HOME: '%USERPROFILE%'
     USERNAME: ContainerAdministrator
@@ -170,16 +174,17 @@ windows_task:
 
 
 coverage_task:
-  name: coverage (Linux - 3.7)
+  name: coverage (Linux - 3.8)
   clone_script: *clone
-  container: {image: "python:3.7-buster"}
+  container: {image: "python:3.8-bullseye"}
   env:
     COVERAGE: yes
     PRE_COMMIT_HOME: ${HOME}/.cache/pre-commit
   depends_on:
-    - test (Linux - 3.6)
     - test (Linux - 3.7)
     - test (Linux - 3.8)
+    - test (Linux - 3.9)
+    - test (Linux - 3.10)
     - test (Linux - Anaconda)
     - test (OS X)
   pip_install_script:
@@ -204,7 +209,7 @@ linkcheck_task:
   # only_if: $CIRRUS_BRANCH == 'master'
   allow_failures: true
   clone_script: *clone
-  container: {image: "python:3.9-buster"}
+  container: {image: "python:3.9-bullseye"}
   depends_on:
     - test (Linux - 3.9)
   pip_cache: *pip-cache
