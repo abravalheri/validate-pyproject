@@ -2,7 +2,7 @@ exclude: '^docs/conf.py'
 
 repos:
 - repo: git://github.com/pre-commit/pre-commit-hooks
-  rev: v4.0.1
+  rev: v4.1.0
   hooks:
   - id: trailing-whitespace
   - id: check-added-large-files
@@ -28,12 +28,12 @@ repos:
     ]
 
 - repo: https://github.com/pycqa/isort
-  rev: 5.9.3
+  rev: 5.10.1
   hooks:
   - id: isort
 
 - repo: https://github.com/psf/black
-  rev: 21.9b0
+  rev: 22.1.0
   hooks:
   - id: black
     language_version: python3
@@ -42,7 +42,7 @@ repos:
   rev: v1.12.1
   hooks:
   - id: blacken-docs
-    additional_dependencies: [black==22.1.0]
+    additional_dependencies: [black==22.*]
 
 - repo: https://github.com/PyCQA/flake8
   rev: 4.0.1
