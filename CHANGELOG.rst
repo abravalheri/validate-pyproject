@@ -2,6 +2,13 @@
 Changelog
 =========
 
+Version 0.3.3
+=============
+
+- Remove upper pin from the :pypi:`tomli` dependency by :user:`hukkin` (:pr:`1`)
+- Fix failing :pypi:`blacken-docs` pre-commit hook by :user:`hukkin` (:pr:`2`)
+- Update versions of tools and containers used in the CI setup (:pr:`3`)
+
 Version 0.3.2
 =============
 
