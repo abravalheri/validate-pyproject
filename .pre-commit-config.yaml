@@ -1,5 +1,3 @@
-exclude: '^docs/conf.py'
-
 repos:
 - repo: git://github.com/pre-commit/pre-commit-hooks
   rev: v4.1.0

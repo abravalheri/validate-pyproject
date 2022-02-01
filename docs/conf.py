@@ -328,8 +328,8 @@ extlinks = {
     "pr": (f"{repository}/pull/%s", "PR #%s"),
     "discussion": (f"{repository}/discussions/%s", "discussion #%s"),
     "pypi": ("https://pypi.org/project/%s", "%s"),
-    "github": ("https://github.com/%s", "%s")
-    "user": ("https://github.com/sponsors/%s", "%s")
+    "github": ("https://github.com/%s", "%s"),
+    "user": ("https://github.com/sponsors/%s", "%s"),
 }
 
 print(f"loading configurations for {project} {version} ...", file=sys.stderr)
