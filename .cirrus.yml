@@ -170,9 +170,9 @@ windows_task:
 
 
 coverage_task:
-  name: coverage (Linux - 3.6)
+  name: coverage (Linux - 3.7)
   clone_script: *clone
-  container: {image: "python:3.6-buster"}
+  container: {image: "python:3.7-buster"}
   env:
     COVERAGE: yes
     PRE_COMMIT_HOME: ${HOME}/.cache/pre-commit
