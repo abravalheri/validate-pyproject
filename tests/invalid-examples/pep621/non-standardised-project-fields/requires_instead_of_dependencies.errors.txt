@@ -1,0 +1,1 @@
+data must not contain {'requires'} properties

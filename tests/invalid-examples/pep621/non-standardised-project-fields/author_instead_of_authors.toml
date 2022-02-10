@@ -1,0 +1,65 @@
+[build-system]
+requires = ["setuptools", "setuptools_scm[toml]"]
+build-backend = "setuptools.build_meta"
+
+
+[project]
+name = "package"
+description = "Package Description"
+readme = "README.rst"
+author = {name="Author", email="author@gmail.com"}
+license = {file="LICENSE"}
+requires-python = ">=3.6"
+dynamic = ["version"]
+dependencies = [
+    "pywin32; platform_system=='Windows' and platform_python_implementation!='PyPy'",
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+]
+keywords = [
+    "cli",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=6.0",
+]
+docs = [
+    "sphinx>=4.0.0",
+]
+ssh = [
+    "paramiko",
+]
+
+[tool.setuptools]
+platforms = ["POSIX", "Windows"]
+
+[tool.setuptools.packages.find]
+include = ["plumbum"]
+
+[tool.setuptools.package-data]
+"plumbum.cli" = ["i18n/*/LC_MESSAGES/*.mo"]
+
+
+[tool.setuptools_scm]
+write_to = "plumbum/version.py"
+
+
+[tool.mypy]
+files = ["plumbum"]
+
+[[tool.mypy.overrides]]
+module = ["IPython.*"]
+ignore_missing_imports = true
+
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = ["-ra", "--cov-config=setup.cfg", "--strict-markers", "--strict-config"]
+filterwarnings = [
+  "always"
+]
+
+[tool.isort]
+profile = "black"
