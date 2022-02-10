@@ -4,7 +4,7 @@ from itertools import product
 from pathlib import Path
 
 import pytest
-import toml
+import tomli
 from fastjsonschema import JsonSchemaValueException
 
 from validate_pyproject.vendoring import cli, vendorify
@@ -108,7 +108,7 @@ def vendored_validate(monkeypatch):
 
 @pytest.mark.parametrize("example, vendored", product(examples(), _VENDORING))
 def test_examples_api(tmp_path, vendored_validate, example, vendored):
-    toml_equivalent = toml.load(EXAMPLES / example)
+    toml_equivalent = tomli.loads((EXAMPLES / example).read_text())
     vendored_path = vendored(Path(tmp_path))
     return vendored_validate(vendored_path, toml_equivalent) is not None
 
@@ -117,7 +117,7 @@ def test_examples_api(tmp_path, vendored_validate, example, vendored):
 def test_invalid_examples_api(tmp_path, vendored_validate, example, vendored):
     example_file = INVALID / example
     expected_error = error_file(example_file).read_text("utf-8")
-    toml_equivalent = toml.load(example_file)
+    toml_equivalent = tomli.loads(example_file.read_text())
     vendored_path = vendored(Path(tmp_path))
     with pytest.raises(JsonSchemaValueException) as exc_info:
         vendored_validate(vendored_path, toml_equivalent)
