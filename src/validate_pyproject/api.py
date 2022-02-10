@@ -58,7 +58,7 @@ AllPlugins = Enum("AllPlugins", "ALL_PLUGINS")
 ALL_PLUGINS = AllPlugins.ALL_PLUGINS
 
 TOP_LEVEL_SCHEMA = "pyproject_toml"
-PROJECT_TABLE_SCHEMA = "pep621_project"
+PROJECT_TABLE_SCHEMA = "project_metadata"
 
 FORMAT_FUNCTIONS: Mapping[str, FormatValidationFn] = MappingProxyType(
     {
@@ -108,7 +108,8 @@ class SchemaRegistry(Mapping[str, Schema]):
         self._ensure_compatibility(PROJECT_TABLE_SCHEMA, project_table_schema)
         sid = project_table_schema["$id"]
         top_level["project"] = {"$ref": sid}
-        self._schemas = {sid: ("project", f"{__name__} - PEP621", project_table_schema)}
+        origin = f"{__name__} - project metadata"
+        self._schemas = {sid: ("project", origin, project_table_schema)}
 
         # Add tools using Plugins
 
@@ -124,7 +125,8 @@ class SchemaRegistry(Mapping[str, Schema]):
 
         self._main_id = sid = top_level["$id"]
         main_schema = Schema(top_level)
-        self._schemas[sid] = ("<$ROOT>", f"{__name__} - PEP517/518", main_schema)
+        origin = f"{__name__} - build metadata"
+        self._schemas[sid] = ("<$ROOT>", origin, main_schema)
 
     @property
     def spec_version(self) -> str:
