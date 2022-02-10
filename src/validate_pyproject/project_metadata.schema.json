@@ -1,11 +1,11 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema",
 
-  "$id": "https://www.python.org/dev/peps/pep-0621/",
-  "title": "``project`` table",
+  "$id": "https://packaging.python.org/en/latest/specifications/declaring-project-metadata/",
+  "title": "Package metadata stored in the ``project`` table",
   "$$description": [
     "Data structure for the **project** table inside ``pyproject.toml``",
-    "(as defined in :pep:`621`)"
+    "(as initially defined in :pep:`621`)"
   ],
 
   "type": "object",

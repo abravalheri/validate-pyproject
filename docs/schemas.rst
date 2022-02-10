@@ -12,7 +12,7 @@ in :doc:`json-schemas`.
 
 
 .. _project_table:
-.. jsonschema:: ../src/validate_pyproject/pep621_project.schema.json
+.. jsonschema:: ../src/validate_pyproject/project_metadata.schema.json
 
 
 ``tool`` table

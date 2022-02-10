@@ -7,14 +7,17 @@ import tomli
 
 from validate_pyproject import api, errors, plugins, types
 
+PYPA_SPECS = "https://packaging.python.org/en/latest/specifications"
+
 
 def test_load():
     spec = api.load("pyproject_toml")
     assert isinstance(spec, Mapping)
-    assert spec["$id"] == "https://www.python.org/dev/peps/pep-0517/"
 
-    spec = api.load("pep621_project")
-    assert spec["$id"] == "https://www.python.org/dev/peps/pep-0621/"
+    assert spec["$id"] == f"{PYPA_SPECS}/declaring-build-dependencies/"
+
+    spec = api.load("project_metadata")
+    assert spec["$id"] == f"{PYPA_SPECS}/declaring-project-metadata/"
 
 
 def test_load_plugin():
@@ -33,7 +36,7 @@ class TestRegistry:
         registry = api.SchemaRegistry(plg)
         main_schema = registry[registry.main]
         project = main_schema["properties"]["project"]
-        assert project["$ref"] == "https://www.python.org/dev/peps/pep-0621/"
+        assert project["$ref"] == f"{PYPA_SPECS}/declaring-project-metadata/"
         tool = main_schema["properties"]["tool"]
         assert "setuptools" in tool["properties"]
         assert "$ref" in tool["properties"]["setuptools"]
