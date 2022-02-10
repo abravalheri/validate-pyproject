@@ -1,7 +1,7 @@
 [project]
 name = "package"
 description = "description"
-author = { name = "Name", email = "email@example.com" }
+authors = [{ name = "Name", email = "email@example.com" }]
 readme = "README.rst"
 classifiers = [
     "Development Status :: 2 - Pre-Alpha",

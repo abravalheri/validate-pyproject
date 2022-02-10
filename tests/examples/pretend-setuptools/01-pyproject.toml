@@ -1,6 +1,6 @@
 [project]
 name = "some-project"
-author = { name = "Anderson Bravalheri" }
+authors = [{ name = "Anderson Bravalheri" }]
 description = "Some description"
 license = { text = "MIT" }
 readme = "README.rst"
