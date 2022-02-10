@@ -16,7 +16,7 @@ Automatically generated documentation is also available on the
 ``project`` table
 =================
 
-.. literalinclude:: ../src/validate_pyproject/pep621_project.schema.json
+.. literalinclude:: ../src/validate_pyproject/project_metadata.schema.json
 
 ``tool`` table
 ==============
