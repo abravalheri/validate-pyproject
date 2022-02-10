@@ -2,6 +2,14 @@
 Changelog
 =========
 
+Version 0.4
+===========
+
+- Validation now fails when non-standardised fields to be added to the
+  project table (:issue:`4`, :pr:`5`)
+- Terminology and schema names were also updated to avoid specific PEP numbers
+  and refer instead to living standards (:issue:`6`, :pr:`7`)
+
 Version 0.3.3
 =============
 
