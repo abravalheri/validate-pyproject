@@ -182,8 +182,6 @@ def python_entrypoint_name(value: str) -> bool:
 
 
 def python_entrypoint_reference(value: str) -> bool:
-    if ":" not in value:
-        return False
     module, _, rest = value.partition(":")
     if "[" in rest:
         obj, _, extras_ = rest.partition("[")
@@ -196,5 +194,6 @@ def python_entrypoint_reference(value: str) -> bool:
     else:
         obj = rest
 
-    identifiers = chain(module.split("."), obj.split("."))
+    module_parts = module.split(".")
+    identifiers = chain(module_parts, obj.split(".")) if rest else module_parts
     return all(python_identifier(i.strip()) for i in identifiers)
