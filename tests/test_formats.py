@@ -72,6 +72,11 @@ ENTRYPOINT_EXAMPLES = {
             "calver-by-date": "setuptools_scm.version:calver_by_date",
         },
     },
+    "anyio": {
+        "pytest11": {
+            "anyio": "anyio.pytest_plugin",
+        },
+    },
 }
 
 
