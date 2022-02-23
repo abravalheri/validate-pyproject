@@ -1,4 +1,5 @@
 import logging
+import os
 from itertools import chain
 from unittest.mock import Mock
 
@@ -276,29 +277,44 @@ class TestClassifiers:
 
     If at any point these tests start to fail, we know that we need to change strategy.
     """
+    VALID_CLASSIFIERS = (
+        "Development Status :: 5 - Production/Stable",
+        "Framework :: Django",
+        "Operating System :: POSIX",
+        "Programming Language :: Python :: 3 :: Only",
+    )
 
     def test_download(self):
-        classifiers = formats._download_classifiers()
+        try:
+            classifiers = formats._download_classifiers()
+        except Exception as ex:
+            pytest.xfail(f"Error with download: {ex.__class__.__name__} - {ex}")
         assert isinstance(classifiers, str)
         assert bytes(classifiers, "utf-8")
 
-    def test_downloaded(self):
+    def test_downloaded(self, monkeypatch):
+        if os.name != "posix":
+            # Mock on Windows (problems with SSL)
+            downloader = Mock(return_value="\n".join(self.VALID_CLASSIFIERS))
+            monkeypatch.setattr(formats, "_download_classifiers", downloader)
+
         validator = formats._TroveClassifier()
         assert validator("Made Up :: Classifier") is False
         assert validator.downloaded is not None
         assert validator.downloaded is not False
-        assert len(validator.downloaded) > 10
+        assert len(validator.downloaded) > 3
 
     def test_valid_download_only_once(self, monkeypatch):
-        downloader = Mock(side_effect=formats._download_classifiers)
+        if os.name == "posix":
+            # Really download to make sure the API is still exposed by PyPI
+            downloader = Mock(side_effect=formats._download_classifiers)
+        else:
+            # Mock on Windows (problems with SSL)
+            downloader = Mock(return_value="\n".join(self.VALID_CLASSIFIERS))
+
         monkeypatch.setattr(formats, "_download_classifiers", downloader)
         validator = formats._TroveClassifier()
-        for classifier in (
-            "Development Status :: 5 - Production/Stable",
-            "Framework :: Django",
-            "Operating System :: POSIX",
-            "Programming Language :: Python :: 3 :: Only",
-        ):
+        for classifier in self.VALID_CLASSIFIERS:
             assert validator(classifier) is True
         downloader.assert_called_once()
 
