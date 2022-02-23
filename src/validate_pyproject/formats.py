@@ -1,8 +1,8 @@
 import logging
 import re
 import string
-from itertools import chain
-from urllib.parse import urlparse
+import typing
+from itertools import chain as _chain
 
 _logger = logging.getLogger(__name__)
 
@@ -101,7 +101,7 @@ def pep508_versionspec(value: str) -> bool:
 
 def pep517_backend_reference(value: str) -> bool:
     module, _, obj = value.partition(":")
-    identifiers = (i.strip() for i in chain(module.split("."), obj.split(".")))
+    identifiers = (i.strip() for i in _chain(module.split("."), obj.split(".")))
     return all(python_identifier(i) for i in identifiers if i)
 
 
@@ -136,6 +136,8 @@ except ImportError:  # pragma: no cover
 
 
 def url(value: str) -> bool:
+    from urllib.parse import urlparse
+
     try:
         parts = urlparse(value)
         return bool(parts.scheme and parts.netloc)
@@ -195,5 +197,5 @@ def python_entrypoint_reference(value: str) -> bool:
         obj = rest
 
     module_parts = module.split(".")
-    identifiers = chain(module_parts, obj.split(".")) if rest else module_parts
+    identifiers = _chain(module_parts, obj.split(".")) if rest else module_parts
     return all(python_identifier(i.strip()) for i in identifiers)
