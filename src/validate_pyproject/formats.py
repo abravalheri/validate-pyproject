@@ -1,4 +1,5 @@
 import logging
+import os
 import re
 import string
 import typing
@@ -109,6 +110,59 @@ def pep517_backend_reference(value: str) -> bool:
 # Classifiers - PEP 301
 
 
+def _download_classifiers() -> str:
+    import cgi
+    from urllib.request import urlopen
+
+    url = "https://pypi.org/pypi?:action=list_classifiers"
+    with urlopen(url) as response:
+        content_type = response.getheader("content-type", "text/plain")
+        encoding = cgi.parse_header(content_type)[1].get("charset", "utf-8")
+        return response.read().decode(encoding)
+
+
+class _TroveClassifier:
+    """The ``trove_classifiers`` package is the official way of validating classifiers,
+    however this package might not be always available.
+    As a workaround we can still download a list from PyPI.
+    We also don't want to be over strict about it, so simply skipping silently is an
+    option (classifiers will be validated anyway during the upload to PyPI).
+    """
+
+    def __init__(self):
+        self.downloaded: typing.Union[None, False, typing.Set[str]] = None
+        # None => not cached yet
+        # False => cache not available
+
+    def __call__(self, value: str) -> bool:
+        if self.downloaded is False:
+            return True
+
+        if os.getenv("NO_NETWORK"):
+            self.downloaded = False
+            msg = (
+                "Install ``trove-classifiers`` to ensure proper validation. "
+                "Skipping download of classifiers list from PyPI (NO_NETWORK)."
+            )
+            _logger.debug(msg)
+            return True
+
+        if self.downloaded is None:
+            msg = (
+                "Install ``trove-classifiers`` to ensure proper validation. "
+                "Meanwhile a list of classifiers will be downloaded from PyPI."
+            )
+            _logger.debug(msg)
+            try:
+                self.downloaded = set(_download_classifiers().splitlines())
+            except Exception:
+                self.downloaded = False
+                _logger.debug("Problem with download, skipping validation")
+                return True
+
+        return value in self.downloaded
+
+
 try:
     from trove_classifiers import classifiers as _trove_classifiers
 
@@ -116,18 +170,6 @@ try:
         return value in _trove_classifiers
 
 except ImportError:  # pragma: no cover
-
-    class _TroveClassifier:
-        def __init__(self):
-            self._warned = False
-            self.__name__ = "trove-classifier"
-
-        def __call__(self, value: str) -> bool:
-            if self._warned is False:
-                self._warned = True
-                _logger.warning("Install ``trove-classifiers`` to ensure validation.")
-            return True
-
     trove_classifier = _TroveClassifier()
 
 

@@ -1,5 +1,6 @@
 import logging
 from itertools import chain
+from unittest.mock import Mock
 
 import pytest
 
@@ -264,3 +265,58 @@ def test_valid_module_name(example):
 )
 def test_invalid_module_name(example):
     assert formats.python_module_name(example) is False
+
+
+class TestClassifiers:
+    """The ``_TroveClassifier`` class and ``_download_classifiers`` are part of the
+    private API and therefore need to be tested.
+
+    By constantly testing them we can make sure the URL used to download classifiers and
+    the format they are presented are still supported by PyPI.
+
+    If at any point these tests start to fail, we know that we need to change strategy.
+    """
+
+    def test_download(self):
+        classifiers = formats._download_classifiers()
+        assert isinstance(classifiers, str)
+        assert bytes(classifiers, "utf-8")
+
+    def test_downloaded(self):
+        validator = formats._TroveClassifier()
+        assert validator("Made Up :: Classifier") is False
+        assert validator.downloaded is not None
+        assert validator.downloaded is not False
+        assert len(validator.downloaded) > 10
+
+    def test_valid_download_only_once(self, monkeypatch):
+        downloader = Mock(side_effect=formats._download_classifiers)
+        monkeypatch.setattr(formats, "_download_classifiers", downloader)
+        validator = formats._TroveClassifier()
+        for classifier in (
+            "Development Status :: 5 - Production/Stable",
+            "Framework :: Django",
+            "Operating System :: POSIX",
+            "Programming Language :: Python :: 3 :: Only",
+        ):
+            assert validator(classifier) is True
+        downloader.assert_called_once()
+
+    def test_always_valid_with_no_network(self, monkeypatch):
+        monkeypatch.setenv("NO_NETWORK", "1")
+        validator = formats._TroveClassifier()
+        assert validator("Made Up :: Classifier") is True
+        assert not validator.downloaded
+        assert validator("Other Made Up :: Classifier") is True
+        assert not validator.downloaded
+
+    def test_always_valid_after_download_error(self, monkeypatch):
+        def _failed_download():
+            raise OSError()
+
+        monkeypatch.setattr(formats, "_download_classifiers", _failed_download)
+        validator = formats._TroveClassifier()
+        assert validator("Made Up :: Classifier") is True
+        assert not validator.downloaded
+        assert validator("Other Made Up :: Classifier") is True
+        assert not validator.downloaded
