@@ -277,6 +277,7 @@ class TestClassifiers:
 
     If at any point these tests start to fail, we know that we need to change strategy.
     """
+
     VALID_CLASSIFIERS = (
         "Development Status :: 5 - Production/Stable",
         "Framework :: Django",
