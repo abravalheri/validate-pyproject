@@ -8,10 +8,10 @@ on:
     tags: ['v*']  # Push events to matching v*, i.e. v1.0, v20.15.10
   # pull_request:  # Run in every PR
   workflow_dispatch:  # Allow manually triggering the workflow
-  # schedule:
-  #   # Run roughly every 15 days at 00:00 UTC
-  #   # (useful to check if updates on dependencies break the package)
-  #   - cron: '0 0 1,16 * *'
+  schedule:
+    # Run roughly every 15 days at 00:00 UTC
+    # (useful to check if updates on dependencies break the package)
+    - cron: '0 0 1,16 * *'
 
 concurrency:
   group: >-
