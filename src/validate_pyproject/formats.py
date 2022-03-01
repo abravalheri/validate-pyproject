@@ -191,8 +191,6 @@ def url(value: str) -> bool:
             )
             if not (value.startswith("/") or value.startswith("\\") or "@" in value):
                 parts = urlparse(f"http://{value}")
-        elif not parts.netloc:
-            return False
 
         return bool(parts.scheme and parts.netloc)
     except Exception:
