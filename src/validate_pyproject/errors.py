@@ -1,6 +1,6 @@
 from textwrap import dedent
 
-from fastjsonschema import (
+from ._vendor.fastjsonschema import (
     JsonSchemaDefinitionException,
     JsonSchemaException,
     JsonSchemaValueException,

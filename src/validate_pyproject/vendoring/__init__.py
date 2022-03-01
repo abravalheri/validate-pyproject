@@ -6,9 +6,8 @@ from pathlib import Path
 from types import MappingProxyType
 from typing import TYPE_CHECKING, Dict, Mapping, Optional, Sequence, Union
 
-import fastjsonschema as FJS
-
 from .. import api, dist_name, types
+from .._vendor import fastjsonschema as FJS
 
 if sys.version_info[:2] >= (3, 8):  # pragma: no cover
     from importlib import metadata as _M
@@ -17,6 +16,11 @@ else:  # pragma: no cover
     from typing import Pattern
 
     import importlib_metadata as _M
+
+if sys.version_info[:2] >= (3, 7):  # pragma: no cover
+    from importlib import resources as _R
+else:  # pragma: no cover
+    import importlib_resources as _R
 
 if TYPE_CHECKING:  # pragma: no cover
     from ..plugins import PluginWrapper  # noqa
@@ -28,6 +32,7 @@ _logger = logging.getLogger(__name__)
 TEXT_REPLACEMENTS = MappingProxyType(
     {
         "from fastjsonschema import": "from .fastjsonschema_exceptions import",
+        "from ._vendor.fastjsonschema import": "from .fastjsonschema_exceptions import",
     }
 )
 
@@ -85,7 +90,7 @@ def copy_fastjsonschema_exceptions(
     output_dir: Path, replacements: Dict[str, str]
 ) -> Path:
     file = output_dir / "fastjsonschema_exceptions.py"
-    code = replace_text(api.read_text("fastjsonschema", "exceptions.py"), replacements)
+    code = replace_text(api.read_text(FJS.__name__, "exceptions.py"), replacements)
     file.write_text(code, "UTF-8")
     return file
 
@@ -126,7 +131,7 @@ def write_notice(
 
 def load_licenses() -> Dict[str, str]:
     return {
-        "fastjsonschema_license": _find_and_load_licence(_M.files("fastjsonschema")),
+        "fastjsonschema_license": _R.read_text(FJS, "LICENSE"),
         "validate_pyproject_license": _find_and_load_licence(_M.files(dist_name)),
     }
 

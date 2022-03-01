@@ -1,1 +1,1 @@
-data must not contain {'requires'} properties
+project must not contain {'requires'} properties

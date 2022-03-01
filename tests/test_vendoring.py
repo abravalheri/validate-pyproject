@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 import tomli
-from fastjsonschema import JsonSchemaValueException
+from validate_pyproject._vendor.fastjsonschema import JsonSchemaValueException
 
 from validate_pyproject.vendoring import cli, vendorify
 
@@ -33,6 +33,8 @@ def _vendoring_checks(path: Path):
     # Make sure standard replacements work
     file_contents = (path / "fastjsonschema_validations.py").read_text()
     assert "from fastjsonschema" not in file_contents
+    assert "from ._vendor.fastjsonschema" not in file_contents
+    assert "from validate_pyproject._vendor.fastjsonschema" not in file_contents
     assert "from .fastjsonschema_exceptions" in file_contents
 
 

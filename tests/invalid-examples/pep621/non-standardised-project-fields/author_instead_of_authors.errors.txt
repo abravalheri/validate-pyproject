@@ -1,1 +1,1 @@
-data must not contain {'author'} properties
+project must not contain {'author'} properties

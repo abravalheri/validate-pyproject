@@ -5,6 +5,7 @@ source = validate_pyproject
 omit =
     */validate_pyproject/__main__.py
     */validate_pyproject/**/__main__.py
+    */validate_pyproject/_vendor/*
 
 [paths]
 source =

@@ -1,1 +1,1 @@
-data.license must be valid exactly by one of oneOf definition
+project.license must be valid exactly by one definition (2 matches found)
