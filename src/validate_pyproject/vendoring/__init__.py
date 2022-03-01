@@ -11,8 +11,6 @@ from .._vendor import fastjsonschema as FJS
 if sys.version_info[:2] >= (3, 8):  # pragma: no cover
     from importlib import metadata as _M
 else:  # pragma: no cover
-    pass
-
     import importlib_metadata as _M
 
 if sys.version_info[:2] >= (3, 7):  # pragma: no cover
