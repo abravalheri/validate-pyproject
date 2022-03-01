@@ -39,7 +39,7 @@ try:
     if sys.version_info[:2] < (3, 7):  # pragma: no cover
         from importlib_resources import files
     else:  # pragma: no cover
-        from importlib.resources import files  # type: ignore
+        from importlib.resources import files
 
     def read_text(package: Union[str, ModuleType], resource) -> str:
         return files(package).joinpath(resource).read_text(encoding="utf-8")
