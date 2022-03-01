@@ -29,8 +29,8 @@ jobs:
         with: {fetch-depth: 0}  # deep clone for setuptools-scm
       - uses: actions/setup-python@v2
         with: {python-version: "3.10"}
-      - name: Lint code
-        run: pipx run tox -e lint
+      - name: Run static analysis and format checkers
+        run: pipx run tox -e lint,typecheck
       - name: Build package distribution files
         run: pipx run tox -e clean,build
       - name: Record the path of wheel distribution
