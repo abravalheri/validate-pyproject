@@ -22,10 +22,9 @@ from typing import (
     cast,
 )
 
-from fastjsonschema.draft07 import CodeGeneratorDraft07
-from fastjsonschema.ref_resolver import RefResolver
-
 from . import errors, formats
+from ._vendor.fastjsonschema.draft07 import CodeGeneratorDraft07
+from ._vendor.fastjsonschema.ref_resolver import RefResolver
 from .extra_validations import EXTRA_VALIDATIONS
 from .types import FormatValidationFn, Schema, ValidationFn
 

@@ -5,7 +5,7 @@ JSON Schema library).
 
 from typing import Mapping, TypeVar
 
-from fastjsonschema import JsonSchemaValueException
+from ._vendor.fastjsonschema import JsonSchemaValueException
 
 T = TypeVar("T", bound=Mapping)
 

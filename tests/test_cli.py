@@ -2,7 +2,7 @@ import logging
 from pathlib import Path
 
 import pytest
-from fastjsonschema import JsonSchemaValueException
+from validate_pyproject._vendor.fastjsonschema import JsonSchemaValueException
 
 from validate_pyproject import cli, plugins
 

@@ -12,9 +12,8 @@ from itertools import chain
 from textwrap import dedent, wrap
 from typing import Callable, Dict, List, NamedTuple, Sequence, Type, TypeVar
 
-from fastjsonschema import JsonSchemaValueException
-
 from . import __version__
+from ._vendor.fastjsonschema import JsonSchemaValueException
 from .api import Validator
 from .plugins import PluginWrapper
 from .plugins import list_from_entry_points as list_plugins_from_entry_points

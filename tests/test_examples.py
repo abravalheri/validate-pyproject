@@ -2,7 +2,7 @@ import logging
 
 import pytest
 import tomli
-from fastjsonschema import JsonSchemaValueException
+from validate_pyproject._vendor.fastjsonschema import JsonSchemaValueException
 
 from validate_pyproject import api, cli
 
