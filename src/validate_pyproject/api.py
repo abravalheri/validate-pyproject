@@ -7,7 +7,7 @@ import sys
 from enum import Enum
 from functools import partial, reduce
 from itertools import chain
-from types import MappingProxyType
+from types import MappingProxyType, ModuleType
 from typing import (
     TYPE_CHECKING,
     Callable,
@@ -28,6 +28,9 @@ from fastjsonschema.ref_resolver import RefResolver
 from . import errors, formats
 from .extra_validations import EXTRA_VALIDATIONS
 from .types import FormatValidationFn, Schema, ValidationFn
+
+_logger = logging.getLogger(__name__)
+_chain_iter = chain.from_iterable
 
 if TYPE_CHECKING:  # pragma: no cover
     from .plugins import PluginWrapper  # noqa
@@ -60,16 +63,16 @@ ALL_PLUGINS = AllPlugins.ALL_PLUGINS
 TOP_LEVEL_SCHEMA = "pyproject_toml"
 PROJECT_TABLE_SCHEMA = "project_metadata"
 
-FORMAT_FUNCTIONS: Mapping[str, FormatValidationFn] = MappingProxyType(
-    {
+
+def _get_public_functions(module: ModuleType) -> Mapping[str, FormatValidationFn]:
+    return {
         fn.__name__.replace("_", "-"): fn
-        for fn in formats.__dict__.values()
+        for fn in module.__dict__.values()
         if callable(fn) and not fn.__name__.startswith("_")
     }
-)
 
-_logger = logging.getLogger(__name__)
-_chain_iter = chain.from_iterable
+
+FORMAT_FUNCTIONS = MappingProxyType(_get_public_functions(formats))
 
 
 def load(name: str, package: str = __package__, ext: str = ".schema.json") -> Schema:

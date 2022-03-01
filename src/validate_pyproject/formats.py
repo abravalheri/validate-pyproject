@@ -133,6 +133,7 @@ class _TroveClassifier:
         self.downloaded: typing.Union[None, False, typing.Set[str]] = None
         # None => not cached yet
         # False => cache not available
+        self.__name__ = "trove_classifier"  # Emulate a public function
 
     def __call__(self, value: str) -> bool:
         if self.downloaded is False:

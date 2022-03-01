@@ -5,7 +5,7 @@ from unittest.mock import Mock
 
 import pytest
 
-from validate_pyproject import formats
+from validate_pyproject import api, formats
 
 _chain_iter = chain.from_iterable
 
@@ -284,6 +284,33 @@ class TestClassifiers:
         "Operating System :: POSIX",
         "Programming Language :: Python :: 3 :: Only",
     )
+
+    def test_does_not_break_public_function_detection(self):
+        # See https://github.com/abravalheri/validate-pyproject/issues/12
+
+        # When `trove_classifiers` is defined from the dependency package
+        # it will be a function.
+        # When it is defined based on the download, it will be a custom object.
+
+        # In both cases the `_TroveClassifier` class should not be made public,
+        # but the instance should
+
+        trove_classifier = formats._TroveClassifier()
+        _formats = Mock(
+            _TroveClassifier=formats._TroveClassifier,
+            trove_classifiers=trove_classifier,
+        )
+        fns = api._get_public_functions(_formats)
+        assert fns == {"trove-classifier": trove_classifier}
+
+        # Make sure the object and the function have the same name
+        assert "trove-classifier" in api.FORMAT_FUNCTIONS
+        normalized_name = trove_classifier.__name__.replace("_", "-")
+        assert normalized_name == "trove-classifier"
+        assert normalized_name in api.FORMAT_FUNCTIONS
+
+        func_name = trove_classifier.__name__
+        assert getattr(formats, func_name) in api.FORMAT_FUNCTIONS.values()
 
     def test_download(self):
         try:
