@@ -1,6 +1,5 @@
 import logging
 import os
-import re
 import sys
 from pathlib import Path
 from types import MappingProxyType
@@ -11,10 +10,7 @@ from .._vendor import fastjsonschema as FJS
 
 if sys.version_info[:2] >= (3, 8):  # pragma: no cover
     from importlib import metadata as _M
-    from re import Pattern
 else:  # pragma: no cover
-    from typing import Pattern
-
     import importlib_metadata as _M
 
 if sys.version_info[:2] >= (3, 7):  # pragma: no cover
@@ -56,7 +52,7 @@ def vendorify(
 
     validator = api.Validator(plugins)
     code = _compile_to_code(validator)
-    code = replace_text(_fix_generated_code(code), replacements)
+    code = replace_text(code, replacements)
     (out / "fastjsonschema_validations.py").write_text(code, "UTF-8")
 
     copy_fastjsonschema_exceptions(out, replacements)
@@ -146,26 +142,6 @@ NOCHECK_HEADERS = (
     "# pylama:skip=1",
     "\n\n# *** PLEASE DO NOT MODIFY DIRECTLY: Automatically generated code *** \n\n\n",
 )
-PICKLED_PATTERNS = r"^REGEX_PATTERNS = pickle.loads\((.*)\)$"
-PICKLED_PATTERNS_REGEX = re.compile(PICKLED_PATTERNS, re.M)
-
-
-def _fix_generated_code(code: str) -> str:
-    # Replace the pickled regexes with calls to `re.compile` (better to read)
-    match = PICKLED_PATTERNS_REGEX.search(code)
-    if match:
-        import ast
-        import pickle
-
-        pickled_regexes = ast.literal_eval(match.group(1))
-        regexes = pickle.loads(pickled_regexes).items()
-        regexes_ = (f"{k!r}: {_repr_regex(v)}" for k, v in regexes)
-        repr_ = "{\n    " + ",\n    ".join(regexes_) + "\n}"
-        subst = f"REGEX_PATTERNS = {repr_}"
-        code = code.replace(match.group(0), subst)
-        code = code.replace("import re, pickle", "import re")
-
-    return "\n".join(NOCHECK_HEADERS) + code
 
 
 def _find_and_load_licence(files: Optional[Sequence[_M.PackagePath]]) -> str:
@@ -181,11 +157,3 @@ def _find_and_load_licence(files: Optional[Sequence[_M.PackagePath]]) -> str:
         )
         _logger.warning(msg)
         raise
-
-
-def _repr_regex(regex: Pattern) -> str:
-    # Unfortunately using `pprint.pformat` is causing errors
-    all_flags = ("A", "I", "DEBUG", "L", "M", "S", "X")
-    flags = " | ".join(f"re.{f}" for f in all_flags if regex.flags & getattr(re, f))
-    flags = ", " + flags if flags else ""
-    return f"re.compile({regex.pattern!r}{flags})"
