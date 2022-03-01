@@ -5,8 +5,7 @@ from unittest.mock import Mock
 
 import pytest
 
-from validate_pyproject import api
-from validate_pyproject import formats
+from validate_pyproject import api, formats
 
 _chain_iter = chain.from_iterable
 
