@@ -34,11 +34,18 @@ _chain_iter = chain.from_iterable
 if TYPE_CHECKING:  # pragma: no cover
     from .plugins import PluginWrapper  # noqa
 
-if sys.version_info[:2] >= (3, 7):  # pragma: no cover
-    # TODO: Import directly (no need for conditional) when `python_requires = >= 3.7`
+
+try:
+    if sys.version_info[:2] <= (3, 7):  # pragma: no cover
+        from importlib_resources import files
+    else:  # pragma: no cover
+        from importlib.resources import files  # type: ignore
+
+    def read_text(package: Union[str, ModuleType], resource) -> str:
+        return files(package).joinpath(resource).read_text(encoding="utf-8")
+
+except ImportError:  # pragma: no cover
     from importlib.resources import read_text
-else:  # pragma: no cover
-    from importlib_resources import read_text
 
 
 T = TypeVar("T", bound=Mapping)
