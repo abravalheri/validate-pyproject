@@ -17,7 +17,7 @@ else:  # pragma: no cover
 
     import importlib_metadata as _M
 
-if sys.version_info[:2] > (3, 7): # pragma: no cover
+if sys.version_info[:2] > (3, 7):  # pragma: no cover
     from importlib import resources as _R
 else:
     import importlib_resources as _R
