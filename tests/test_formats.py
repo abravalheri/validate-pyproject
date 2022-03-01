@@ -234,7 +234,6 @@ def test_valid_url(example):
         "",
         42,
         "p@python.org",
-        "python.org",
         "http:python.org",
         "/python.org",
     ],
