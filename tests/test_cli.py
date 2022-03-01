@@ -126,7 +126,7 @@ class TestOutput:
         with pytest.raises(SystemExit):
             cli.main([str(invalid_example)])
         captured = caplog.text.lower()
-        assert "data.zip-safe must be boolean" in captured
+        assert "tool.setuptools.zip-safe must be boolean" in captured
         assert "offending rule" in captured
         assert "given value" in captured
         assert '"type": "boolean"' in captured
