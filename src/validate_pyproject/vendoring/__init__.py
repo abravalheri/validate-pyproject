@@ -1,6 +1,5 @@
 import logging
 import os
-import re
 import sys
 from pathlib import Path
 from types import MappingProxyType
@@ -11,9 +10,8 @@ from .._vendor import fastjsonschema as FJS
 
 if sys.version_info[:2] >= (3, 8):  # pragma: no cover
     from importlib import metadata as _M
-    from re import Pattern
 else:  # pragma: no cover
-    from typing import Pattern
+    pass
 
     import importlib_metadata as _M
 
