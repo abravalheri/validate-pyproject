@@ -17,8 +17,8 @@ def format(spec):
             {"type": "array", "items": {"type": "number"}},
             """
             an array (list):
-              - with any items in the form of:
-                * a number value
+            - with any items in the form of:
+              - a number value
             """,
         ),
         (
@@ -29,10 +29,10 @@ def format(spec):
             },
             """
             an array (list):
-              - with any items in the form of:
-                * a number value
-              - with at least one item in the form of:
-                * a string value (pattern: 'a*', max length: 8)
+            - with any items in the form of:
+              - a number value
+            - with at least one item in the form of:
+              - a string value (pattern: 'a*', max length: 8)
             """,
         ),
         (
@@ -48,13 +48,13 @@ def format(spec):
             },
             """
             an array (list):
-              - with the following items:
-                * a number value
-                * a boolean value
-              - with at least one item in the form of:
-                * a string value (pattern: 'a*', max length: 8)
-              - min items: 5
-              - unique items: True
+            - with the following items:
+              - a number value
+              - a boolean value
+            - with at least one item in the form of:
+              - a string value (pattern: 'a*', max length: 8)
+            - min items: 5
+            - unique items: True
             """,
         ),
     ],
@@ -73,8 +73,8 @@ def test_array(example, expected):
             {"type": "object", "minProperties": 2},
             """
             a table (dict):
-              - min fields: 2
-            """
+            - min fields: 2
+            """,
         ),
         (
             {
@@ -84,11 +84,11 @@ def test_array(example, expected):
             },
             """
             a table (dict):
-              - with the following fields:
-                * `number`: a number value
-                * /^.*/ (pattern): a value that does **NOT** match the following:
-                    - a string value
-              - extra fields are allowed
+            - with the following fields:
+              - `number`: a number value
+              - /^.*/ (pattern): NOT ("negative" match):
+                - a string value
+            - extra fields are allowed
             """,
         ),
         (
@@ -99,11 +99,11 @@ def test_array(example, expected):
             },
             """
             a table (dict):
-              - with the following fields:
-                * `type`: one of ['A', 'B']
-              - with any fields in the form of:
-                * a string value (pattern: 'a*', max length: 8)
-              - extra fields are allowed
+            - with the following fields:
+              - `type`: one of ['A', 'B']
+            - with any fields in the form of:
+              - a string value (pattern: 'a*', max length: 8)
+            - extra fields are allowed
             """,
         ),
         (
@@ -120,14 +120,14 @@ def test_array(example, expected):
             },
             """
             a table (dict):
-              - with the following fields:
-                * `type`: one of ['A', 'B']
-              - with any fields in the form of:
-                * a value that matches exactly one of the following:
-                    - specifically '*'
-                    - a string value (pattern: 'a*', min length: 8)
-              - no extra fields
-              - required fields: ['type']
+            - with the following fields:
+              - `type`: one of ['A', 'B']
+            - with any fields in the form of:
+              - one of the following (only one):
+                - specifically '*'
+                - a string value (pattern: 'a*', min length: 8)
+            - no extra fields
+            - required fields: ['type']
             """,
         ),
         (
@@ -146,19 +146,121 @@ def test_array(example, expected):
             },
             """
             a table (dict):
-              - with the following fields:
-                * `type`: one of ['A', 'B']
-              - with any fields in the form of:
-                * a value that does NOT match any (one or more) of the following:
-                    - specifically '*'
-                    - a string value (pattern: '.*', min length: 8)
-              - no extra fields
-              - required fields: ['type']
+            - with the following fields:
+              - `type`: one of ['A', 'B']
+            - with any fields in the form of:
+              - NOT ("negative" match):
+                - any of the following (one or more):
+                  - specifically '*'
+                  - a string value (pattern: '.*', min length: 8)
+            - no extra fields
+            - required fields: ['type']
             """,
         ),
     ],
 )
 def test_object(example, expected):
+    formatted = format(example)
+    expected = f"{cleandoc(expected)}\n"
+    assert formatted == expected
+
+
+@pytest.mark.parametrize(
+    "example, expected",
+    [
+        (
+            {
+                "type": "object",
+                "properties": {
+                    "street_address": {"type": "string"},
+                    "country": {
+                        "default": "United States of America",
+                        "enum": ["United States of America", "Canada", "Netherlands"],
+                    },
+                },
+                "allOf": [
+                    {
+                        "if": {
+                            "properties": {
+                                "country": {"const": "United States of America"}
+                            }
+                        },
+                        "then": {
+                            "properties": {
+                                "postal_code": {"pattern": "[0-9]{5}(-[0-9]{4})?"}
+                            }
+                        },
+                    },
+                    {
+                        "if": {
+                            "properties": {"country": {"const": "Canada"}},
+                            "required": ["country"],
+                        },
+                        "then": {
+                            "properties": {
+                                "postal_code": {
+                                    "pattern": "[A-Z][0-9][A-Z] [0-9][A-Z][0-9]"
+                                }
+                            }
+                        },
+                    },
+                    {
+                        "if": {
+                            "properties": {"country": {"const": "Netherlands"}},
+                            "required": ["country"],
+                        },
+                        "then": {
+                            "properties": {
+                                "postal_code": {"pattern": "[0-9]{4} [A-Z]{2}"}
+                            }
+                        },
+                    },
+                ],
+            },
+            """
+            a table (dict):
+            - with the following fields:
+              - `street_address`: a string value
+              - `country`: one of ['United States of America', 'Canada', 'Netherlands']
+            - extra fields are allowed
+            - all of the following:
+              - if:
+                - a table (dict):
+                  - with the following fields:
+                    - `country`: specifically 'United States of America'
+                  - extra fields are allowed
+                then:
+                - a table (dict):
+                  - with the following fields:
+                    - `postal_code`: a string value (pattern: '[0-9]{5}(-[0-9]{4})?')
+                  - extra fields are allowed
+              - if:
+                - a table (dict):
+                  - with the following fields:
+                    - `country`: specifically 'Canada'
+                  - extra fields are allowed
+                  - required fields: ['country']
+                then:
+                - a table (dict):
+                  - with the following fields:
+                    - `postal_code`: a string value (pattern: '[A-Z][0-9][A-Z] [0-9][A-Z][0-9]')
+                  - extra fields are allowed
+              - if:
+                - a table (dict):
+                  - with the following fields:
+                    - `country`: specifically 'Netherlands'
+                  - extra fields are allowed
+                  - required fields: ['country']
+                then:
+                - a table (dict):
+                  - with the following fields:
+                    - `postal_code`: a string value (pattern: '[0-9]{4} [A-Z]{2}')
+                  - extra fields are allowed
+            """
+        )
+    ],
+)
+def test_complex(example, expected):
     formatted = format(example)
     expected = f"{cleandoc(expected)}\n"
     assert formatted == expected

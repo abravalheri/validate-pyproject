@@ -70,26 +70,27 @@ class _ErrorProcessor:
 
 
 class _Formatter:
-    def __call__(self, definition: dict, *, _neg=False) -> str:
+    COMPLEX = ("anyOf", "oneOf", "allOf", "if", "then", "else")
+
+    def __call__(self, definition: dict) -> str:
         if "enum" in definition:
             return f"one of {definition['enum']!r}\n"
         if "const" in definition:
             return f"specifically {definition['const']!r}\n"
 
-        if "not" in definition and definition["not"]:
-            return self._format_not(definition["not"])
+        spec = definition.copy()
+        if "properties" in spec and "type" not in spec:
+            spec["type"] = "object"
+        if "pattern" in spec and "type" not in spec:
+            spec["type"] = "string"
 
-        for rule in ("anyOf", "oneOf", "allOf"):
-            if rule in definition and definition[rule]:
-                return self._format_composition(rule, definition[rule], _neg)
+        if "type" in spec:
+            return self._format_type(spec)
 
-        if "properties" in definition and "type" not in definition:
-            definition["type"] = "object"
-        if "pattern" in definition and "type" not in definition:
-            definition["type"] = "string"
+        if "not" in spec and spec["not"]:
+            return self._format_not(spec["not"])
 
-        if "type" in definition:
-            return self._format_type(definition)
+        return self._format_all_complex(spec)
 
     def _format_type(self, definition: dict) -> str:
         type_ = definition["type"]
@@ -103,24 +104,33 @@ class _Formatter:
         return f"a {type_} value{suffix}\n"
 
     def _format_not(self, definition: dict) -> str:
-        prefix = "  - "
-        if any(rule in definition for rule in ("anyOf", "oneOf", "allOf")):
-            return self(definition, _neg=True)
-
+        prefix = "- "
         child = self.details(definition, prefix)
-        return f"a value that does **NOT** match the following:\n{child}"
+        return f'NOT ("negative" match):\n{child}'
 
-    def _format_composition(self, rule: str, definitions: List[dict], neg=False) -> str:
+    def _format_all_complex(self, definition, *, prefix=""):
+        with io.StringIO() as buffer:
+            for rule in self.COMPLEX:
+                if rule in definition and definition[rule]:
+                    spec = definition.pop(rule)
+                    buffer.write(self._format_complex(rule, spec, prefix=prefix))
+
+            return buffer.getvalue()
+
+    def _format_complex(
+        self, rule: str, definition: Union[dict, List[dict]], *, prefix=""
+    ) -> str:
+        child_prefix = (len(prefix) * " ") + f"- "
         expr = {
-            "anyOf": "any (one or more)",
-            "oneOf": "exactly one",
-            "allOf": "all",
+            "anyOf": f"any of the following (one or more)",
+            "oneOf": f"one of the following (only one)",
+            "allOf": f"all of the following",
         }
-
-        prefix = "  - "
-        pred = "does NOT match" if neg else "matches"
-        children = "".join(self.details(k, prefix) for k in definitions)
-        return f"a value that {pred} {expr[rule]} of the following:\n{children}"
+        if isinstance(definition, list):
+            children = "".join(self.details(k, child_prefix) for k in definition)
+        else:
+            children = self.details(definition, child_prefix)
+        return f"{prefix}{expr.get(rule, rule)}:\n{children}"
 
     def _format_object(self, definition):
         with io.StringIO() as buffer:
@@ -133,25 +143,27 @@ class _Formatter:
             }
             required: List[str] = spec.pop("required", [])
 
-            prefix = "    * "
+            prefix = "  - "  # children prefix
             buffer.write("a table (dict)\n")
             if properties:
-                buffer.write("  - with the following fields:\n")
+                buffer.write("- with the following fields:\n")
                 children = (self.details(v, prefix, k) for k, v in properties.items())
                 buffer.write("".join(children))
             if property_names:
-                buffer.write("  - with any fields in the form of:\n")
+                buffer.write("- with any fields in the form of:\n")
                 buffer.write(self.details(property_names, prefix))
             if spec.pop("additionalProperties", True) is False:
-                buffer.write("  - no extra fields\n")
+                buffer.write("- no extra fields\n")
             elif properties or property_names:
-                buffer.write("  - extra fields are allowed\n")
+                buffer.write("- extra fields are allowed\n")
             if required:
-                buffer.write(f"  - required fields: {required!r}\n")
+                buffer.write(f"- required fields: {required!r}\n")
+
+            buffer.write(self._format_all_complex(spec, prefix="- "))
 
             attrs = "\n".join(_format_attrs(spec)).replace("properties", "fields")
             if attrs:
-                buffer.write(indent(attrs + "\n", "  - "))
+                buffer.write(indent(attrs + "\n", "- "))
 
             return _add_colon(buffer.getvalue())
 
@@ -162,27 +174,31 @@ class _Formatter:
             general_item: Union[bool, dict] = spec.pop("items", {})
             contains: Optional[dict] = spec.pop("contains", None)
 
-            prefix = "    * "
+            prefix = "  - "  # children prefix
             buffer.write(f"an array (list)\n")
             if items:
-                buffer.write("  - with the following items:\n")
+                buffer.write("- with the following items:\n")
                 buffer.write("".join(self.details(i, prefix) for i in items))
                 if general_item is False:
-                    buffer.write("  - no extra item\n")
+                    buffer.write("- no extra item\n")
             if general_item:
-                buffer.write("  - with any items in the form of:\n")
+                buffer.write("- with any items in the form of:\n")
                 buffer.write(self.details(general_item, prefix))
             if contains:
-                buffer.write("  - with at least one item in the form of:\n")
+                buffer.write("- with at least one item in the form of:\n")
                 buffer.write(self.details(contains, prefix))
+
+            buffer.write(self._format_all_complex(spec, prefix="- "))
 
             attrs = "\n".join(_format_attrs(spec))
             if attrs:
-                buffer.write(indent(attrs + "\n", "  - "))
+                buffer.write(indent(attrs + "\n", "- "))
 
             return _add_colon(buffer.getvalue())
 
-    def details(self, definition: dict, prefix="  - ", name: str = "") -> str:
+    def details(
+        self, definition: Union[dict, List[dict]], prefix="- ", name: str = ""
+    ) -> str:
         L = len(prefix)
         rest = indent(self(definition), L * " ")
         return prefix + (f"{name}: " if name else "") + rest[L:]
