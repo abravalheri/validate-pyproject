@@ -16,9 +16,9 @@ def format(spec):
         (
             {"type": "array", "items": {"type": "number"}},
             """
-            an array (list)
-            - with any items in the form of:
-              * a number value
+            an array (list):
+              - with any items in the form of:
+                * a number value
             """,
         ),
         (
@@ -28,11 +28,11 @@ def format(spec):
                 "contains": {"type": "string", "pattern": "a*", "maxLength": 8},
             },
             """
-            an array (list)
-            - with any items in the form of:
-              * a number value
-            - with at least one item in the form of:
-              * a string value (pattern: 'a*', max length: 8)
+            an array (list):
+              - with any items in the form of:
+                * a number value
+              - with at least one item in the form of:
+                * a string value (pattern: 'a*', max length: 8)
             """,
         ),
         (
@@ -47,14 +47,14 @@ def format(spec):
                 "uniqueItems": True,
             },
             """
-            an array (list)
-            - with the following items:
-              * a number value
-              * a boolean value
-            - with at least one item in the form of:
-              * a string value (pattern: 'a*', max length: 8)
-            - min items: 5
-            - unique items: True
+            an array (list):
+              - with the following items:
+                * a number value
+                * a boolean value
+              - with at least one item in the form of:
+                * a string value (pattern: 'a*', max length: 8)
+              - min items: 5
+              - unique items: True
             """,
         ),
     ],
@@ -72,8 +72,8 @@ def test_array(example, expected):
         (
             {"type": "object", "minProperties": 2},
             """
-            a table (dict)
-            - min fields: 2
+            a table (dict):
+              - min fields: 2
             """
         ),
         (
@@ -83,11 +83,11 @@ def test_array(example, expected):
                 "patternProperties": {"^.*": {"type": "string"}},
             },
             """
-            a table (dict)
-            - with the following fields:
-              * `number`: a number value
-              * /^.*/ (pattern): a string value
-            - extra fields are allowed
+            a table (dict):
+              - with the following fields:
+                * `number`: a number value
+                * /^.*/ (pattern): a string value
+              - extra fields are allowed
             """,
         ),
         (
@@ -97,12 +97,12 @@ def test_array(example, expected):
                 "propertyNames": {"pattern": "a*", "maxLength": 8},
             },
             """
-            a table (dict)
-            - with the following fields:
-              * `type`: one of ['A', 'B']
-            - with any fields in the form of:
-              * a string value (pattern: 'a*', max length: 8)
-            - extra fields are allowed
+            a table (dict):
+              - with the following fields:
+                * `type`: one of ['A', 'B']
+              - with any fields in the form of:
+                * a string value (pattern: 'a*', max length: 8)
+              - extra fields are allowed
             """,
         ),
         (
@@ -113,13 +113,13 @@ def test_array(example, expected):
                 "required": ["type"],
             },
             """
-            a table (dict)
-            - with the following fields:
-              * `type`: one of ['A', 'B']
-            - with any fields in the form of:
-              * specifically '*'
-            - no extra fields
-            - required fields: ['type']
+            a table (dict):
+              - with the following fields:
+                * `type`: one of ['A', 'B']
+              - with any fields in the form of:
+                * specifically '*'
+              - no extra fields
+              - required fields: ['type']
             """,
         ),
     ],

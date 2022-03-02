@@ -1,5 +1,6 @@
 import io
 import re
+from itertools import chain
 from numbers import Number
 from textwrap import indent
 from typing import Union, List, Optional, Callable
@@ -101,27 +102,27 @@ class _Formatter:
             }
             required: List[str] = spec.pop("required", [])
 
-            prefix = "  * "
+            prefix = "    * "
             buffer.write("a table (dict)\n")
             if properties:
-                buffer.write("- with the following fields:\n")
+                buffer.write("  - with the following fields:\n")
                 children = (self.details(v, prefix, k) for k, v in properties.items())
                 buffer.write("".join(children))
             if property_names:
-                buffer.write("- with any fields in the form of:\n")
+                buffer.write("  - with any fields in the form of:\n")
                 buffer.write(self.details({"type": "string", **property_names}, prefix))
             if spec.pop("additionalProperties", True) is False:
-                buffer.write("- no extra fields\n")
+                buffer.write("  - no extra fields\n")
             elif properties or property_names:
-                buffer.write("- extra fields are allowed\n")
+                buffer.write("  - extra fields are allowed\n")
             if required:
-                buffer.write(f"- required fields: {required!r}\n")
+                buffer.write(f"  - required fields: {required!r}\n")
 
             attrs = "\n".join(_format_attrs(spec)).replace("properties", "fields")
             if attrs:
-                buffer.write(indent(attrs + "\n", "- "))
+                buffer.write(indent(attrs + "\n", "  - "))
 
-            return buffer.getvalue()
+            return _add_colon(buffer.getvalue())
 
     def _format_array(self, definition: dict) -> str:
         with io.StringIO() as buffer:
@@ -130,25 +131,25 @@ class _Formatter:
             general_item: Union[bool, dict] = spec.pop("items", {})
             contains: Optional[dict] = spec.pop("contains", None)
 
-            prefix = "  * "
+            prefix = "    * "
             buffer.write(f"an array (list)\n")
             if items:
-                buffer.write("- with the following items:\n")
+                buffer.write("  - with the following items:\n")
                 buffer.write("".join(self.details(i, prefix) for i in items))
                 if general_item is False:
-                    buffer.write("- no extra item\n")
+                    buffer.write("  - no extra item\n")
             if general_item:
-                buffer.write("- with any items in the form of:\n")
+                buffer.write("  - with any items in the form of:\n")
                 buffer.write(self.details(general_item, prefix))
             if contains:
-                buffer.write("- with at least one item in the form of:\n")
+                buffer.write("  - with at least one item in the form of:\n")
                 buffer.write(self.details(contains, prefix))
 
             attrs = "\n".join(_format_attrs(spec))
             if attrs:
-                buffer.write(indent(attrs + "\n", "- "))
+                buffer.write(indent(attrs + "\n", "  - "))
 
-            return buffer.getvalue()
+            return _add_colon(buffer.getvalue())
 
     def details(self, definition: dict, prefix="  - ", name: str = "") -> str:
         L = len(prefix)
@@ -175,3 +176,12 @@ def _format_attrs(definition: dict) -> List[str]:
     ["pattern": "'a*'"]
     """
     return [f"{_format_attr(k)}: {v!r}" for k, v in definition.items() if k != "type"]
+
+
+def _add_colon(text: str) -> str:
+    lines = text.splitlines(keepends=True)
+    if len(lines) <= 1:
+        return text
+    header = lines[0].strip()
+    changed = lines[0].replace(header, f"{header.rstrip(':')}:")
+    return "".join(chain((changed,), lines[1:]))
