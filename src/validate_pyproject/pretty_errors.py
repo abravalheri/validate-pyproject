@@ -73,9 +73,9 @@ class _Formatter:
         if "properties" in definition and "type" not in definition:
             definition["type"] = "object"
         if "enum" in definition:
-            return f"one of: {definition['enum']!r}\n"
+            return f"one of {definition['enum']!r}\n"
         if "const" in definition:
-            return f"specifically: {definition['const']!r}\n"
+            return f"specifically {definition['const']!r}\n"
         if "type" in definition:
             return self._format_type(definition)
 
@@ -91,7 +91,37 @@ class _Formatter:
         return f"a {type_} value{suffix}\n"
 
     def _format_object(self, definition):
-        pass
+        with io.StringIO() as buffer:
+            spec = definition.copy()
+            property_names = spec.pop("propertyNames", {})
+            pattern_properties = spec.pop("patternProperties", {})
+            properties: dict = {
+                **{f"`{k}`": v for k, v in spec.pop("properties", {}).items()},
+                **{f"/{k}/ (pattern)": v for k, v in pattern_properties.items()},
+            }
+            required: List[str] = spec.pop("required", [])
+
+            prefix = "  * "
+            buffer.write("a table (dict)\n")
+            if properties:
+                buffer.write("- with the following fields:\n")
+                children = (self.details(v, prefix, k) for k, v in properties.items())
+                buffer.write("".join(children))
+            if property_names:
+                buffer.write("- with any fields in the form of:\n")
+                buffer.write(self.details({"type": "string", **property_names}, prefix))
+            if spec.pop("additionalProperties", True) is False:
+                buffer.write("- no extra fields\n")
+            elif properties or property_names:
+                buffer.write("- extra fields are allowed\n")
+            if required:
+                buffer.write(f"- required fields: {required!r}\n")
+
+            attrs = "\n".join(_format_attrs(spec)).replace("properties", "fields")
+            if attrs:
+                buffer.write(indent(attrs + "\n", "- "))
+
+            return buffer.getvalue()
 
     def _format_array(self, definition: dict) -> str:
         with io.StringIO() as buffer:
@@ -120,11 +150,10 @@ class _Formatter:
 
             return buffer.getvalue()
 
-
-    def details(self, definition: dict, prefix="  - ") -> str:
+    def details(self, definition: dict, prefix="  - ", name: str = "") -> str:
         L = len(prefix)
         rest = indent(self(definition), L * " ")
-        return prefix + rest[L:]
+        return prefix + (f"{name}: " if name else "") + rest[L:]
 
 
 CAMEL_CASE_SPLITTER = re.compile(r"\W+|([A-Z][^A-Z\W]*)")
