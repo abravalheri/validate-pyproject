@@ -137,6 +137,7 @@ class _Formatter:
             spec = definition.copy()
             property_names = spec.pop("propertyNames", {})
             pattern_properties = spec.pop("patternProperties", {})
+            additional_properties = spec.pop("additionalProperties", None)
             properties: dict = {
                 **{f"`{k}`": v for k, v in spec.pop("properties", {}).items()},
                 **{f"/{k}/ (pattern)": v for k, v in pattern_properties.items()},
@@ -152,10 +153,10 @@ class _Formatter:
             if property_names:
                 buffer.write("- with any fields in the form of:\n")
                 buffer.write(self.details(property_names, prefix))
-            if spec.pop("additionalProperties", True) is False:
-                buffer.write("- no extra fields\n")
-            elif properties or property_names:
+            if additional_properties is True:
                 buffer.write("- extra fields are allowed\n")
+            elif additional_properties is False:
+                buffer.write("- no extra fields\n")
             if required:
                 buffer.write(f"- required fields: {required!r}\n")
 

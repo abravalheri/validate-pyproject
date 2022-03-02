@@ -88,7 +88,6 @@ def test_array(example, expected):
               - `number`: a number value
               - /^.*/ (pattern): NOT ("negative" match):
                 - a string value
-            - extra fields are allowed
             """,
         ),
         (
@@ -103,7 +102,6 @@ def test_array(example, expected):
               - `type`: one of ['A', 'B']
             - with any fields in the form of:
               - a string value (pattern: 'a*', max length: 8)
-            - extra fields are allowed
             """,
         ),
         (
@@ -222,40 +220,33 @@ def test_object(example, expected):
             - with the following fields:
               - `street_address`: a string value
               - `country`: one of ['United States of America', 'Canada', 'Netherlands']
-            - extra fields are allowed
             - all of the following:
               - if:
                 - a table (dict):
                   - with the following fields:
                     - `country`: specifically 'United States of America'
-                  - extra fields are allowed
                 then:
                 - a table (dict):
                   - with the following fields:
                     - `postal_code`: a string value (pattern: '[0-9]{5}(-[0-9]{4})?')
-                  - extra fields are allowed
               - if:
                 - a table (dict):
                   - with the following fields:
                     - `country`: specifically 'Canada'
-                  - extra fields are allowed
                   - required fields: ['country']
                 then:
                 - a table (dict):
                   - with the following fields:
                     - `postal_code`: a string value (pattern: '[A-Z][0-9][A-Z] [0-9][A-Z][0-9]')
-                  - extra fields are allowed
               - if:
                 - a table (dict):
                   - with the following fields:
                     - `country`: specifically 'Netherlands'
-                  - extra fields are allowed
                   - required fields: ['country']
                 then:
                 - a table (dict):
                   - with the following fields:
                     - `postal_code`: a string value (pattern: '[0-9]{4} [A-Z]{2}')
-                  - extra fields are allowed
             """
         )
     ],
