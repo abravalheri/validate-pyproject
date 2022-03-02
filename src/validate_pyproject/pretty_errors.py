@@ -70,13 +70,24 @@ class _ErrorProcessor:
 
 
 class _Formatter:
-    def __call__(self, definition: dict) -> str:
-        if "properties" in definition and "type" not in definition:
-            definition["type"] = "object"
+    def __call__(self, definition: dict, *, _neg=False) -> str:
         if "enum" in definition:
             return f"one of {definition['enum']!r}\n"
         if "const" in definition:
             return f"specifically {definition['const']!r}\n"
+
+        if "not" in definition and definition["not"]:
+            return self._format_not(definition["not"])
+
+        for rule in ("anyOf", "oneOf", "allOf"):
+            if rule in definition and definition[rule]:
+                return self._format_composition(rule, definition[rule], _neg)
+
+        if "properties" in definition and "type" not in definition:
+            definition["type"] = "object"
+        if "pattern" in definition and "type" not in definition:
+            definition["type"] = "string"
+
         if "type" in definition:
             return self._format_type(definition)
 
@@ -90,6 +101,26 @@ class _Formatter:
         attrs = _format_attrs(definition)
         suffix = f" ({', '.join(attrs)})" if attrs else ""
         return f"a {type_} value{suffix}\n"
+
+    def _format_not(self, definition: dict) -> str:
+        prefix = "  - "
+        if any(rule in definition for rule in ("anyOf", "oneOf", "allOf")):
+            return self(definition, _neg=True)
+
+        child = self.details(definition, prefix)
+        return f"a value that does **NOT** match the following:\n{child}"
+
+    def _format_composition(self, rule: str, definitions: List[dict], neg=False) -> str:
+        expr = {
+            "anyOf": "any (one or more)",
+            "oneOf": "exactly one",
+            "allOf": "all",
+        }
+
+        prefix = "  - "
+        pred = "does NOT match" if neg else "matches"
+        children = "".join(self.details(k, prefix) for k in definitions)
+        return f"a value that {pred} {expr[rule]} of the following:\n{children}"
 
     def _format_object(self, definition):
         with io.StringIO() as buffer:
@@ -110,7 +141,7 @@ class _Formatter:
                 buffer.write("".join(children))
             if property_names:
                 buffer.write("  - with any fields in the form of:\n")
-                buffer.write(self.details({"type": "string", **property_names}, prefix))
+                buffer.write(self.details(property_names, prefix))
             if spec.pop("additionalProperties", True) is False:
                 buffer.write("  - no extra fields\n")
             elif properties or property_names:

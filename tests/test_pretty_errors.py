@@ -80,13 +80,14 @@ def test_array(example, expected):
             {
                 "type": "object",
                 "properties": {"number": {"type": "number"}},
-                "patternProperties": {"^.*": {"type": "string"}},
+                "patternProperties": {"^.*": {"not": {"type": "string"}}},
             },
             """
             a table (dict):
               - with the following fields:
                 * `number`: a number value
-                * /^.*/ (pattern): a string value
+                * /^.*/ (pattern): a value that does **NOT** match the following:
+                    - a string value
               - extra fields are allowed
             """,
         ),
@@ -108,7 +109,12 @@ def test_array(example, expected):
         (
             {
                 "properties": {"type": {"enum": ["A", "B"]}},
-                "propertyNames": {"const": "*"},
+                "propertyNames": {
+                    "oneOf": [
+                        {"const": "*"},
+                        {"pattern": "a*", "minLength": 8},
+                    ]
+                },
                 "additionalProperties": False,
                 "required": ["type"],
             },
@@ -117,7 +123,35 @@ def test_array(example, expected):
               - with the following fields:
                 * `type`: one of ['A', 'B']
               - with any fields in the form of:
-                * specifically '*'
+                * a value that matches exactly one of the following:
+                    - specifically '*'
+                    - a string value (pattern: 'a*', min length: 8)
+              - no extra fields
+              - required fields: ['type']
+            """,
+        ),
+        (
+            {
+                "properties": {"type": {"enum": ["A", "B"]}},
+                "propertyNames": {
+                    "not": {
+                        "anyOf": [
+                            {"const": "*"},
+                            {"pattern": ".*", "minLength": 8},
+                        ]
+                    }
+                },
+                "additionalProperties": False,
+                "required": ["type"],
+            },
+            """
+            a table (dict):
+              - with the following fields:
+                * `type`: one of ['A', 'B']
+              - with any fields in the form of:
+                * a value that does NOT match any (one or more) of the following:
+                    - specifically '*'
+                    - a string value (pattern: '.*', min length: 8)
               - no extra fields
               - required fields: ['type']
             """,
