@@ -247,7 +247,7 @@ def test_object(example, expected):
                 - a table (dict):
                   - with the following fields:
                     - `postal_code`: a string value (pattern: '[0-9]{4} [A-Z]{2}')
-            """
+            """,
         )
     ],
 )

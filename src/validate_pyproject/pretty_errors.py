@@ -1,16 +1,15 @@
 import io
 import re
 from itertools import chain
-from numbers import Number
 from textwrap import indent
-from typing import Union, List, Optional, Callable
+from typing import Callable, List, Optional, Union
 
 from ._vendor.fastjsonschema import JsonSchemaValueException
 
 
 def format_error(ex: JsonSchemaValueException) -> str:
     name = f"`{ex.name.replace('data.','')}`"
-    header = ex.message.replace(ex.name, name)
+    ex.message.replace(ex.name, name)
 
 
 class _ErrorProcessor:
