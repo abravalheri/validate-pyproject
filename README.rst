@@ -100,8 +100,8 @@ You can also use ``validate-pyproject`` in your Python scripts or projects:
 
     try:
         validator(pyproject_as_dict)
-    except errors.JsonSchemaValueException:
-        print("Invalid Document")
+    except errors.ValidationError as ex:
+        print(f"Invalid Document: {ex.message}")
 
 To do so, don't forget to add it to your `virtual environment`_ or specify it as a
 `project`_ or `library dependency`_.
