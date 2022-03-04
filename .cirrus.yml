@@ -61,7 +61,7 @@ typecheck_task:
   name: typecheck (Linux - 3.10)
   only_if: $TYPE_CHECKING == 'true'
   clone_script: *clone
-  container: {image: "python:3.9-bullseye"}  # most recent => better type support
+  container: {image: "python:3.10-bullseye"}  # most recent => better type support
   pip_cache: *pip-cache
   mypy_cache:
     folder: .mypy_cache
