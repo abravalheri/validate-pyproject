@@ -13,11 +13,6 @@ if sys.version_info[:2] >= (3, 8):  # pragma: no cover
 else:  # pragma: no cover
     import importlib_metadata as _M
 
-if sys.version_info[:2] >= (3, 7):  # pragma: no cover
-    from importlib import resources as _R
-else:  # pragma: no cover
-    import importlib_resources as _R
-
 if TYPE_CHECKING:  # pragma: no cover
     from ..plugins import PluginWrapper  # noqa
 
@@ -128,7 +123,7 @@ def write_notice(
 
 def load_licenses() -> Dict[str, str]:
     return {
-        "fastjsonschema_license": _R.read_text(FJS, "LICENSE"),
+        "fastjsonschema_license": api.read_text(FJS, "LICENSE"),
         "validate_pyproject_license": _find_and_load_licence(_M.files(dist_name)),
     }
 

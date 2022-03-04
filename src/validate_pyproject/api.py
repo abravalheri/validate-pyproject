@@ -35,25 +35,18 @@ _chain_iter = chain.from_iterable
 if TYPE_CHECKING:  # pragma: no cover
     from .plugins import PluginWrapper  # noqa
 
-if sys.version_info[:2] >= (3, 7):  # pragma: no cover
-    # TODO: Import directly (no need for conditional) when `python_requires = >= 3.7`
+
+try:
+    if sys.version_info[:2] < (3, 7):  # pragma: no cover
+        from importlib_resources import files
+    else:  # pragma: no cover
+        from importlib.resources import files
+
+    def read_text(package: Union[str, ModuleType], resource) -> str:
+        return files(package).joinpath(resource).read_text(encoding="utf-8")
+
+except ImportError:  # pragma: no cover
     from importlib.resources import read_text
-else:  # pragma: no cover
-    try:
-        from pkgutil import get_data  # pragma: no cover
-    except ImportError as ex:
-        msg = "Please install `setuptools` or `importlib_metadata`"
-        raise ImportError(msg) from ex
-
-    # The following "polyfill" is taken from PyScaffold (licensed under MIT)
-    # https://github.com/pyscaffold/pyscaffold/blob/master/LICENSE.txt
-    # https://github.com/pyscaffold/pyscaffold/blob/609f548574618834e6056997aff411b43a24e3fb/src/pyscaffold/templates/__init__.py#L27
-
-    def read_text(package, resource, encoding="utf-8") -> str:  # pragma: no cover
-        data = get_data(package, resource)
-        if data is None:
-            raise FileNotFoundError(f"{resource!r} resource not found in {package!r}")
-        return data.decode(encoding)
 
 
 T = TypeVar("T", bound=Mapping)
