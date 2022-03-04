@@ -58,6 +58,7 @@ def vendorify(
     copy_fastjsonschema_exceptions(out, replacements)
     copy_module("extra_validations", out, replacements)
     copy_module("formats", out, replacements)
+    copy_module("error_reporting", out, replacements)
     write_main(out / main_file, validator.schema, replacements)
     write_notice(out, main_file, original_cmd, replacements)
     (out / "__init__.py").touch()
