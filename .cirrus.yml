@@ -32,6 +32,7 @@ env:
     # This script is also used in Windows, so the shell is not POSIX
     - git config --global user.email "you@example.com"
     - git config --global user.name "Your Name"
+    - python -VV  # Useful for debugging
   clean_workspace_script:
     # Avoid information carried from one run to the other
     - rm -rf .coverage junit-*.xml .tox
