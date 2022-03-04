@@ -5,6 +5,7 @@ from ._vendor.fastjsonschema import (
     JsonSchemaException,
     JsonSchemaValueException,
 )
+from .error_reporting import ValidationError
 
 
 class InvalidSchemaVersion(JsonSchemaDefinitionException):
@@ -50,4 +51,5 @@ __all__ = [
     "JsonSchemaValueException",
     "SchemaMissingId",
     "SchemaWithDuplicatedId",
+    "ValidationError",
 ]

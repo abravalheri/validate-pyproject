@@ -20,6 +20,7 @@ def _vendoring_checks(path: Path):
     assert (path / MAIN_FILE).exists()
     assert "def validate(" in (path / MAIN_FILE).read_text()
     files = {
+        "error_reporting.py": "def detailed_errors(",
         "fastjsonschema_exceptions.py": "class JsonSchemaValueException",
         "fastjsonschema_validations.py": "def validate(",
         "extra_validations.py": "def validate",
@@ -31,11 +32,12 @@ def _vendoring_checks(path: Path):
         assert content in (path / file).read_text()
 
     # Make sure standard replacements work
-    file_contents = (path / "fastjsonschema_validations.py").read_text()
-    assert "from fastjsonschema" not in file_contents
-    assert "from ._vendor.fastjsonschema" not in file_contents
-    assert "from validate_pyproject._vendor.fastjsonschema" not in file_contents
-    assert "from .fastjsonschema_exceptions" in file_contents
+    for file in ("fastjsonschema_validations.py", "error_reporting.py"):
+        file_contents = (path / file).read_text()
+        assert "from fastjsonschema" not in file_contents
+        assert "from ._vendor.fastjsonschema" not in file_contents
+        assert "from validate_pyproject._vendor.fastjsonschema" not in file_contents
+        assert "from .fastjsonschema_exceptions" in file_contents
 
 
 def test_vendoring_api(tmp_path):

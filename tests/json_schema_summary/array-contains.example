@@ -1,0 +1,9 @@
+{
+    "type": "array",
+    "items": {"type": "number"},
+    "contains": {"type": "string", "pattern": "a*", "maxLength": 8}
+}
+# - # - # - #
+type: array
+items: {type: number}
+contains at least one of: {type: string, pattern: 'a*', max length: 8}

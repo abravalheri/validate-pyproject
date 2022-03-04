@@ -13,8 +13,8 @@ from textwrap import dedent, wrap
 from typing import Callable, Dict, List, NamedTuple, Sequence, Type, TypeVar
 
 from . import __version__
-from ._vendor.fastjsonschema import JsonSchemaValueException
 from .api import Validator
+from .errors import ValidationError
 from .plugins import PluginWrapper
 from .plugins import list_from_entry_points as list_plugins_from_entry_points
 
@@ -167,17 +167,8 @@ def setup_logging(loglevel: int):
 def exceptisons2exit():
     try:
         yield
-    except JsonSchemaValueException as ex:
-        error_msg = [f"Schema: {ex}"]
-        if ex.value:
-            error_msg.append(f"Given value:\n{json.dumps(ex.value, indent=2)}")
-        if ex.rule:
-            error_msg.append(f"Offending rule: {json.dumps(ex.rule, indent=2)}")
-        if ex.definition:
-            error_msg.append(f"Definition:\n{json.dumps(ex.definition, indent=2)}")
-
-        _logger.error("\n\n".join(error_msg) + "\n")
-        _logger.debug("Please check the following information:", exc_info=True)
+    except ValidationError as ex:
+        _logger.error(str(ex))
         raise SystemExit(1)
     except Exception as ex:
         _logger.error(f"{ex.__class__.__name__}: {ex}\n")

@@ -1,1 +1,1 @@
-tool.setuptools.package-dir must be named by propertyName definition
+`tool.setuptools.package-dir` keys must be named by

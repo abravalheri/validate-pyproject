@@ -1,0 +1,12 @@
+{
+    "type": "object",
+    "properties": {"number": {"type": "number"}},
+    "patternProperties": {"^.*": {"not": {"type": "string"}}}
+}
+# - # - # - #
+type: object
+properties:
+  'number': {type: number}
+properties named via pattern:
+  (regex '^.*'):
+    (*NOT* the following): {type: string}

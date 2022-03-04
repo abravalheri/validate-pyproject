@@ -25,6 +25,7 @@ from typing import (
 from . import errors, formats
 from ._vendor.fastjsonschema.draft07 import CodeGeneratorDraft07
 from ._vendor.fastjsonschema.ref_resolver import RefResolver
+from .error_reporting import detailed_errors
 from .extra_validations import EXTRA_VALIDATIONS
 from .types import FormatValidationFn, Schema, ValidationFn
 
@@ -266,5 +267,6 @@ class Validator:
             # >>> fn = partial(compiled, custom_formats=self._format_validators)
             # >>> self._cache = cast(ValidationFn, fn)
 
-        self._cache(pyproject)
+        with detailed_errors():
+            self._cache(pyproject)
         return reduce(lambda acc, fn: fn(acc), self.extra_validations, pyproject)
