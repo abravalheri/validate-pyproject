@@ -11,10 +11,10 @@ from ._vendor.fastjsonschema import JsonSchemaValueException
 _logger = logging.getLogger(__name__)
 
 _MESSAGE_REPLACEMENTS = {
-    "by propertyName definition": "according to the following",
-    "one of contains definition": "at least one item that matches the following",
+    "must be named by propertyName definition": "keys must be named by",
+    "one of contains definition": "at least one item that matches",
     " same as const definition:": "",
-    "only specified items": "only items matching the following definition",
+    "only specified items": "only items matching the definition",
 }
 
 _SKIP_DETAILS = (

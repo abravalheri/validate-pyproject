@@ -1,1 +1,1 @@
-cmdclass.sdist must be python-qualified-identifier
+`tool.setuptools.cmdclass.sdist` must be python-qualified-identifier
