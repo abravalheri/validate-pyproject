@@ -1,0 +1,74 @@
+{
+    "type": "object",
+    "properties": {
+        "street_address": {"type": "string"},
+        "country": {
+            "default": "United States of America",
+            "enum": ["United States of America", "Canada", "Netherlands"]
+        }
+    },
+    "allOf": [
+        {
+            "if": {
+                "properties": {
+                    "country": {"const": "United States of America"}
+                }
+            },
+            "then": {
+                "properties": {
+                    "postal_code": {"pattern": "[0-9]{5}(-[0-9]{4})?"}
+                }
+            }
+        },
+        {
+            "if": {
+                "properties": {"country": {"const": "Canada"}},
+                "required": ["country"]
+            },
+            "then": {
+                "properties": {
+                    "postal_code": {
+                        "pattern": "[A-Z][0-9][A-Z] [0-9][A-Z][0-9]"
+                    }
+                }
+            }
+        },
+        {
+            "if": {
+                "properties": {"country": {"const": "Netherlands"}},
+                "required": ["country"]
+            },
+            "then": {
+                "properties": {
+                    "postal_code": {"pattern": "[0-9]{4} [A-Z]{2}"}
+                }
+            }
+        }
+    ]
+}
+# - # - # - #
+type: object
+properties:
+  'street_address': {type: string}
+  'country': {one of: ['United States of America', 'Canada', 'Netherlands']}
+all of the following:
+  - if:
+      properties:
+        'country': {predefined value: 'United States of America'}
+    then:
+      properties:
+        'postal_code': {pattern: '[0-9]{5}(-[0-9]{4})?'}
+  - if:
+      properties:
+        'country': {predefined value: 'Canada'}
+      required: ['country']
+    then:
+      properties:
+        'postal_code': {pattern: '[A-Z][0-9][A-Z] [0-9][A-Z][0-9]'}
+  - if:
+      properties:
+        'country': {predefined value: 'Netherlands'}
+      required: ['country']
+    then:
+      properties:
+        'postal_code': {pattern: '[0-9]{4} [A-Z]{2}'}

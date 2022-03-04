@@ -1,0 +1,18 @@
+{
+    "type": "array",
+    "prefixItems": [
+        {"type": "number"},
+        {"type": "boolean"}
+    ],
+    "contains": {"type": "string", "pattern": "a*", "maxLength": 8},
+    "minItems": 5,
+    "uniqueItems": true
+}
+# - # - # - #
+type: array
+items (in order):
+  - {type: number}
+  - {type: boolean}
+contains at least one of: {type: string, pattern: 'a*', max length: 8}
+min items: 5
+unique items: True
