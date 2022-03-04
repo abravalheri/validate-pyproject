@@ -38,6 +38,7 @@ _TOML_JARGON = {
 
 class ValidationError(JsonSchemaValueException):
     original_message = ""
+    details = ""
 
 
 @contextmanager
@@ -49,6 +50,7 @@ def detailed_errors():
         args = (str(formatter), ex.value, formatter.name, ex.definition, ex.rule)
         error = ValidationError(*args).with_traceback(ex.__traceback__)
         error.original_message = ex.message
+        error.details = formatter.details
         raise error from None
 
 
@@ -56,10 +58,12 @@ class _ErrorFormatting:
     def __init__(self, ex: JsonSchemaValueException):
         self.ex = ex
         self.name = f"`{ex.name.replace('data.', '')}`"
-        self.msg = self.ex.message.replace(ex.name, self.name)
+        self.original_message = self.ex.message.replace(ex.name, self.name)
+        self._str = ""
+        self._details = ""
 
     def _format_msg(self) -> str:
-        msg = self.msg
+        msg = self.original_message
 
         for bad, repl in _MESSAGE_REPLACEMENTS.items():
             msg = msg.replace(bad, repl)
@@ -75,28 +79,42 @@ class _ErrorFormatting:
         return msg
 
     def __str__(self) -> str:
+        if self._str:
+            return self._str
+
         msg = self._format_msg()
         if _logger.getEffectiveLevel() <= logging.DEBUG:
-            desc_lines = self.ex.definition.pop("$$description", [])
-            desc = self.ex.definition.pop("description", None) or " ".join(desc_lines)
-            if desc:
-                description = "\n".join(
-                    wrap(
-                        desc,
-                        width=80,
-                        initial_indent="    ",
-                        subsequent_indent="    ",
-                        break_long_words=False,
-                    )
-                )
-                msg += f"\n\nDESCRIPTION:\n{description}"
-            schema = json.dumps(self.ex.definition, indent=4)
-            value = json.dumps(self.ex.value, indent=4)
-            msg += f"\n\nGIVEN VALUE:\n{indent(value, '    ')}"
-            msg += f"\n\nOFFENDING RULE: {self.ex.rule!r}"
-            msg += f"\n\nDEFINITION:\n{indent(schema, '    ')}"
+            msg += self.details
 
-        return msg + "\n"
+        self._str = msg + "\n"
+        return self._str
+
+    @property
+    def details(self) -> str:
+        if self._details:
+            return self._details
+
+        msg = ""
+        desc_lines = self.ex.definition.pop("$$description", [])
+        desc = self.ex.definition.pop("description", None) or " ".join(desc_lines)
+        if desc:
+            description = "\n".join(
+                wrap(
+                    desc,
+                    width=80,
+                    initial_indent="    ",
+                    subsequent_indent="    ",
+                    break_long_words=False,
+                )
+            )
+            msg += f"\n\nDESCRIPTION:\n{description}"
+        schema = json.dumps(self.ex.definition, indent=4)
+        value = json.dumps(self.ex.value, indent=4)
+        msg += f"\n\nGIVEN VALUE:\n{indent(value, '    ')}"
+        msg += f"\n\nOFFENDING RULE: {self.ex.rule!r}"
+        msg += f"\n\nDEFINITION:\n{indent(schema, '    ')}"
+        self._details = msg
+        return msg
 
 
 class _SummaryWriter:

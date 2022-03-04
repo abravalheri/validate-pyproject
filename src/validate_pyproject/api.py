@@ -269,4 +269,4 @@ class Validator:
 
         with detailed_errors():
             self._cache(pyproject)
-            return reduce(lambda acc, fn: fn(acc), self.extra_validations, pyproject)
+        return reduce(lambda acc, fn: fn(acc), self.extra_validations, pyproject)
