@@ -37,8 +37,35 @@ _TOML_JARGON = {
 
 
 class ValidationError(JsonSchemaValueException):
-    original_message = ""
+    """Report violations of a given JSON schema.
+
+    This class extends :exc:`~fastjsonschema.JsonSchemaValueException`
+    by adding the following properties:
+
+    - ``summary``: an improved version of the ``JsonSchemaValueException`` error message
+      with only the necessary information)
+
+    - ``details``: more contextual information about the error like the failing schema
+      itself and the value that violates the schema.
+
+    Depending on the level of the verbosity of the ``logging`` configuration
+    the exception message will be only ``summary`` (default) or a combination of
+    ``summary`` and ``details`` (when the logging level is set to :obj:`logging.DEBUG`).
+    """
+
+    summary = ""
     details = ""
+    _original_message = ""
+
+    @classmethod
+    def _from_jsonschema(cls, ex: JsonSchemaValueException):
+        formatter = _ErrorFormatting(ex)
+        obj = cls(str(formatter), ex.value, formatter.name, ex.definition, ex.rule)
+        obj.__cause__, obj.__traceback__ = ex.__cause__, ex.__traceback__
+        obj._original_message = ex.message
+        obj.summary = formatter.summary
+        obj.details = formatter.details
+        return obj
 
 
 @contextmanager
@@ -46,24 +73,43 @@ def detailed_errors():
     try:
         yield
     except JsonSchemaValueException as ex:
-        formatter = _ErrorFormatting(ex)
-        args = (str(formatter), ex.value, formatter.name, ex.definition, ex.rule)
-        error = ValidationError(*args).with_traceback(ex.__traceback__)
-        error.original_message = ex.message
-        error.details = formatter.details
-        raise error from None
+        raise ValidationError._from_jsonschema(ex) from None
 
 
 class _ErrorFormatting:
     def __init__(self, ex: JsonSchemaValueException):
         self.ex = ex
-        self.name = f"`{ex.name.replace('data.', '')}`"
-        self.original_message = self.ex.message.replace(ex.name, self.name)
-        self._str = ""
+        self.name = f"`{self._simplify_name(ex.name)}`"
+        self._original_message = self.ex.message.replace(ex.name, self.name)
+        self._summary = ""
         self._details = ""
 
-    def _format_msg(self) -> str:
-        msg = self.original_message
+    def __str__(self) -> str:
+        if _logger.getEffectiveLevel() <= logging.DEBUG and self.details:
+            return f"{self.summary}\n\n{self.details}"
+
+        return self.summary
+
+    @property
+    def summary(self) -> str:
+        if not self._summary:
+            self._summary = self._expand_summary()
+
+        return self._summary
+
+    @property
+    def details(self) -> str:
+        if not self._details:
+            self._details = self._expand_details()
+
+        return self._details
+
+    def _simplify_name(self, name):
+        x = len("data.")
+        return name[x:] if name.startswith("data.") else name
+
+    def _expand_summary(self):
+        msg = self._original_message
 
         for bad, repl in _MESSAGE_REPLACEMENTS.items():
             msg = msg.replace(bad, repl)
@@ -78,23 +124,8 @@ class _ErrorFormatting:
 
         return msg
 
-    def __str__(self) -> str:
-        if self._str:
-            return self._str
-
-        msg = self._format_msg()
-        if _logger.getEffectiveLevel() <= logging.DEBUG:
-            msg += self.details
-
-        self._str = msg + "\n"
-        return self._str
-
-    @property
-    def details(self) -> str:
-        if self._details:
-            return self._details
-
-        msg = ""
+    def _expand_details(self) -> str:
+        optional = []
         desc_lines = self.ex.definition.pop("$$description", [])
         desc = self.ex.definition.pop("description", None) or " ".join(desc_lines)
         if desc:
@@ -107,14 +138,15 @@ class _ErrorFormatting:
                     break_long_words=False,
                 )
             )
-            msg += f"\n\nDESCRIPTION:\n{description}"
+            optional.append(f"DESCRIPTION:\n{description}")
         schema = json.dumps(self.ex.definition, indent=4)
         value = json.dumps(self.ex.value, indent=4)
-        msg += f"\n\nGIVEN VALUE:\n{indent(value, '    ')}"
-        msg += f"\n\nOFFENDING RULE: {self.ex.rule!r}"
-        msg += f"\n\nDEFINITION:\n{indent(schema, '    ')}"
-        self._details = msg
-        return msg
+        defaults = [
+            f"GIVEN VALUE:\n{indent(value, '    ')}",
+            f"OFFENDING RULE: {self.ex.rule!r}",
+            f"DEFINITION:\n{indent(schema, '    ')}",
+        ]
+        return "\n\n".join(optional + defaults)
 
 
 class _SummaryWriter:

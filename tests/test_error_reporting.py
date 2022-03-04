@@ -122,6 +122,9 @@ def test_error_reporting(caplog, example):
             validate(schema, value, formats=FORMAT_FUNCTIONS)
     except ValidationError as ex:
         assert ex.message.strip() == message
+        assert ex.message == ex.summary
+        assert "GIVEN VALUE:" in ex.details
+        assert "DEFINITION:" in ex.details
 
     try:
         with caplog.at_level(logging.DEBUG), detailed_errors():
@@ -129,5 +132,6 @@ def test_error_reporting(caplog, example):
     except ValidationError as ex:
         assert "GIVEN VALUE:" in ex.message
         assert "DEFINITION:" in ex.message
+        assert ex.summary in ex.message
         if debug_info != "**SKIP-TEST**":
-            assert debug_info in ex.message.replace(message, "")
+            assert debug_info in ex.details
