@@ -46,8 +46,9 @@ def vendorify(
     replacements = {**TEXT_REPLACEMENTS, **text_replacements}
 
     validator = api.Validator(plugins)
+    header = "\n".join(NOCHECK_HEADERS)
     code = replace_text(validator.generated_code, replacements)
-    (out / "fastjsonschema_validations.py").write_text(code, "UTF-8")
+    (out / "fastjsonschema_validations.py").write_text(header + code, "UTF-8")
 
     copy_fastjsonschema_exceptions(out, replacements)
     copy_module("extra_validations", out, replacements)
