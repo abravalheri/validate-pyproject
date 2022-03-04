@@ -2,6 +2,11 @@
 Changelog
 =========
 
+Version 0.5.1
+=============
+
+- Fixed typecheck errors (only found against GitHub Actions, not Cirrus CI), :pr:`22`
+
 Version 0.5
 ===========
 
