@@ -36,7 +36,7 @@ if TYPE_CHECKING:  # pragma: no cover
 
 
 try:  # pragma: no cover
-    if sys.version_info[:2] < (3, 7) or TYPE_CHECKING:
+    if sys.version_info[:2] < (3, 7) or TYPE_CHECKING:  # See #22
         from importlib_resources import files
     else:
         from importlib.resources import files
