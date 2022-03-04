@@ -23,8 +23,7 @@ from typing import (
 )
 
 from . import errors, formats
-from ._vendor.fastjsonschema.draft07 import CodeGeneratorDraft07
-from ._vendor.fastjsonschema.ref_resolver import RefResolver
+from ._vendor import fastjsonschema as FJS
 from .error_reporting import detailed_errors
 from .extra_validations import EXTRA_VALIDATIONS
 from .types import FormatValidationFn, Schema, ValidationFn
@@ -36,10 +35,10 @@ if TYPE_CHECKING:  # pragma: no cover
     from .plugins import PluginWrapper  # noqa
 
 
-try:
-    if sys.version_info[:2] < (3, 7):  # pragma: no cover
+try:  # pragma: no cover
+    if sys.version_info[:2] < (3, 7):
         from importlib_resources import files
-    else:  # pragma: no cover
+    else:
         from importlib.resources import files
 
     def read_text(package: Union[str, ModuleType], resource) -> str:
@@ -191,6 +190,7 @@ class Validator:
         format_validators: Mapping[str, FormatValidationFn] = FORMAT_FUNCTIONS,
         extra_validations: Sequence[ValidationFn] = EXTRA_VALIDATIONS,
     ):
+        self._code_cache: Optional[str] = None
         self._cache: Optional[ValidationFn] = None
         self._schema: Optional[Schema] = None
 
@@ -207,10 +207,6 @@ class Validator:
 
         self._schema_registry = SchemaRegistry(self._plugins)
         self.handlers = RefHandler(self._schema_registry)
-
-        # Only needed while issue #129 of fastjsonschema is not solved
-        self._gen: Optional[CodeGeneratorDraft07] = None
-        self._resolver: Optional[RefResolver] = None
 
     @property
     def registry(self) -> SchemaRegistry:
@@ -232,13 +228,12 @@ class Validator:
         return self._format_validators
 
     @property
-    def _generator(self):
-        # Only needed while issue #129 of fastjsonschema is not solved
-        if self._gen is None:
-            self._resolver = RefResolver("", self.schema, {}, handlers=self.handlers)
-            formats = dict(self.formats)
-            self._gen = CodeGeneratorDraft07(self.schema, self._resolver, formats)
-        return self._gen
+    def generated_code(self) -> str:
+        if self._code_cache is None:
+            fmts = dict(self.formats)
+            self._code_cache = FJS.compile_to_code(self.schema, self.handlers, fmts)
+
+        return self._code_cache
 
     def __getitem__(self, schema_id: str) -> Schema:
         """Retrieve a schema from registry"""
@@ -246,19 +241,9 @@ class Validator:
 
     def __call__(self, pyproject: T) -> T:
         if self._cache is None:
-            # Only needed while issue #129 of fastjsonschema is not solved
-            generator = self._generator
-            state = generator.global_state
-            exec(generator.func_code, state)
-            resolver = cast(RefResolver, self._resolver)
-            fn = partial(
-                state[resolver.get_scope_name()], custom_formats=self._format_validators
-            )
+            compiled = FJS.compile(self.schema, self.handlers, dict(self.formats))
+            fn = partial(compiled, custom_formats=self._format_validators)
             self._cache = cast(ValidationFn, fn)
-            # Once the issue is solved we can use the `fastjsonschema.compile`
-            # >>> compiled = FJS.compile(self.schema, self.handlers, dict(self.formats))
-            # >>> fn = partial(compiled, custom_formats=self._format_validators)
-            # >>> self._cache = cast(ValidationFn, fn)
 
         with detailed_errors():
             self._cache(pyproject)
