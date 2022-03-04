@@ -2,6 +2,18 @@
 Changelog
 =========
 
+Version 0.5
+===========
+
+- Fixed entry-points format to allow values without the ``:obj.attr part``, :pr:`8`
+- Improved trove-classifier validation, even when the package is not installed, :pr:`9`
+- Improved URL validation when scheme prefix is not present, :pr:`14`
+- Vendor :pypi:`fastjsonschema` to facilitate applying patches and latest updates, :pr:`15`
+- Remove fixes for old version of :pypi:`fastjsonschema`, :pr:`16`, :pr:`19`
+- Replaced usage of :mod:`importlib.resources` legacy functions with the new API, :pr:`17`
+- Improved error messages, :pr:`18`
+- Added GitHub Actions for automatic test and release of tags, :pr:`11`
+
 Version 0.4
 ===========
 
