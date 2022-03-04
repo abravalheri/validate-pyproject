@@ -202,7 +202,6 @@ class _SummaryWriter:
     ) -> str:
         repr_ = repr(schemas)
         if all(not isinstance(e, (dict, list)) for e in schemas) and len(repr_) < 60:
-            print(f"--list, {schemas=}, {repr_=}")
             return f"{repr_}\n"
 
         item_prefix = self._child_prefix(prefix, "- ")
@@ -233,7 +232,6 @@ class _SummaryWriter:
         return repr(key)  # property name
 
     def _value(self, value: Any, path: Sequence[str]) -> str:
-        print(f"hello? {value=} {path=}")
         if path[-1] == "type" and not self._is_property(path):
             type_ = self._jargon(value)
             return (
