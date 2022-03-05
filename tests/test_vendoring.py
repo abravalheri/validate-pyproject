@@ -1,5 +1,8 @@
+import re
 import shutil
+import subprocess
 import sys
+from inspect import cleandoc
 from itertools import product
 from pathlib import Path
 
@@ -18,16 +21,17 @@ def _vendoring_checks(path: Path):
     assert (path / "__init__.py").exists()
     assert (path / "__init__.py").read_text() == ""
     assert (path / MAIN_FILE).exists()
-    assert "def validate(" in (path / MAIN_FILE).read_text()
-    files = {
-        "error_reporting.py": "def detailed_errors(",
-        "fastjsonschema_exceptions.py": "class JsonSchemaValueException",
-        "fastjsonschema_validations.py": "def validate(",
-        "extra_validations.py": "def validate",
-        "formats.py": "def pep508(",
-        "NOTICE": "The relevant copyright notes and licenses are included bellow",
-    }
-    for file, content in files.items():
+    files = [
+        (MAIN_FILE, "def validate("),
+        (MAIN_FILE, "from .error_reporting import detailed_errors, ValidationError"),
+        ("error_reporting.py", "def detailed_errors("),
+        ("fastjsonschema_exceptions.py", "class JsonSchemaValueException"),
+        ("fastjsonschema_validations.py", "def validate("),
+        ("extra_validations.py", "def validate"),
+        ("formats.py", "def pep508("),
+        ("NOTICE", "The relevant copyright notes and licenses are included bellow"),
+    ]
+    for file, content in files:
         assert (path / file).exists()
         assert content in (path / file).read_text()
 
@@ -38,6 +42,24 @@ def _vendoring_checks(path: Path):
         assert "from ._vendor.fastjsonschema" not in file_contents
         assert "from validate_pyproject._vendor.fastjsonschema" not in file_contents
         assert "from .fastjsonschema_exceptions" in file_contents
+
+    # Make sure the vendored lib works
+    script = f"""
+    from {path.stem} import {Path(MAIN_FILE).stem} as mod
+
+    assert issubclass(mod.ValidationError, mod.JsonSchemaValueException)
+
+    example = {{
+        "project": {{"name": "proj", "version": 42}}
+    }}
+    assert mod.validate(example) == example
+    """
+    cmd = [sys.executable, "-c", cleandoc(script)]
+    error = r".project\.version. must be string"
+    with pytest.raises(subprocess.CalledProcessError) as exc_info:
+        subprocess.check_output(cmd, cwd=path.parent, stderr=subprocess.STDOUT)
+
+    assert re.search(error, str(exc_info.value.output, "utf-8"))
 
 
 def test_vendoring_api(tmp_path):
