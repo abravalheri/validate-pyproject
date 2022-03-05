@@ -2,6 +2,12 @@
 Changelog
 =========
 
+Version 0.5.2
+=============
+
+- Exported ``ValidationError`` from the main file when vendored, :pr:`23`
+- Removed ``ValidationError`` traceback to avoid polluting the user logs with generate code, :pr:`24`
+
 Version 0.5.1
 =============
 
