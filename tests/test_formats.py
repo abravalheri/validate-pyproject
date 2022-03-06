@@ -282,6 +282,7 @@ class TestClassifiers:
         "Framework :: Django",
         "Operating System :: POSIX",
         "Programming Language :: Python :: 3 :: Only",
+        "private :: not really a classifier",
     )
 
     def test_does_not_break_public_function_detection(self):
@@ -363,3 +364,8 @@ class TestClassifiers:
         assert not validator.downloaded
         assert validator("Other Made Up :: Classifier") is True
         assert not validator.downloaded
+
+
+def test_private_classifier():
+    assert formats.trove_classifier("private :: Keep Off PyPI") is True
+    assert formats.trove_classifier("private:: Keep Off PyPI") is False
