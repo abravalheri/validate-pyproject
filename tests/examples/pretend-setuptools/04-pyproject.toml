@@ -4,6 +4,7 @@ readme = "README.md"
 dynamic = ["version"]
 requires-python = ">=3.8"
 dependencies = ["numpy>=1.18.5"]
+license.file = "LICENSE.txt"
 
 [project.entry-points]
 pandas_plotting_backends = {matplotlib = "project.plotting:matplotlib_plot"}

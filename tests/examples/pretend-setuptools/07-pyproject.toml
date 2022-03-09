@@ -1,6 +1,7 @@
 [project]
 name = "myproj"
 keywords = ["some", "key", "words"]
+license = {text = "MIT"}
 dynamic = [
     "version",
     "description",
@@ -37,6 +38,7 @@ build-backend = "setuptools.build_meta"
 package-dir = {"" = "src"}
 zip-safe = true
 platforms = ["any"]
+license-files = ["LICENSE*", "NOTICE*"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -46,8 +48,6 @@ namespaces = true
 sdist = "pkg.mod.CustomSdist"
 
 [tool.setuptools.dynamic]
-license = "MIT"
-license-files = ["LICENSE*", "NOTICE*"]
 version = {attr = "pkg.__version__.VERSION"}
 description = {file = ["README.md"]}
 readme = {file = ["README.md"], content-type = "text/markdown"}

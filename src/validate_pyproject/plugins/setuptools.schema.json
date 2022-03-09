@@ -172,9 +172,20 @@
           "^.*$": {"type": "string", "format": "python-qualified-identifier"}
       }
     },
+    "license-files": {
+      "type": "array",
+      "items": {"type": "string"},
+      "$$description": [
+        "PROVISIONAL: List of glob patterns for all license files being distributed.",
+        "(might become standard with PEP 639)."
+      ],
+      "default": ["LICEN[CS]E*", " COPYING*", " NOTICE*", "AUTHORS*"],
+      "$comment": "TODO: revise if PEP 639 is accepted. Probably ``project.license-files``?"
+    },
     "dynamic": {
       "type": "object",
       "description": "Instructions for loading :pep:`621`-related metadata dynamically",
+      "additionalProperties": false,
       "properties": {
         "version": {
           "$$description": [
@@ -195,24 +206,6 @@
             {"properties": {"content-type": {"type": "string"}}}
           ],
           "required": ["file"]
-        },
-        "license": {
-          "type": "string",
-          "$$description": [
-            "PROVISIONAL: A string specifying the license of the package",
-            "(might change with PEP 639)"
-          ],
-          "$comment": "TODO: revise if PEP 639 is accepted. Maybe ``license-expression``?"
-        },
-        "license-files": {
-          "type": "array",
-          "items": {"type": "string"},
-          "$$description": [
-            "PROVISIONAL: List of glob patterns for all license files being distributed.",
-            "(might change with PEP 639)"
-          ],
-          "default": ["LICEN[CS]E*", " COPYING*", " NOTICE*", "AUTHORS*"],
-          "$comment": "TODO: revise if PEP 639 is accepted. Maybe ``license-files.glob``?"
         }
       }
     }
