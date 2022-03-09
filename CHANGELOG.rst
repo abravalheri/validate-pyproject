@@ -2,6 +2,13 @@
 Changelog
 =========
 
+Version 0.6
+=============
+
+- Allow private classifiers, #26
+- ``setuptools`` plugin:
+   - Remove ``license`` and ``license-files`` from dynamic, #27
+
 Version 0.5.2
 =============
 
