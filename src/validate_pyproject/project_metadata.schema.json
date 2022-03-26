@@ -250,8 +250,13 @@
   "additionalProperties": false,
   "if": {
     "not": {
-      "required": ["version"],
-      "$$description": ["version is statically defined in the ``version`` field"]
+      "required": ["dynamic"],
+      "properties": {
+        "dynamic": {
+          "contains": {"const": "version"},
+          "$$description": ["version is listed in ``dynamic``"]
+        }
+      }
     },
     "$$comment": [
       "According to :pep:`621`:",
@@ -266,12 +271,8 @@
     ]
   },
   "then": {
-    "properties": {
-      "dynamic": {
-        "contains": {"const": "version"},
-        "$$description": ["version should be listed in ``dynamic``"]
-      }
-    }
+    "required": ["version"],
+    "$$description": ["version should be statically defined in the ``version`` field"]
   },
 
   "definitions": {
