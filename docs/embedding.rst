@@ -22,7 +22,7 @@ a validation file (thanks to :pypi:`fastjsonschema`'s ability to compile JSON Sc
 to code) and copying only the strictly necessary Python modules.
 
 After :ref:`installing <installation>` ``validate-pyproject`` this can be done
-via CLI as indicated in the command bellow:
+via CLI as indicated in the command below:
 
 .. code-block:: bash
 

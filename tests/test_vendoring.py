@@ -29,7 +29,7 @@ def _vendoring_checks(path: Path):
         ("fastjsonschema_validations.py", "def validate("),
         ("extra_validations.py", "def validate"),
         ("formats.py", "def pep508("),
-        ("NOTICE", "The relevant copyright notes and licenses are included bellow"),
+        ("NOTICE", "The relevant copyright notes and licenses are included below"),
     ]
     for file, content in files:
         assert (path / file).exists()
