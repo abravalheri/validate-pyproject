@@ -2,6 +2,11 @@
 Changelog
 =========
 
+Version 0.6.1
+=============
+
+- Fix validation of ``version`` to ensure it is given either statically or dynamically, #29
+
 Version 0.6
 =============
 
