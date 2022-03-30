@@ -16,19 +16,18 @@ This can be done automatically via tools such as :pypi:`vendoring` or
 :pypi:`vendorize` and many others others, however this technique will copy
 several files into your project.
 
-If you want to keep the amount of files to a minimum,
-``validate-pyproject`` offers a different solution that consists in generating
-a validation file (thanks to :pypi:`fastjsonschema`'s ability to compile JSON Schemas
-to code) and copying only the strictly necessary Python modules.
+However, if you want to keep the amount of files to a minimum,
+``validate-pyproject`` offers a different solution that consists in
+pre-compiling the JSON Schemas (thanks to :pypi:`fastjsonschema`).
 
 After :ref:`installing <installation>` ``validate-pyproject`` this can be done
-via CLI as indicated in the command bellow:
+via CLI as indicated in the command below:
 
 .. code-block:: bash
 
     # in you terminal
-    $ python -m validate_pyproject.vendoring --help
-    $ python -m validate_pyproject.vendoring -O dir/for/genereated_files
+    $ python -m validate_pyproject.pre_compile --help
+    $ python -m validate_pyproject.pre_compile -O dir/for/genereated_files
 
 This command will generate a few files under the directory given to the CLI.
 Please notice this directory should, ideally, be empty, and will correspond to

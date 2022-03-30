@@ -36,7 +36,7 @@ community, none of the ones the original author of this package investigated
   directly without requiring installation.
 
 :pypi:`fastjsonschema` has no dependency and can generate validation code directly,
-which bypass the need for copying most of the files when :doc:`"vendoring"
+which bypass the need for copying most of the files when :doc:`"embedding"
 <embedding>`.
 
 

@@ -123,7 +123,7 @@ To do so, don't forget to add it to your `virtual environment`_ or specify it as
 
 More details about ``validate-pyproject`` and its Python API can be found in
 `our docs`_, which includes a description of the `used JSON schemas`_,
-instructions for using it in a |vendored way|_ and information about
+instructions for using it in a |pre-compiled way|_ and information about
 extending the validation with your own plugins_.
 
 .. _pyscaffold-notes:
@@ -142,7 +142,7 @@ For details and usage information on PyScaffold see https://pyscaffold.org/.
 
 
 .. |pipx| replace:: ``pipx``
-.. |vendored way| replace:: *"vendored" way*
+.. |pre-compiled way| replace:: *pre-compiled* way
 
 
 .. _contribution guides: https://validate-pyproject.readthedocs.io/en/latest/contributing.html
@@ -157,6 +157,6 @@ For details and usage information on PyScaffold see https://pyscaffold.org/.
 .. _project: https://packaging.python.org/tutorials/managing-dependencies/
 .. _setuptools: https://setuptools.pypa.io/en/stable/
 .. _used JSON schemas: https://validate-pyproject.readthedocs.io/en/latest/schemas.html
-.. _vendored way: https://validate-pyproject.readthedocs.io/en/latest/embedding.html
+.. _pre-compiled way: https://validate-pyproject.readthedocs.io/en/latest/embedding.html
 .. _plugins: https://validate-pyproject.readthedocs.io/en/latest/dev-guide.html
 .. _virtual environment: https://realpython.com/python-virtual-environments-a-primer/
