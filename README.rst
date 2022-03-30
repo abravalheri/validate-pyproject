@@ -119,8 +119,8 @@ To do so, don't forget to add it to your `virtual environment`_ or specify it as
 
    If you don't install ``trove-classifiers``, ``validate-pyproject`` will
    try to download a list of valid classifiers directly from PyPI
-   (to prevent that, set the environment variable:
-   ``NO_NETWORK=true`` or ``VALIDATE_PYPROJECT_NO_NETWORK=true``).
+   (to prevent that, set the environment variable
+   ``NO_NETWORK`` or ``VALIDATE_PYPROJECT_NO_NETWORK``).
 
    On the other hand, if ``validate-pyproject`` cannot find a copy of
    ``packaging`` in your environment, the validation will fail.
