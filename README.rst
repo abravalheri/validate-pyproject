@@ -111,15 +111,19 @@ To do so, don't forget to add it to your `virtual environment`_ or specify it as
    ``packaging`` and ``trove-classifiers`` will be automatically pulled as
    dependencies. ``tomli`` is a lightweight parser for TOML, while
    ``packaging`` and ``trove-classifiers`` are used to validate aspects of `PEP
-   621`_
+   621`_.
 
    If you are only interested in using the Python API and wants to keep the
-   depedependencies minimal, you can also install ``validate-pyproject``
+   dependencies minimal, you can also install ``validate-pyproject``
    (without the ``[all]`` extra dependencies group).
+
    If you don't install ``trove-classifiers``, ``validate-pyproject`` will
-   perform a weaker validation. On the other hand, if ``validate-pyproject``
-   cannot find a copy of ``packaging`` in your environment, the validation will
-   fail.
+   try to download a list of valid classifiers directly from PyPI
+   (to prevent that, set the environment variable
+   ``NO_NETWORK`` or ``VALIDATE_PYPROJECT_NO_NETWORK``).
+
+   On the other hand, if ``validate-pyproject`` cannot find a copy of
+   ``packaging`` in your environment, the validation will fail.
 
 More details about ``validate-pyproject`` and its Python API can be found in
 `our docs`_, which includes a description of the `used JSON schemas`_,

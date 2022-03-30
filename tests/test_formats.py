@@ -346,8 +346,11 @@ class TestClassifiers:
             assert validator(classifier) is True
         downloader.assert_called_once()
 
-    def test_always_valid_with_no_network(self, monkeypatch):
-        monkeypatch.setenv("NO_NETWORK", "1")
+    @pytest.mark.parametrize(
+        "no_network", ("NO_NETWORK", "VALIDATE_PYPROJECT_NO_NETWORK")
+    )
+    def test_always_valid_with_no_network(self, monkeypatch, no_network):
+        monkeypatch.setenv(no_network, "1")
         validator = formats._TroveClassifier()
         assert validator("Made Up :: Classifier") is True
         assert not validator.downloaded
