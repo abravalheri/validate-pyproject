@@ -357,6 +357,14 @@ class TestClassifiers:
         assert validator("Other Made Up :: Classifier") is True
         assert not validator.downloaded
 
+    def test_always_valid_with_skip_download(self):
+        validator = formats._TroveClassifier()
+        validator._disable_download()
+        assert validator("Made Up :: Classifier") is True
+        assert not validator.downloaded
+        assert validator("Other Made Up :: Classifier") is True
+        assert not validator.downloaded
+
     def test_always_valid_after_download_error(self, monkeypatch):
         def _failed_download():
             raise OSError()
