@@ -64,7 +64,8 @@ def iterate_entry_points(group=ENTRYPOINT_GROUP) -> Iterable[EntryPoint]:
         # TODO: Once Python 3.10 becomes the oldest version supported, this fallback and
         #       conditional statement can be removed.
         entries_ = (plugin for plugin in entries.get(group, []))
-    return sorted(entries_, key=lambda e: e.name)
+    deduplicated = {e.name: e for e in sorted(entries_, key=lambda e: e.name)}
+    return list(deduplicated.values())
 
 
 def load_from_entry_point(entry_point: EntryPoint) -> PluginWrapper:
