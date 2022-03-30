@@ -1,3 +1,4 @@
+import builtins
 import re
 import shutil
 import subprocess
@@ -113,6 +114,10 @@ def pre_compiled_validate(monkeypatch):
     def _validate(vendored_path, toml_equivalent):
         assert PRE_COMPILED_NAME not in sys.modules
         with monkeypatch.context() as m:
+            # Make sure original imports are not used
+            _disable_import(m, "fastjsonschema")
+            _disable_import(m, "validate_pyproject")
+            # Make newly generated package available for importing
             m.syspath_prepend(str(vendored_path.parent))
             mod = __import__(PRE_COMPILED_NAME)
             print(list(vendored_path.glob("*")))
@@ -154,3 +159,14 @@ def test_invalid_examples_api(tmp_path, pre_compiled_validate, example, pre_comp
     print("definition", "=", exc_info.value.definition)
     for error in expected_error.splitlines():
         assert error in exception_message
+
+
+def _disable_import(monkeypatch, name):
+    orig = builtins.__import__
+
+    def _import(import_name, *args, **kwargs):
+        if import_name == name or import_name.startswith(f"{name}."):
+            raise ImportError(name)
+        return orig(import_name, *args, **kwargs)
+
+    monkeypatch.setattr(builtins, "__import__", _import)
