@@ -2,6 +2,12 @@
 Changelog
 =========
 
+Version 0.7.1
+=============
+
+- CI: Enforced doctests
+- CI: Add more tests for situations when downloading classifiers is disabled
+
 Version 0.7
 ===========
 
