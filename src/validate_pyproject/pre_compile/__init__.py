@@ -28,7 +28,7 @@ TEXT_REPLACEMENTS = MappingProxyType(
 )
 
 
-def vendorify(
+def pre_compile(
     output_dir: Union[str, os.PathLike] = ".",
     main_file: str = "__init__.py",
     original_cmd: str = "",

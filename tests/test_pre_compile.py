@@ -3,21 +3,20 @@ import shutil
 import subprocess
 import sys
 from inspect import cleandoc
-from itertools import product
 from pathlib import Path
 
 import pytest
 import tomli
 from validate_pyproject._vendor.fastjsonschema import JsonSchemaValueException
 
-from validate_pyproject.vendoring import cli, vendorify
+from validate_pyproject.pre_compile import cli, pre_compile
 
 from .helpers import EXAMPLES, INVALID, error_file, examples, invalid_examples
 
 MAIN_FILE = "hello_world.py"  # Let's use something different that `__init__.py`
 
 
-def _vendoring_checks(path: Path):
+def _pre_compile_checks(path: Path):
     assert (path / "__init__.py").exists()
     assert (path / "__init__.py").read_text() == ""
     assert (path / MAIN_FILE).exists()
@@ -43,7 +42,7 @@ def _vendoring_checks(path: Path):
         assert "from validate_pyproject._vendor.fastjsonschema" not in file_contents
         assert "from .fastjsonschema_exceptions" in file_contents
 
-    # Make sure the vendored lib works
+    # Make sure the pre-compiled lib works
     script = f"""
     from {path.stem} import {Path(MAIN_FILE).stem} as mod
 
@@ -62,14 +61,14 @@ def _vendoring_checks(path: Path):
     assert re.search(error, str(exc_info.value.output, "utf-8"))
 
 
-def test_vendoring_api(tmp_path):
+def test_pre_compile_api(tmp_path):
     path = Path(tmp_path)
-    vendorify(path, MAIN_FILE)
-    _vendoring_checks(path)
+    pre_compile(path, MAIN_FILE)
+    _pre_compile_checks(path)
     # Let's make sure it also works for __init__
     shutil.rmtree(str(path), ignore_errors=True)
     replacements = {"from fastjsonschema import": "from _vend.fastjsonschema import"}
-    vendorify(path, text_replacements=replacements)
+    pre_compile(path, text_replacements=replacements)
     assert "def validate(" in (path / "__init__.py").read_text()
     assert not (path / MAIN_FILE).exists()
     file_contents = (path / "fastjsonschema_validations.py").read_text()
@@ -80,7 +79,7 @@ def test_vendoring_api(tmp_path):
 def test_vendoring_cli(tmp_path):
     path = Path(tmp_path)
     cli.run(["-O", str(path), "-M", MAIN_FILE])
-    _vendoring_checks(Path(path))
+    _pre_compile_checks(Path(path))
     # Let's also try to test JSON replacements
     shutil.rmtree(str(path), ignore_errors=True)
     replacements = '{"from fastjsonschema import": "from _vend.fastjsonschema import"}'
@@ -93,29 +92,29 @@ def test_vendoring_cli(tmp_path):
 # ---- Examples ----
 
 
-VENDORED_NAME = "_vendored_validation"
+PRE_COMPILED_NAME = "_validation"
 
 
-def api_vendored(tmp_path) -> Path:
-    return vendorify(Path(tmp_path / VENDORED_NAME))
+def api_pre_compile(tmp_path) -> Path:
+    return pre_compile(Path(tmp_path / PRE_COMPILED_NAME))
 
 
-def cli_vendored(tmp_path) -> Path:
-    path = Path(tmp_path / VENDORED_NAME)
+def cli_pre_compile(tmp_path) -> Path:
+    path = Path(tmp_path / PRE_COMPILED_NAME)
     cli.run(["-O", str(path)])
     return path
 
 
-_VENDORING = (api_vendored, cli_vendored)
+_PRE_COMPILED = (api_pre_compile, cli_pre_compile)
 
 
 @pytest.fixture
-def vendored_validate(monkeypatch):
+def pre_compiled_validate(monkeypatch):
     def _validate(vendored_path, toml_equivalent):
-        assert VENDORED_NAME not in sys.modules
+        assert PRE_COMPILED_NAME not in sys.modules
         with monkeypatch.context() as m:
             m.syspath_prepend(str(vendored_path.parent))
-            mod = __import__(VENDORED_NAME)
+            mod = __import__(PRE_COMPILED_NAME)
             print(list(vendored_path.glob("*")))
             print(mod, "\n\n", dir(mod))
             try:
@@ -127,26 +126,28 @@ def vendored_validate(monkeypatch):
                 )
                 raise new_ex from ex
             finally:
-                del sys.modules[VENDORED_NAME]
+                del sys.modules[PRE_COMPILED_NAME]
 
     return _validate
 
 
-@pytest.mark.parametrize("example, vendored", product(examples(), _VENDORING))
-def test_examples_api(tmp_path, vendored_validate, example, vendored):
+@pytest.mark.parametrize("example", examples())
+@pytest.mark.parametrize("pre_compiled", _PRE_COMPILED)
+def test_examples_api(tmp_path, pre_compiled_validate, example, pre_compiled):
     toml_equivalent = tomli.loads((EXAMPLES / example).read_text())
-    vendored_path = vendored(Path(tmp_path))
-    return vendored_validate(vendored_path, toml_equivalent) is not None
+    pre_compiled_path = pre_compiled(Path(tmp_path))
+    return pre_compiled_validate(pre_compiled_path, toml_equivalent) is not None
 
 
-@pytest.mark.parametrize("example, vendored", product(invalid_examples(), _VENDORING))
-def test_invalid_examples_api(tmp_path, vendored_validate, example, vendored):
+@pytest.mark.parametrize("example", invalid_examples())
+@pytest.mark.parametrize("pre_compiled", _PRE_COMPILED)
+def test_invalid_examples_api(tmp_path, pre_compiled_validate, example, pre_compiled):
     example_file = INVALID / example
     expected_error = error_file(example_file).read_text("utf-8")
     toml_equivalent = tomli.loads(example_file.read_text())
-    vendored_path = vendored(Path(tmp_path))
+    pre_compiled_path = pre_compiled(Path(tmp_path))
     with pytest.raises(JsonSchemaValueException) as exc_info:
-        vendored_validate(vendored_path, toml_equivalent)
+        pre_compiled_validate(pre_compiled_path, toml_equivalent)
     exception_message = str(exc_info.value)
     print("rule", "=", exc_info.value.rule)
     print("rule_definition", "=", exc_info.value.rule_definition)

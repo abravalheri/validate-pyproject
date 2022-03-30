@@ -8,7 +8,7 @@ from typing import Any, Dict, List, Mapping, NamedTuple, Sequence
 from .. import cli
 from ..plugins import PluginWrapper
 from ..plugins import list_from_entry_points as list_plugins_from_entry_points
-from . import vendorify
+from . import pre_compile
 
 if sys.platform == "win32":  # pragma: no cover
     from subprocess import list2cmdline as arg_join
@@ -76,10 +76,10 @@ def run(args: Sequence[str] = ()):
     args = args if args else sys.argv[1:]
     cmd = f"python -m {__package__} " + arg_join(args)
     plugins = list_plugins_from_entry_points()
-    desc = 'Generate files for "vendoring" `validate-pyproject`'
+    desc = 'Generate files for "pre-compiling" `validate-pyproject`'
     prms = cli.parse_args(args, plugins, desc, parser_spec, CliParams)
     cli.setup_logging(prms.loglevel)
-    vendorify(prms.output_dir, prms.main_file, cmd, prms.plugins, prms.replacements)
+    pre_compile(prms.output_dir, prms.main_file, cmd, prms.plugins, prms.replacements)
     return 0
 
 

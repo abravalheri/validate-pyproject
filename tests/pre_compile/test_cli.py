@@ -2,7 +2,7 @@ import traceback
 
 import pytest
 
-from validate_pyproject.vendoring import cli
+from validate_pyproject.pre_compile import cli
 
 
 def test_invalid_replacements(tmp_path):
