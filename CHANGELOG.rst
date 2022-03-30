@@ -2,8 +2,8 @@
 Changelog
 =========
 
-Version 0.7 (development)
-=========================
+Version 0.7
+===========
 
 - **Deprecated** use of ``validate_pyproject.vendoring``.
   This module is replaced by ``validate_pyproject.pre_compile``.
