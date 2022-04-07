@@ -203,6 +203,8 @@
         "entry-points": {"$ref": "#/definitions/file-directive"},
         "optional-dependencies": {
           "type": "object",
+          "propertyNames": {"format": "pep508-identifier"},
+          "additionalProperties": false,
           "patternProperties": {".+": {"$ref": "#/definitions/file-directive"}}
         },
         "readme": {
