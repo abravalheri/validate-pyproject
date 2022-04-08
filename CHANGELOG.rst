@@ -2,6 +2,12 @@
 Changelog
 =========
 
+Version 0.7.2
+=============
+
+- ``setuptools`` plugin:
+    - Allow ``dependencies``/``optional-dependencies`` to use file directives (#37)
+
 Version 0.7.1
 =============
 
