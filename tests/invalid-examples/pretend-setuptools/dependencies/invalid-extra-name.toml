@@ -3,5 +3,5 @@ name = "myproj"
 version = "42"
 dynamic = ["optional-dependencies"]
 
-[tool.setuptools.dynamic.optional-dependencies."non pep508 compliant"]
+[tool.setuptools.dynamic.optional-dependencies."not a Python identifier"]
 file = "extra.txt"
