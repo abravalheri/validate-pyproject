@@ -136,6 +136,31 @@ extending the validation with your own plugins_.
    If you consider contributing to this project, have a look on our
    `contribution guides`_.
 
+pre-commit
+==========
+
+``validate-pyproject`` can be installed as a pre-commit hook:
+
+.. code-block:: yaml
+
+    ---
+    repos:
+      - repo: https://github.com/abravalheri/validate-pyproject
+        rev: main
+        hooks:
+          - id: validate-pyproject
+
+For a minimal install without additional dependencies, use the ``validate-pyproject-minimal`` hook instead:
+
+.. code-block:: yaml
+
+    ---
+    repos:
+      - repo: https://github.com/abravalheri/validate-pyproject
+        rev: main
+        hooks:
+          - id: validate-pyproject-minimal
+
 Note
 ====
 
