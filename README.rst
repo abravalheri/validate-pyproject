@@ -150,17 +150,6 @@ pre-commit
         hooks:
           - id: validate-pyproject
 
-For a minimal install without additional dependencies, use the ``validate-pyproject-minimal`` hook instead:
-
-.. code-block:: yaml
-
-    ---
-    repos:
-      - repo: https://github.com/abravalheri/validate-pyproject
-        rev: main
-        hooks:
-          - id: validate-pyproject-minimal
-
 Note
 ====
 
