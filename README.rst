@@ -150,6 +150,12 @@ pre-commit
         hooks:
           - id: validate-pyproject
 
+By default, this ``pre-commit`` hook will only validate the ``pyproject.toml``
+file at the root of the project repository.
+You can customize that by defining a `custom regular expression pattern`_ for
+``files``, but please have in mind that only one file can be analysed per hook.
+
+
 Note
 ====
 
@@ -164,6 +170,7 @@ For details and usage information on PyScaffold see https://pyscaffold.org/.
 
 
 .. _contribution guides: https://validate-pyproject.readthedocs.io/en/latest/contributing.html
+.. _custom regular expression pattern: https://pre-commit.com/#regular-expressions
 .. _our docs: https://validate-pyproject.readthedocs.io
 .. _ini2toml: https://ini2toml.readthedocs.io
 .. _JSON Schema: https://json-schema.org/
