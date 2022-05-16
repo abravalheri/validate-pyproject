@@ -196,7 +196,7 @@ def run(args: Sequence[str] = ()):
     if params.dump_json:
         print(json.dumps(toml_equivalent, indent=2))
     else:
-        print("Valid file")
+        print(f"Valid {_format_file(params.input_file)}")
     return 0
 
 
@@ -226,3 +226,9 @@ def _format_plugin_help(plugin: PluginWrapper) -> str:
     help_text = plugin.help_text
     help_text = f": {_flatten_str(help_text)}" if help_text else ""
     return f'* "{plugin.tool}"{help_text}'
+
+
+def _format_file(file: io.TextIOBase) -> str:
+    if hasattr(file, "name") and file.name:  # type: ignore[attr-defined]
+        return f"file: {file.name}"  # type: ignore[attr-defined]
+    return "file"
