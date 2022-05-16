@@ -1,5 +1,6 @@
 import logging
 from pathlib import Path
+from uuid import uuid4
 
 import pytest
 from validate_pyproject._vendor.fastjsonschema import JsonSchemaValueException
@@ -46,23 +47,25 @@ packages = {find = {}}
 """
 
 
-def write_example(dir_path, text):
-    path = Path(dir_path, "pyproject.toml")
-    path.write_text(text, "UTF-8")
+def write_example(dir_path, *, name="pyproject.toml", _text=simple_example):
+    path = Path(dir_path, name)
+    path.write_text(_text, "UTF-8")
     return path
+
+
+def write_invalid_example(dir_path, *, name="pyproject.toml"):
+    text = simple_example.replace("zip-safe = false", "zip-safe = { hello = 'world' }")
+    return write_example(dir_path, name=name, _text=text)
 
 
 @pytest.fixture
 def valid_example(tmp_path):
-    return write_example(tmp_path, simple_example)
+    return write_example(tmp_path)
 
 
 @pytest.fixture
 def invalid_example(tmp_path):
-    example = simple_example.replace(
-        "zip-safe = false", "zip-safe = { hello = 'world' }"
-    )
-    return write_example(tmp_path, example)
+    return write_invalid_example(tmp_path)
 
 
 class TestEnable:
@@ -130,3 +133,31 @@ class TestOutput:
         assert "offending rule" in captured
         assert "given value" in captured
         assert '"type": "boolean"' in captured
+
+
+def test_multiple_files(tmp_path, capsys):
+    N = 3
+
+    valid_files = [
+        write_example(tmp_path, name=f"valid-pyproject{i}.toml") for i in range(N)
+    ]
+    cli.run(map(str, valid_files))
+    captured = capsys.readouterr().out.lower()
+    number_valid = captured.count("valid file:")
+    assert number_valid == N
+
+    invalid_files = [
+        write_invalid_example(tmp_path, name=f"invalid-pyproject{i}.toml")
+        for i in range(N + 3)
+    ]
+    with pytest.raises(SystemExit):
+        cli.main(map(str, valid_files + invalid_files))
+
+    repl = str(uuid4())
+    captured = capsys.readouterr().out.lower()
+    captured = captured.replace("invalid file:", repl)
+    number_invalid = captured.count(repl)
+    number_valid = captured.count("valid file:")
+    captured = captured.replace(repl, "invalid file:")
+    assert number_valid == N
+    assert number_invalid == N + 3
