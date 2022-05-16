@@ -33,12 +33,15 @@ T = TypeVar("T", bound=NamedTuple)
 
 
 try:
-    from tomli import loads
+    from tomli import TOMLDecodeError, loads
 except ImportError:  # pragma: no cover
     try:
+        from toml import TomlDecodeError as TOMLDecodeError  # type: ignore
         from toml import loads  # type: ignore
     except ImportError as ex:
         raise ImportError("Please install a TOML parser (e.g. `tomli`)") from ex
+
+_REGULAR_EXCEPTIONS = (ValidationError, TOMLDecodeError)
 
 
 @contextmanager
@@ -61,7 +64,7 @@ META: Dict[str, dict] = {
     "input_file": dict(
         dest="input_file",
         nargs="*",
-        default="-",
+        default=[argparse.FileType("r")("-")],
         type=argparse.FileType("r"),
         help="TOML file to be verified (`stdin` by default)",
     ),
@@ -182,7 +185,7 @@ def exceptions2exit():
             print(prefix)
             _logger.error(str(ex) + "\n")
         raise SystemExit(1)
-    except ValidationError as ex:
+    except _REGULAR_EXCEPTIONS as ex:
         _logger.error(str(ex))
         raise SystemExit(1)
     except Exception as ex:  # pragma: no cover
@@ -216,7 +219,7 @@ def run(args: Sequence[str] = ()):
                 print(json.dumps(toml_equivalent, indent=2))
             else:
                 print(f"Valid {_format_file(file)}")
-        except ValidationError as ex:
+        except _REGULAR_EXCEPTIONS as ex:
             exceptions.add(f"Invalid {_format_file(file)}", ex)
 
     exceptions.raise_if_any()
