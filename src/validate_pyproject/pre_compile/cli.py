@@ -83,7 +83,7 @@ def run(args: Sequence[str] = ()):
     return 0
 
 
-main = cli.exceptisons2exit()(run)
+main = cli.exceptions2exit()(run)
 
 
 if __name__ == "__main__":

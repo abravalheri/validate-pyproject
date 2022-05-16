@@ -10,7 +10,17 @@ import sys
 from contextlib import contextmanager
 from itertools import chain
 from textwrap import dedent, wrap
-from typing import Callable, Dict, List, NamedTuple, Sequence, Type, TypeVar
+from typing import (
+    Callable,
+    Dict,
+    Iterator,
+    List,
+    NamedTuple,
+    Sequence,
+    Tuple,
+    Type,
+    TypeVar,
+)
 
 from . import __version__
 from .api import Validator
@@ -50,7 +60,7 @@ META: Dict[str, dict] = {
     ),
     "input_file": dict(
         dest="input_file",
-        nargs="?",
+        nargs="*",
         default="-",
         type=argparse.FileType("r"),
         help="TOML file to be verified (`stdin` by default)",
@@ -94,7 +104,7 @@ META: Dict[str, dict] = {
 
 
 class CliParams(NamedTuple):
-    input_file: io.TextIOBase
+    input_file: List[io.TextIOBase]
     plugins: List[PluginWrapper]
     loglevel: int = logging.WARNING
     dump_json: bool = False
@@ -164,13 +174,18 @@ def setup_logging(loglevel: int):
 
 
 @contextmanager
-def exceptisons2exit():
+def exceptions2exit():
     try:
         yield
+    except _ExceptionGroup as group:
+        for prefix, ex in group:
+            print(prefix)
+            _logger.error(str(ex) + "\n")
+        raise SystemExit(1)
     except ValidationError as ex:
         _logger.error(str(ex))
         raise SystemExit(1)
-    except Exception as ex:
+    except Exception as ex:  # pragma: no cover
         _logger.error(f"{ex.__class__.__name__}: {ex}\n")
         _logger.debug("Please check the following information:", exc_info=True)
         raise SystemExit(1)
@@ -191,16 +206,25 @@ def run(args: Sequence[str] = ()):
     params: CliParams = parse_args(args, plugins)
     setup_logging(params.loglevel)
     validator = Validator(plugins=params.plugins)
-    toml_equivalent = loads(params.input_file.read())
-    validator(toml_equivalent)
-    if params.dump_json:
-        print(json.dumps(toml_equivalent, indent=2))
-    else:
-        print(f"Valid {_format_file(params.input_file)}")
+
+    exceptions = _ExceptionGroup()
+    for file in params.input_file:
+        try:
+            toml_equivalent = loads(file.read())
+            validator(toml_equivalent)
+            if params.dump_json:
+                print(json.dumps(toml_equivalent, indent=2))
+            else:
+                print(f"Valid {_format_file(file)}")
+        except ValidationError as ex:
+            exceptions.add(f"Invalid {_format_file(file)}", ex)
+
+    exceptions.raise_if_any()
+
     return 0
 
 
-main = exceptisons2exit()(run)
+main = exceptions2exit()(run)
 
 
 class Formatter(argparse.RawTextHelpFormatter):
@@ -231,4 +255,24 @@ def _format_plugin_help(plugin: PluginWrapper) -> str:
 def _format_file(file: io.TextIOBase) -> str:
     if hasattr(file, "name") and file.name:  # type: ignore[attr-defined]
         return f"file: {file.name}"  # type: ignore[attr-defined]
-    return "file"
+    return "file"  # pragma: no cover
+
+
+class _ExceptionGroup(Exception):
+    def __init__(self):
+        self._members: List[Tuple[str, Exception]] = []
+        super().__init__()
+
+    def add(self, prefix: str, ex: Exception):
+        self._members.append((prefix, ex))
+
+    def __iter__(self) -> Iterator[Tuple[str, Exception]]:
+        return iter(self._members)
+
+    def raise_if_any(self):
+        number = len(self._members)
+        if number == 1:
+            print(self._members[0][0])
+            raise self._members[0][1]
+        if number > 0:
+            raise self
