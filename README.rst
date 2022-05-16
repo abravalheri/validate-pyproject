@@ -152,8 +152,8 @@ pre-commit
 
 By default, this ``pre-commit`` hook will only validate the ``pyproject.toml``
 file at the root of the project repository.
-You can customize that by defining a `custom regular expression pattern`_ for
-``files``, but please have in mind that only one file can be analysed per hook.
+You can customize that by defining a `custom regular expression pattern`_ using
+the ``files`` parameter.
 
 
 Note
