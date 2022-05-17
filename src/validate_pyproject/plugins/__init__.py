@@ -8,7 +8,7 @@
 import sys
 from string import Template
 from textwrap import dedent
-from typing import Callable, Iterable, List, Optional
+from typing import Any, Callable, Iterable, List, Optional, cast
 
 from .. import __version__
 from ..types import Plugin
@@ -59,7 +59,8 @@ def iterate_entry_points(group=ENTRYPOINT_GROUP) -> Iterable[EntryPoint]:
     if hasattr(entries, "select"):  # pragma: no cover
         # The select method was introduced in importlib_metadata 3.9 (and Python 3.10)
         # and the previous dict interface was declared deprecated
-        entries_: Iterable[EntryPoint] = entries.select(group=group)
+        select = cast(Any, getattr(entries, "select"))  # typecheck gymnastics # noqa
+        entries_: Iterable[EntryPoint] = select(group=group)
     else:  # pragma: no cover
         # TODO: Once Python 3.10 becomes the oldest version supported, this fallback and
         #       conditional statement can be removed.
