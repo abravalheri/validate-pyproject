@@ -2,6 +2,12 @@
 Changelog
 =========
 
+Version 0.8.1
+=============
+
+- Workaround typecheck inconsistencies between different Python versions
+- Publish :pep:`561` type hints, #43
+
 Version 0.8
 ===========
 
