@@ -4,7 +4,7 @@
   description: Validation library for a simple check on pyproject.toml,
     including optional dependencies
   language: python
-  files: pyproject.toml
+  files: ^pyproject.toml$
   entry: validate-pyproject
   additional_dependencies:
     - .[all]

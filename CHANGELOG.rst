@@ -2,11 +2,18 @@
 Changelog
 =========
 
+Version 0.8
+===========
+
+- New :pypi:`pre-commit` hook, #40
+- Allow multiple TOML files to be validated at once via **CLI**
+  (*no changes regarding the Python API*).
+
 Version 0.7.2
 =============
 
 - ``setuptools`` plugin:
-    - Allow ``dependencies``/``optional-dependencies`` to use file directives (#37)
+    - Allow ``dependencies``/``optional-dependencies`` to use file directives, #37
 
 Version 0.7.1
 =============
