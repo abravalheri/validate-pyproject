@@ -2,10 +2,11 @@ from collections.abc import Mapping
 from functools import partial, wraps
 
 import pytest
-import tomli
 from validate_pyproject._vendor import fastjsonschema as FJS
 
 from validate_pyproject import api, errors, plugins, types
+
+from .helpers import toml_
 
 PYPA_SPECS = "https://packaging.python.org/en/latest/specifications"
 
@@ -84,7 +85,7 @@ class TestValidator:
 
     @property
     def valid_example(self):
-        return tomli.loads(self.example_toml)
+        return toml_.loads(self.example_toml)
 
     @property
     def invalid_example(self):

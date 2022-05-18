@@ -1,17 +1,16 @@
 import logging
 
 import pytest
-import tomli
 from validate_pyproject._vendor.fastjsonschema import JsonSchemaValueException
 
 from validate_pyproject import api, cli
 
-from .helpers import EXAMPLES, INVALID, error_file, examples, invalid_examples
+from .helpers import EXAMPLES, INVALID, error_file, examples, invalid_examples, toml_
 
 
 @pytest.mark.parametrize("example", examples())
 def test_examples_api(example):
-    toml_equivalent = tomli.loads((EXAMPLES / example).read_text())
+    toml_equivalent = toml_.loads((EXAMPLES / example).read_text())
     validator = api.Validator()
     return validator(toml_equivalent) is not None
 
@@ -25,7 +24,7 @@ def test_examples_cli(example):
 def test_invalid_examples_api(example):
     example_file = INVALID / example
     expected_error = error_file(example_file).read_text("utf-8")
-    toml_equivalent = tomli.loads(example_file.read_text())
+    toml_equivalent = toml_.loads(example_file.read_text())
     validator = api.Validator()
     with pytest.raises(JsonSchemaValueException) as exc_info:
         validator(toml_equivalent)
