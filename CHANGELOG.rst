@@ -2,6 +2,11 @@
 Changelog
 =========
 
+Version 0.9
+===========
+
+- Use ``tomllib`` from the standard library in Python 3.11+, #42
+
 Version 0.8.1
 =============
 
