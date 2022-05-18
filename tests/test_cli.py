@@ -1,4 +1,5 @@
 import logging
+import sys
 from pathlib import Path
 from uuid import uuid4
 
@@ -161,3 +162,10 @@ def test_multiple_files(tmp_path, capsys):
     captured = captured.replace(repl, "invalid file:")
     assert number_valid == N
     assert number_invalid == N + 3
+
+
+@pytest.mark.skipif(sys.version_info[:2] < (3, 11), reason="requires 3.11+")
+def test_toml_parser():
+    """Make sure Python >= 3.11 uses tomllib instead of tomli"""
+    func_name = cli.loads.__qualname__
+    assert func_name.startswith("tomllib")
