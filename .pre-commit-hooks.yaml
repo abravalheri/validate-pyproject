@@ -1,7 +1,8 @@
 ---
 - id: validate-pyproject
   name: Validate pyproject.toml
-  description: Validation library for a simple check on pyproject.toml,
+  description: >
+    Validation library for a simple check on pyproject.toml,
     including optional dependencies
   language: python
   files: ^pyproject.toml$
