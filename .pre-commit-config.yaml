@@ -52,13 +52,12 @@ repos:
   - id: flake8
     additional_dependencies: [flake8-bugbear]
 
-
 - repo: local  # self-test for `validate-pyproject` hook
   hooks:
   - id: validate-pyproject
     name: Validate pyproject.toml
     language: python
-    files: ^tests/examples/pretend-setuptools/07-pyproject.toml$
+    files: ^tests/examples/.*pyproject\.toml$
     entry: validate-pyproject
     additional_dependencies:
-      - validate-pyproject[all]
+      - validate-pyproject[all]>=0.8
