@@ -96,7 +96,7 @@ You can also use ``validate-pyproject`` in your Python scripts or projects:
     pyproject_as_dict = loads(pyproject_toml_str)
 
     # now we can use validate-pyproject
-    validator = Validator()
+    validator = api.Validator()
 
     try:
         validator(pyproject_as_dict)
