@@ -20,7 +20,7 @@ repos:
     args: ['--fix=auto']  # replace 'auto' with 'lf' to enforce Linux/Mac line endings or 'crlf' for Windows
 
 - repo: https://github.com/myint/autoflake.git
-  rev: v1.4
+  rev: v1.5.1
   hooks:
   - id: autoflake
     args: [
