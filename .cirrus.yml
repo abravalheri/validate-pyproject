@@ -41,7 +41,7 @@ env:
   <<: *task-template
   dist_cache: {folder: dist, fingerprint_script: echo $CIRRUS_BUILD_ID}  # download
   test_script: >
-    tox --installpkg dist/*.whl -e all --
+    tox --installpkg dist/*.whl --
     -n 5 --randomly-seed=42 -rfEx --durations 10 --color yes
   submit_coverage_script:
     - pipx run coverage xml -o coverage.xml
