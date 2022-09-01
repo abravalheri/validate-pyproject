@@ -2,6 +2,14 @@
 Changelog
 =========
 
+Version 0.10
+===========
+
+- Add ``NOTICE.txt`` to ``license_files``, #58
+- Use default SSL context when downloading classifiers from PyPI, #57
+- Remove ``setup.py``, #52
+- Explicitly limit oldest supported Python version.
+
 Version 0.9
 ===========
 
