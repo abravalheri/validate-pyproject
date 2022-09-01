@@ -112,10 +112,12 @@ def pep517_backend_reference(value: str) -> bool:
 
 def _download_classifiers() -> str:
     import cgi
+    import ssl
     from urllib.request import urlopen
 
     url = "https://pypi.org/pypi?:action=list_classifiers"
-    with urlopen(url) as response:
+    context = ssl.create_default_context()
+    with urlopen(url, context=context) as response:
         content_type = response.getheader("content-type", "text/plain")
         encoding = cgi.parse_header(content_type)[1].get("charset", "utf-8")
         return response.read().decode(encoding)
