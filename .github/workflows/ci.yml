@@ -5,7 +5,7 @@ on:
     # Avoid using all the resources/limits available by checking only
     # relevant branches and tags. Other branches can be checked via PRs.
     # branches: [main]
-    tags: ['v*']  # Push events to matching v*, i.e. v1.0, v20.15.10
+    tags: ['v[0-9]*', '[0-9]+.[0-9]+*']  # Match tags that resemble a version
   # pull_request:  # Run in every PR
   workflow_dispatch:  # Allow manually triggering the workflow
   schedule:
@@ -27,7 +27,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with: {fetch-depth: 0}  # deep clone for setuptools-scm
-      - uses: actions/setup-python@v3
+      - uses: actions/setup-python@v4
         with: {python-version: "3.10"}
       - name: Run static analysis and format checkers
         run: pipx run --python python3.10 tox -e lint,typecheck
@@ -50,7 +50,7 @@ jobs:
     strategy:
       matrix:
         python:
-        - 3.7  # oldest Python supported by PSF
+        - "3.7"  # oldest Python supported by PSF
         - "3.10"  # newest Python that is stable
         platform:
         - ubuntu-latest
@@ -59,7 +59,7 @@ jobs:
     runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-python@v3
+      - uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python }}
       - name: Retrieve pre-built distribution files
@@ -96,7 +96,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-python@v3
+      - uses: actions/setup-python@v4
         with: {python-version: "3.10"}
       - name: Retrieve pre-built distribution files
         uses: actions/download-artifact@v3
