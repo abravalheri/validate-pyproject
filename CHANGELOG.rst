@@ -8,7 +8,8 @@ Version 0.10
 - Add ``NOTICE.txt`` to ``license_files``, #58
 - Use default SSL context when downloading classifiers from PyPI, #57
 - Remove ``setup.py``, #52
-- Explicitly limit oldest supported Python version.
+- Explicitly limit oldest supported Python version
+- Replace usage of ``cgi.parse_header`` with ``email.message.Message``
 
 Version 0.9
 ===========
