@@ -2,8 +2,13 @@
 Changelog
 =========
 
+Version 0.10.1
+==============
+
+- Ensure ``LICENSE.txt`` is added to wheel.
+
 Version 0.10
-===========
+============
 
 - Add ``NOTICE.txt`` to ``license_files``, #58
 - Use default SSL context when downloading classifiers from PyPI, #57
