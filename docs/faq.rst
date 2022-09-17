@@ -58,11 +58,11 @@ The text on the standard is:
     In the case of a network-addressable URL, a schema need not be downloadable
     from its canonical URI.
 
-This information is confirmed in a `similar document submited to the IETF`_.
+This information is confirmed in a `similar document submitted to the IETF`_.
 
 
 .. _if-then-else: https://json-schema.org/understanding-json-schema/reference/conditionals.html
 .. _issue: https://github.com/pypa/setuptools/issues/2671
 .. _JSON Schema: https://json-schema.org/
 .. _$id keyword: https://json-schema.org/draft/2020-12/json-schema-core.html#name-the-id-keyword
-.. _similar document submited to the IETF: https://datatracker.ietf.org/doc/html/draft-wright-json-schema-01#section-8
+.. _similar document submitted to the IETF: https://datatracker.ietf.org/doc/html/draft-wright-json-schema-01#section-8
