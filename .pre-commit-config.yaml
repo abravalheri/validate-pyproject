@@ -29,6 +29,11 @@ repos:
       --remove-unused-variables,
     ]
 
+- repo: https://github.com/codespell-project/codespell
+  rev: v2.2.1
+  hooks:
+  - id: codespell
+
 - repo: https://github.com/pycqa/isort
   rev: 5.10.1
   hooks:
