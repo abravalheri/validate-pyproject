@@ -19,7 +19,7 @@ text = "BSD-3-Clause"
 
 [project.urls]
 Homepage = "https://www.example.com/"
-Documentation = "https://docs.exmaple.com/"
+Documentation = "https://docs.example.com/"
 
 [project.optional-dependencies]
 argon2 = ["argon2-cffi >= 19.1.0"]

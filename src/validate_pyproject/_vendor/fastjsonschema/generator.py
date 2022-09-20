@@ -208,7 +208,7 @@ class CodeGenerator:
     @indent
     def l(self, line, *args, **kwds):
         """
-        Short-cut of line. Used for inserting line. It's formated with parameters
+        Short-cut of line. Used for inserting line. It's formatted with parameters
         ``variable``, ``variable_name`` (as ``name`` for short-cut), all keys from
         current JSON schema ``definition`` and also passed arguments in ``args``
         and named ``kwds``.
