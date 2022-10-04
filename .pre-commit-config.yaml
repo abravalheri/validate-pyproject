@@ -20,7 +20,7 @@ repos:
     args: ['--fix=auto']  # replace 'auto' with 'lf' to enforce Linux/Mac line endings or 'crlf' for Windows
 
 - repo: https://github.com/PyCQA/autoflake
-  rev: v1.6.0
+  rev: v1.6.1
   hooks:
   - id: autoflake
     args: [
