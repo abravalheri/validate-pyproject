@@ -20,7 +20,7 @@ repos:
     args: ['--fix=auto']  # replace 'auto' with 'lf' to enforce Linux/Mac line endings or 'crlf' for Windows
 
 - repo: https://github.com/PyCQA/autoflake
-  rev: v1.6.1
+  rev: v1.7.1
   hooks:
   - id: autoflake
     args: [
@@ -40,7 +40,7 @@ repos:
   - id: isort
 
 - repo: https://github.com/psf/black
-  rev: 22.8.0
+  rev: 22.10.0
   hooks:
   - id: black
     language_version: python3
