@@ -261,7 +261,7 @@ on PyPI_, the following steps can be used to release a new version for
    uploaded to PyPI_ correctly.
 
 
-.. <-- strart -->
+.. <-- start -->
 .. |the repository service| replace:: GitHub
 .. |contribute button| replace:: "Create pull request"
 
