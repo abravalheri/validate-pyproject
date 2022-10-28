@@ -12,4 +12,6 @@ def test_invalid_replacements(tmp_path):
 
     e = exc.value
     trace = "".join(traceback.format_exception(e.__class__, e, e.__traceback__))
-    assert "`replacements` should be a dict" in trace
+    print(trace)
+    assert "--replacements: invalid" in trace
+    assert '["a", "b"]' in trace
