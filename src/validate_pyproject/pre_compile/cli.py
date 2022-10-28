@@ -1,6 +1,7 @@
 import json
 import logging
 import sys
+from functools import partial, wraps
 from pathlib import Path
 from types import MappingProxyType
 from typing import Any, Dict, List, Mapping, NamedTuple, Sequence
@@ -23,6 +24,14 @@ else:  # pragma: no cover
 
 _logger = logging.getLogger(__package__)
 
+
+def JSON_dict(name: str, value: str):
+    try:
+        return ensure_dict(name, json.loads(value))
+    except json.JSONDecodeError as ex:
+        raise ValueError(f"Invalid JSON: {value}") from ex
+
+
 META: Dict[str, dict] = {
     "output_dir": dict(
         flags=("-O", "--output-dir"),
@@ -40,7 +49,7 @@ META: Dict[str, dict] = {
     "replacements": dict(
         flags=("-R", "--replacements"),
         default="{}",
-        type=lambda x: ensure_dict("replacements", json.loads(x)),
+        type=wraps(JSON_dict)(partial(JSON_dict, "replacements")),
         help="JSON string (don't forget to quote) representing a map between strings "
         "that should be replaced in the generated files and their replacement, "
         "for example: \n"
