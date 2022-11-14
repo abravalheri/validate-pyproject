@@ -12,7 +12,7 @@ from .helpers import EXAMPLES, INVALID, error_file, examples, invalid_examples, 
 def test_examples_api(example):
     toml_equivalent = toml_.loads((EXAMPLES / example).read_text())
     validator = api.Validator()
-    return validator(toml_equivalent) is not None
+    assert validator(toml_equivalent) is not None
 
 
 @pytest.mark.parametrize("example", examples())

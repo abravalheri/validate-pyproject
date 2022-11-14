@@ -140,7 +140,7 @@ def pre_compiled_validate(monkeypatch):
 def test_examples_api(tmp_path, pre_compiled_validate, example, pre_compiled):
     toml_equivalent = toml_.loads((EXAMPLES / example).read_text())
     pre_compiled_path = pre_compiled(Path(tmp_path))
-    return pre_compiled_validate(pre_compiled_path, toml_equivalent) is not None
+    assert pre_compiled_validate(pre_compiled_path, toml_equivalent) is not None
 
 
 @pytest.mark.parametrize("example", invalid_examples())

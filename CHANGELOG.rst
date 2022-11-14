@@ -2,6 +2,11 @@
 Changelog
 =========
 
+Development Version
+====================
+
+- Improve error message for invalid replacements in the ``pre_compile`` CLI, #71.
+
 Version 0.10.1
 ==============
 
