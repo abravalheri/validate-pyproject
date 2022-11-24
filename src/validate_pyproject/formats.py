@@ -5,6 +5,9 @@ import string
 import typing
 from itertools import chain as _chain
 
+if typing.TYPE_CHECKING:
+    from typing_extensions import Literal
+
 _logger = logging.getLogger(__name__)
 
 # -------------------------------------------------------------------------------------
@@ -131,8 +134,10 @@ class _TroveClassifier:
     option (classifiers will be validated anyway during the upload to PyPI).
     """
 
+    downloaded: typing.Union[None, "Literal[False]", typing.Set[str]]
+
     def __init__(self):
-        self.downloaded: typing.Union[None, False, typing.Set[str]] = None
+        self.downloaded = None
         self._skip_download = False
         # None => not cached yet
         # False => cache not available
