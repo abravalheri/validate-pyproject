@@ -5,7 +5,7 @@ import string
 import typing
 from itertools import chain as _chain
 
-if typing.TYPE_CHECKING:
+if typing.TYPE_CHECKING:  # pragma: no cov
     from typing_extensions import Literal
 
 _logger = logging.getLogger(__name__)
