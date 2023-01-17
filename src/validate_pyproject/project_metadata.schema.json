@@ -281,6 +281,7 @@
       "title": "Author or Maintainer",
       "$comment": "https://peps.python.org/pep-0621/#authors-maintainers",
       "type": "object",
+      "additionalProperties": false,
       "properties": {
         "name": {
           "type": "string",
