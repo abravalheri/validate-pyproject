@@ -155,6 +155,9 @@ file at the root of the project repository.
 You can customize that by defining a `custom regular expression pattern`_ using
 the ``files`` parameter.
 
+You can also use ``pre-commit autoupdate`` to update to the latest stable
+version of ``validate-pyproject`` (recommended).
+
 
 Note
 ====

@@ -2,10 +2,18 @@
 Changelog
 =========
 
-Development Version
-====================
+..
+   Development Version
+   ====================
+
+Version 0.11
+============
 
 - Improve error message for invalid replacements in the ``pre_compile`` CLI, #71.
+- Allow package to be build from git archive, #53
+- Improve error message for invalid replacements in the ``pre_compile`` CLI, #71.
+- Error-out when extra keys are added to ``project.authors/maintainers``, #82
+- De-vendor ``fastjsonschema``, #83
 
 Version 0.10.1
 ==============
