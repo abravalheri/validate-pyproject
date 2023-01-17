@@ -259,14 +259,16 @@ def _format_plugin_help(plugin: PluginWrapper) -> str:
 
 
 def _format_file(file: io.TextIOBase) -> str:
-    if hasattr(file, "name") and file.name:  # type: ignore[attr-defined]
-        return f"file: {file.name}"  # type: ignore[attr-defined]
+    if hasattr(file, "name") and file.name:
+        return f"file: {file.name}"
     return "file"  # pragma: no cover
 
 
 class _ExceptionGroup(Exception):
+    _members: List[Tuple[str, Exception]]
+
     def __init__(self):
-        self._members: List[Tuple[str, Exception]] = []
+        self._members = []
         super().__init__()
 
     def add(self, prefix: str, ex: Exception):
