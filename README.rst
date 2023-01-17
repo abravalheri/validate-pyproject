@@ -175,9 +175,9 @@ For details and usage information on PyScaffold see https://pyscaffold.org/.
 .. _ini2toml: https://ini2toml.readthedocs.io
 .. _JSON Schema: https://json-schema.org/
 .. _library dependency: https://setuptools.pypa.io/en/latest/userguide/dependency_management.html
-.. _PEP 517: https://www.python.org/dev/peps/pep-0517/
-.. _PEP 518: https://www.python.org/dev/peps/pep-0518/
-.. _PEP 621: https://www.python.org/dev/peps/pep-0621/
+.. _PEP 517: https://peps.python.org/pep-0517/
+.. _PEP 518: https://peps.python.org/pep-0518/
+.. _PEP 621: https://peps.python.org/pep-0621/
 .. _pipx: https://pypa.github.io/pipx/
 .. _project: https://packaging.python.org/tutorials/managing-dependencies/
 .. _setuptools: https://setuptools.pypa.io/en/stable/
