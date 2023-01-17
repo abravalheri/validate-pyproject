@@ -120,7 +120,7 @@ Clone the repository
 
     pip install -U pip setuptools -e .
 
-   to be able import the package under development in the Python REPL.
+   to be able to import the package under development in the Python REPL.
 
 #. Install |pre-commit|_::
 
