@@ -6,7 +6,7 @@ on:
     # relevant branches and tags. Other branches can be checked via PRs.
     # branches: [main]
     tags: ['v[0-9]*', '[0-9]+.[0-9]+*']  # Match tags that resemble a version
-  # pull_request:  # Run in every PR
+  pull_request:  # Run in every PR
   workflow_dispatch:  # Allow manually triggering the workflow
   schedule:
     # Run roughly every 15 days at 00:00 UTC
@@ -35,7 +35,7 @@ jobs:
         run: pipx run --python python3.10 tox -e clean,build
       - name: Record the path of wheel distribution
         id: wheel-distribution
-        run: echo "::set-output name=path::$(ls dist/*.whl)"
+        run: echo "path=$(ls dist/*.whl)" >> $GITHUB_OUTPUT
       - name: Store the distribution files for use in other stages
         # `tests` and `publish` will use the same pre-built distributions,
         # so we make sure to release the exact same package that was tested
@@ -51,7 +51,8 @@ jobs:
       matrix:
         python:
         - "3.7"  # oldest Python supported by PSF
-        - "3.10"  # newest Python that is stable
+        - "3.11"  # newest Python that is stable
+        - "3.12-dev"  # current Python beta
         platform:
         - ubuntu-latest
         - macos-latest
