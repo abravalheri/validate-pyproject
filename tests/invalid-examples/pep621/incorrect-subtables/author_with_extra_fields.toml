@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools", "setuptools_scm[toml]"]
+build-backend = "setuptools.build_meta"
+
+
+[project]
+name = "package"
+description = "Package Description"
+readme = "README.rst"
+authors = [{author="Author", email="author@gmail.com"}]
+license = {file="LICENSE"}
+requires-python = ">=3.6"
+dynamic = ["version"]
+dependencies = [
+    "pywin32; platform_system=='Windows' and platform_python_implementation!='PyPy'",
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+]
+keywords = [
+    "cli",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=6.0",
+]
+docs = [
+    "sphinx>=4.0.0",
+]
+ssh = [
+    "paramiko",
+]
