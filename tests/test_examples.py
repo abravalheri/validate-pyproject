@@ -1,7 +1,7 @@
 import logging
 
 import pytest
-from validate_pyproject._vendor.fastjsonschema import JsonSchemaValueException
+from fastjsonschema import JsonSchemaValueException
 
 from validate_pyproject import api, cli
 

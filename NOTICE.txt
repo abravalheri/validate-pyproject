@@ -7,18 +7,6 @@ see the LICENSE.txt file for details.
 
 ----------------------------------------------------------------------
 
-'validate-pyproject' also includes a vendored copy of the 'fastjsonschema'
-project, which is license under the BSD-3-Clause license, with the following
-copyright notice:
-
-  Copyright (c) 2018, Michal Horejsek
-  All rights reserved.
-
-A full copy of the original license file is available inside the
-'validate_pyproject/_vendor/fastjsonschema/LICENSE' subdirectory.
-
-----------------------------------------------------------------------
-
 A few extra files, derived from other opensource projects are collocated in
 this code base ('tests/examples' and 'tests/invalid-examples') exclusively for
 testing purposes during development:

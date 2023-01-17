@@ -7,7 +7,7 @@ from inspect import cleandoc
 from pathlib import Path
 
 import pytest
-from validate_pyproject._vendor.fastjsonschema import JsonSchemaValueException
+from fastjsonschema import JsonSchemaValueException
 
 from validate_pyproject.pre_compile import cli, pre_compile
 

@@ -5,8 +5,9 @@ from pathlib import Path
 from types import MappingProxyType
 from typing import TYPE_CHECKING, Dict, Mapping, Optional, Sequence, Union
 
+import fastjsonschema as FJS
+
 from .. import api, dist_name, types
-from .._vendor import fastjsonschema as FJS
 
 if sys.version_info[:2] >= (3, 8):  # pragma: no cover
     from importlib import metadata as _M
@@ -23,7 +24,6 @@ _logger = logging.getLogger(__name__)
 TEXT_REPLACEMENTS = MappingProxyType(
     {
         "from fastjsonschema import": "from .fastjsonschema_exceptions import",
-        "from ._vendor.fastjsonschema import": "from .fastjsonschema_exceptions import",
     }
 )
 
@@ -112,7 +112,7 @@ def write_notice(
 
 def load_licenses() -> Dict[str, str]:
     return {
-        "fastjsonschema_license": api.read_text(FJS, "LICENSE"),
+        "fastjsonschema_license": _find_and_load_licence(_M.files("fastjsonschema")),
         "validate_pyproject_license": _find_and_load_licence(_M.files(dist_name)),
     }
 

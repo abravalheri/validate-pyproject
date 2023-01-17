@@ -1,8 +1,8 @@
 from collections.abc import Mapping
 from functools import partial, wraps
 
+import fastjsonschema as FJS
 import pytest
-from validate_pyproject._vendor import fastjsonschema as FJS
 
 from validate_pyproject import api, errors, plugins, types
 
