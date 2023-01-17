@@ -1,10 +1,11 @@
 from textwrap import dedent
 
-from ._vendor.fastjsonschema import (
+from fastjsonschema import (
     JsonSchemaDefinitionException,
     JsonSchemaException,
     JsonSchemaValueException,
 )
+
 from .error_reporting import ValidationError
 
 

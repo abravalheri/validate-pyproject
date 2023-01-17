@@ -2,7 +2,7 @@ import logging
 from inspect import cleandoc
 
 import pytest
-from validate_pyproject._vendor.fastjsonschema import validate
+from fastjsonschema import validate
 
 from validate_pyproject.api import FORMAT_FUNCTIONS
 from validate_pyproject.error_reporting import ValidationError, detailed_errors

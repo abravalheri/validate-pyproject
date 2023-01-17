@@ -22,8 +22,9 @@ from typing import (
     cast,
 )
 
+import fastjsonschema as FJS
+
 from . import errors, formats
-from ._vendor import fastjsonschema as FJS
 from .error_reporting import detailed_errors
 from .extra_validations import EXTRA_VALIDATIONS
 from .types import FormatValidationFn, Schema, ValidationFn

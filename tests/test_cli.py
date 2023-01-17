@@ -5,7 +5,7 @@ from pathlib import Path
 from uuid import uuid4
 
 import pytest
-from validate_pyproject._vendor.fastjsonschema import JsonSchemaValueException
+from fastjsonschema import JsonSchemaValueException
 
 from validate_pyproject import cli, plugins
 

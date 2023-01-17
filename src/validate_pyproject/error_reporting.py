@@ -7,7 +7,7 @@ from contextlib import contextmanager
 from textwrap import indent, wrap
 from typing import Any, Dict, Iterator, List, Optional, Sequence, Union, cast
 
-from ._vendor.fastjsonschema import JsonSchemaValueException
+from fastjsonschema import JsonSchemaValueException
 
 _logger = logging.getLogger(__name__)
 
