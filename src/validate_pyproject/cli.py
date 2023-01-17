@@ -255,7 +255,7 @@ def _flatten_str(text: str) -> str:
 def _format_plugin_help(plugin: PluginWrapper) -> str:
     help_text = plugin.help_text
     help_text = f": {_flatten_str(help_text)}" if help_text else ""
-    return f'* "{plugin.tool}"{help_text}'
+    return f"* {plugin.tool!r}{help_text}"
 
 
 def _format_file(file: io.TextIOBase) -> str:
