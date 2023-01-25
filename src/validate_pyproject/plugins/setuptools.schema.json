@@ -76,7 +76,7 @@
           "type": "array",
           "items": {
             "type": "string",
-            "oneOf": [
+            "anyOf": [
               {"format": "python-module-name"},
               {"format": "pep561-stub-name"}
             ]
