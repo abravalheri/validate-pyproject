@@ -74,7 +74,13 @@
         {
           "title": "Array of Python package identifiers",
           "type": "array",
-          "items": {"type": "string", "format": "python-module-name"}
+          "items": {
+            "type": "string",
+            "oneOf": [
+              {"format": "python-module-name"},
+              {"format": "pep561-stub-name"}
+            ]
+          }
         },
         {"$ref": "#/definitions/find-directive"}
       ]

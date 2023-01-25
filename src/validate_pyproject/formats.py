@@ -187,6 +187,24 @@ except ImportError:  # pragma: no cover
 
 
 # -------------------------------------------------------------------------------------
+# Stub packages - PEP 561
+
+
+def _strip_suffix(suffix: str, value: str) -> str:
+    if value.endswith(suffix):
+        return value[: -len(suffix)]
+    return value
+
+
+def pep561_stub_name(value: str) -> bool:
+    if value.startswith(".") or value.endswith(".") or not value:
+        return False
+    top, *children = value.split(".")
+    parts = [_strip_suffix("-stubs", top), *children]
+    return all(python_identifier(m) for m in parts)
+
+
+# -------------------------------------------------------------------------------------
 # Non-PEP related
 
 
