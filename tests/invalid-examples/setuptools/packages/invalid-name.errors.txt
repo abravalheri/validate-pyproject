@@ -1,0 +1,3 @@
+`tool.setuptools.packages` must be valid exactly by one definition
+{format: 'python-module-name'}
+{format: 'pep561-stub-name'}
