@@ -6,12 +6,18 @@ Changelog
    Development Version
    ====================
 
+Version 0.12
+============
+
+- ``setuptools`` plugin:
+    - Allow ``tool.setuptools.packages`` to contain stub package names, as defined in PEP 561, #86
+
 Version 0.11
 ============
 
-- Improve error message for invalid replacements in the ``pre_compile`` CLI, #71.
+- Improve error message for invalid replacements in the ``pre_compile`` CLI, #71
 - Allow package to be build from git archive, #53
-- Improve error message for invalid replacements in the ``pre_compile`` CLI, #71.
+- Improve error message for invalid replacements in the ``pre_compile`` CLI, #71
 - Error-out when extra keys are added to ``project.authors/maintainers``, #82
 - De-vendor ``fastjsonschema``, #83
 
