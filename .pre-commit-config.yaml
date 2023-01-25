@@ -63,6 +63,13 @@ repos:
     name: Validate pyproject.toml
     language: python
     files: ^tests/examples/.*pyproject\.toml$
-    entry: validate-pyproject
+    entry: python
+    args:
+      - -c
+      - >
+        import sys;
+        sys.path.insert(0, "src");
+        from validate_pyproject.cli import main;
+        main()
     additional_dependencies:
       - validate-pyproject[all]>=0.8
