@@ -187,6 +187,17 @@ except ImportError:  # pragma: no cover
 
 
 # -------------------------------------------------------------------------------------
+# Stub packages - PEP 561
+
+
+def pep561_stub_name(value: str) -> bool:
+    top, *children = value.split(".")
+    if not top.endswith("-stubs"):
+        return False
+    return python_module_name(".".join([top[: -len("-stubs")], *children]))
+
+
+# -------------------------------------------------------------------------------------
 # Non-PEP related
 
 
