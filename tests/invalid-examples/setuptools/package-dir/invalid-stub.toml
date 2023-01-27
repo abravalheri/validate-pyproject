@@ -1,0 +1,6 @@
+[project]
+name = "project"
+version = "0.42"
+
+[tool.setuptools]
+package-dir = {"package-st42ubs" = "src"}

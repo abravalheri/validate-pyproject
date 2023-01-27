@@ -74,13 +74,7 @@
         {
           "title": "Array of Python package identifiers",
           "type": "array",
-          "items": {
-            "type": "string",
-            "anyOf": [
-              {"format": "python-module-name"},
-              {"format": "pep561-stub-name"}
-            ]
-          }
+          "items": {"$ref": "#/definitions/package-name"}
         },
         {"$ref": "#/definitions/find-directive"}
       ]
@@ -95,7 +89,7 @@
       "type": "object",
       "additionalProperties": false,
       "propertyNames": {
-        "oneOf": [{"format": "python-module-name"}, {"const": ""}]
+        "oneOf": [{"const": ""}, {"$ref": "#/definitions/package-name"}]
       },
       "patternProperties": {
         "^.*$": {"type": "string" }
@@ -225,6 +219,16 @@
   },
 
   "definitions": {
+    "package-name": {
+      "$id": "#/definitions/package-name",
+      "title": "Valid package name",
+      "description": "Valid package name (importable or PEP 561).",
+      "type": "string",
+      "anyOf": [
+        {"format": "python-module-name"},
+        {"format": "pep561-stub-name"}
+      ]
+    },
     "file-directive": {
       "$id": "#/definitions/file-directive",
       "title": "'file:' directive",
