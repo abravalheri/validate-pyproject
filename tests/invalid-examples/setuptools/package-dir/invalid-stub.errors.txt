@@ -1,0 +1,4 @@
+exactly one of the following:
+{predefined value: ''}
+{format: 'python-module-name'}
+{format: 'pep561-stub-name'}
