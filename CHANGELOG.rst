@@ -6,11 +6,17 @@ Changelog
    Development Version
    ====================
 
+Version 0.12.1
+==============
+
+- ``setuptools`` plugin:
+    - Allow PEP 561 stub names in ``tool.setuptools.package-dir``, #87
+
 Version 0.12
 ============
 
 - ``setuptools`` plugin:
-    - Allow ``tool.setuptools.packages`` to contain stub package names, as defined in PEP 561, #86
+    - Allow PEP 561 stub names in ``tool.setuptools.packages``, #86
 
 Version 0.11
 ============
