@@ -15,7 +15,7 @@ def _deprecated(orig, repl):
 
     @wraps(orig)
     def _wrapper(*args, **kwargs):
-        warnings.warn(cleandoc(msg), category=DeprecationWarning)
+        warnings.warn(cleandoc(msg), category=DeprecationWarning, stacklevel=2)
         return repl(*args, **kwargs)
 
     return _wrapper
