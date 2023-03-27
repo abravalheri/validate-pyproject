@@ -177,9 +177,9 @@
       "items": {"type": "string"},
       "$$description": [
         "PROVISIONAL: List of glob patterns for all license files being distributed.",
-        "(might become standard with PEP 639)."
+        "(might become standard with PEP 639).",
+        "By default: ``['LICEN[CS]E*', 'COPYING*', 'NOTICE*', 'AUTHORS*']``"
       ],
-      "default": ["LICEN[CS]E*", " COPYING*", " NOTICE*", "AUTHORS*"],
       "$comment": "TODO: revise if PEP 639 is accepted. Probably ``project.license-files``?"
     },
     "dynamic": {

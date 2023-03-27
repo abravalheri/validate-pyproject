@@ -6,6 +6,13 @@ Changelog
    Development Version
    ====================
 
+Version 0.12.2 (dev)
+====================
+
+- ``setuptools`` plugin:
+    - Fix problem with ``license-files`` patterns,
+      by removing ``default`` value.
+
 Version 0.12.1
 ==============
 
