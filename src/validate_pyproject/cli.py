@@ -58,6 +58,8 @@ def critical_logging():
         raise
 
 
+_STDIN = argparse.FileType("r")("-")
+
 META: Dict[str, dict] = {
     "version": dict(
         flags=("-V", "--version"),
@@ -67,7 +69,7 @@ META: Dict[str, dict] = {
     "input_file": dict(
         dest="input_file",
         nargs="*",
-        default=[argparse.FileType("r")("-")],
+        # default=[_STDIN],  # postponed to facilitate testing
         type=argparse.FileType("r"),
         help="TOML file to be verified (`stdin` by default)",
     ),
@@ -120,6 +122,7 @@ def __meta__(plugins: Sequence[PluginWrapper]) -> Dict[str, dict]:
     """'Hyper parameters' to instruct :mod:`argparse` how to create the CLI"""
     meta = {k: v.copy() for k, v in META.items()}
     meta["enable"]["choices"] = set([p.tool for p in plugins])
+    meta["input_file"]["default"] = [_STDIN]  # lazily defined to facilitate testing
     return meta
 
 
@@ -216,18 +219,25 @@ def run(args: Sequence[str] = ()):
     exceptions = _ExceptionGroup()
     for file in params.input_file:
         try:
-            toml_equivalent = loads(file.read())
-            validator(toml_equivalent)
-            if params.dump_json:
-                print(json.dumps(toml_equivalent, indent=2))
-            else:
-                print(f"Valid {_format_file(file)}")
+            _run_on_file(validator, params, file)
         except _REGULAR_EXCEPTIONS as ex:
             exceptions.add(f"Invalid {_format_file(file)}", ex)
 
     exceptions.raise_if_any()
 
     return 0
+
+
+def _run_on_file(validator: Validator, params: CliParams, file: io.TextIOBase):
+    if file in (sys.stdin, _STDIN):
+        print("Expecting input via `stdin`...", file=sys.stderr, flush=True)
+
+    toml_equivalent = loads(file.read())
+    validator(toml_equivalent)
+    if params.dump_json:
+        print(json.dumps(toml_equivalent, indent=2))
+    else:
+        print(f"Valid {_format_file(file)}")
 
 
 main = exceptions2exit()(run)
