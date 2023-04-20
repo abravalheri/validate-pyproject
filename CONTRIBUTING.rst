@@ -153,7 +153,7 @@ Implement your changes
 
    Please make sure to see the validation messages from |pre-commit|_ and fix
    any eventual issues.
-   This should automatically use flake8_/black_ to check/fix the code style
+   This should automatically use ruff_/black_ to check/fix the code style
    in a way that is compatible with the project.
 
    .. important:: Don't forget to add unit tests and documentation in case your
@@ -281,7 +281,6 @@ on PyPI_, the following steps can be used to release a new version for
 .. _descriptive commit message: https://chris.beams.io/posts/git-commit
 .. _docstrings: https://www.sphinx-doc.org/en/master/usage/extensions/napoleon.html
 .. _first-contributions tutorial: https://github.com/firstcontributions/first-contributions
-.. _flake8: https://flake8.pycqa.org/en/stable/
 .. _git: https://git-scm.com
 .. _GitHub's fork and pull request workflow: https://guides.github.com/activities/forking/
 .. _guide created by FreeCodeCamp: https://github.com/FreeCodeCamp/how-to-contribute-to-open-source
@@ -294,6 +293,7 @@ on PyPI_, the following steps can be used to release a new version for
 .. _Pytest can drop you: https://docs.pytest.org/en/stable/how-to/failures.html#using-python-library-pdb-with-pytest
 .. _Python Software Foundation's Code of Conduct: https://www.python.org/psf/conduct/
 .. _reStructuredText: https://www.sphinx-doc.org/en/master/usage/restructuredtext/
+.. _ruff: https://beta.ruff.rs/docs/
 .. _Sphinx: https://www.sphinx-doc.org/en/master/
 .. _tox: https://tox.wiki/en/stable/
 .. _virtual environment: https://realpython.com/python-virtual-environments-a-primer/
