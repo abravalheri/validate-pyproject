@@ -6,8 +6,16 @@ Changelog
    Development Version
    ====================
 
-Version 0.12.2 (dev)
-====================
+Version 0.13
+============
+
+- Make it clear when using input from ``stdin``, #96
+- Fix summary for ``allOf``, #100
+- ``setuptools`` plugin:
+    - Improve validation of ``attr`` directives, #101
+
+Version 0.12.2
+==============
 
 - ``setuptools`` plugin:
     - Fix problem with ``license-files`` patterns,
