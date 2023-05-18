@@ -132,7 +132,7 @@ class TestInput:
             ctx.setattr("builtins.print", print_mock)
             cli.run()
         calls = print_mock.call_args_list
-        assert any("input via `stdin`" in x.args[0] for x in calls)
+        assert any("input via `stdin`" in str(args[0]) for args, _kwargs in calls)
 
 
 class TestOutput:
