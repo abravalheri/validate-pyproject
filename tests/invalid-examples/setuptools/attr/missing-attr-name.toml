@@ -1,0 +1,17 @@
+# Issue pypa/setuptools#3928
+# https://github.com/RonnyPfannschmidt/reproduce-setuptools-dynamic-attr
+[build-system]
+build-backend = "_own_version_helper"
+backend-path = ["."]
+requires = ["setuptools" ]
+
+[project]
+name = "ronnypfannschmidt.setuptools-build-attr-error-reproduce"
+description = "reproducer for a setuptools issue"
+requires-python = ">=3.7"
+dynamic = [
+  "version",
+]
+
+[tool.setuptools.dynamic]
+version = { attr = "_own_version_helper."}
