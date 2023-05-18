@@ -1,7 +1,9 @@
 import inspect
+import io
 import logging
 import sys
 from pathlib import Path
+from unittest.mock import Mock
 from uuid import uuid4
 
 import pytest
@@ -118,6 +120,19 @@ class TestDisable:
     def test_invalid_disabled(self, invalid_example):
         # When the plugin is disabled, the validator should ignore the tool
         assert cli.main([str(invalid_example), "-D", "setuptools"]) == 0
+
+
+class TestInput:
+    def test_inform_user_about_stdin(self, monkeypatch):
+        print_mock = Mock()
+        fake_stdin = io.StringIO('[project]\nname="test"\nversion="0.42"\n')
+        with monkeypatch.context() as ctx:
+            ctx.setattr("validate_pyproject.cli._STDIN", fake_stdin)
+            ctx.setattr("sys.argv", ["validate-pyproject"])
+            ctx.setattr("builtins.print", print_mock)
+            cli.run()
+        calls = print_mock.call_args_list
+        assert any("input via `stdin`" in str(args[0]) for args, _kwargs in calls)
 
 
 class TestOutput:
