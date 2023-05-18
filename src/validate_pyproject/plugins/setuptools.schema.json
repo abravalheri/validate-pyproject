@@ -256,7 +256,7 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "attr": {"type": "string"}
+        "attr": {"format": "python-qualified-identifier"}
       },
       "required": ["attr"]
     },
