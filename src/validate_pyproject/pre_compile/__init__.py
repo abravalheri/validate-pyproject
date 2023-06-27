@@ -48,7 +48,7 @@ def pre_compile(
     validator = api.Validator(plugins)
     header = "\n".join(NOCHECK_HEADERS)
     code = replace_text(validator.generated_code, replacements)
-    (out / "fastjsonschema_validations.py").write_text(header + code, "UTF-8")
+    _write(out / "fastjsonschema_validations.py", header + code)
 
     copy_fastjsonschema_exceptions(out, replacements)
     copy_module("extra_validations", out, replacements)
@@ -70,27 +70,20 @@ def replace_text(text: str, replacements: Dict[str, str]) -> str:
 def copy_fastjsonschema_exceptions(
     output_dir: Path, replacements: Dict[str, str]
 ) -> Path:
-    file = output_dir / "fastjsonschema_exceptions.py"
     code = replace_text(api.read_text(FJS.__name__, "exceptions.py"), replacements)
-    file.write_text(code, "UTF-8")
-    return file
+    return _write(output_dir / "fastjsonschema_exceptions.py", code)
 
 
 def copy_module(name: str, output_dir: Path, replacements: Dict[str, str]) -> Path:
-    file = output_dir / f"{name}.py"
     code = api.read_text(api.__package__, f"{name}.py")
-    code = replace_text(code, replacements)
-    file.write_text(code, "UTF-8")
-    return file
+    return _write(output_dir / f"{name}.py", replace_text(code, replacements))
 
 
 def write_main(
     file_path: Path, schema: types.Schema, replacements: Dict[str, str]
 ) -> Path:
     code = api.read_text(__name__, "main_file.template")
-    code = replace_text(code, replacements)
-    file_path.write_text(code, "UTF-8")
-    return file_path
+    return _write(file_path, replace_text(code, replacements))
 
 
 def write_notice(
@@ -105,9 +98,7 @@ def write_notice(
     notice = notice.format(notice=opening, main_file=main_file, **load_licenses())
     notice = replace_text(notice, replacements)
 
-    file = out / "NOTICE"
-    file.write_text(notice, "UTF-8")
-    return file
+    return _write(out / "NOTICE", notice)
 
 
 def load_licenses() -> Dict[str, str]:
@@ -120,6 +111,7 @@ def load_licenses() -> Dict[str, str]:
 NOCHECK_HEADERS = (
     "# noqa",
     "# type: ignore",
+    "# ruff: noqa",
     "# flake8: noqa",
     "# pylint: skip-file",
     "# mypy: ignore-errors",
@@ -142,3 +134,8 @@ def _find_and_load_licence(files: Optional[Sequence[_M.PackagePath]]) -> str:
         )
         _logger.warning(msg)
         raise
+
+
+def _write(file: Path, text: str) -> Path:
+    file.write_text(text.rstrip() + "\n", encoding="utf-8")  # POSIX convention
+    return file
