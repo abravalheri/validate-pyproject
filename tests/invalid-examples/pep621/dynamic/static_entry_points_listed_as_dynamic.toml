@@ -1,0 +1,10 @@
+[build-system]
+requires = ["setuptools>=67.5"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "timmins"
+dynamic = ["version", "entry-points"]
+
+[project.entry-points."timmins.display"]
+excl = "timmins_plugin_fancy:excl_display"

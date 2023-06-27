@@ -1,0 +1,1 @@
+cannot provide a value for `project.entry-points` and list it under `project.dynamic` at the same time

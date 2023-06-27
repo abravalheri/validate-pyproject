@@ -3,6 +3,7 @@ difficult to express as a JSON Schema (or that are not supported by the current
 JSON Schema library).
 """
 
+from inspect import cleandoc
 from typing import Mapping, TypeVar
 
 from .error_reporting import ValidationError
@@ -17,6 +18,11 @@ class RedefiningStaticFieldAsDynamic(ValidationError):
     statically as well as being listed in dynamic.
     """
 
+    _URL = (
+        "https://packaging.python.org/en/latest/specifications/"
+        "declaring-project-metadata/#dynamic"
+    )
+
 
 def validate_project_dynamic(pyproject: T) -> T:
     project_table = pyproject.get("project", {})
@@ -24,11 +30,21 @@ def validate_project_dynamic(pyproject: T) -> T:
 
     for field in dynamic:
         if field in project_table:
-            msg = f"You cannot provide a value for `project.{field}` and "
-            msg += "list it under `project.dynamic` at the same time"
-            name = f"data.project.{field}"
-            value = {field: project_table[field], "...": " # ...", "dynamic": dynamic}
-            raise RedefiningStaticFieldAsDynamic(msg, value, name, rule="PEP 621")
+            raise RedefiningStaticFieldAsDynamic(
+                message=f"You cannot provide a value for `project.{field}` and "
+                "list it under `project.dynamic` at the same time",
+                value={
+                    field: project_table[field],
+                    "...": " # ...",
+                    "dynamic": dynamic,
+                },
+                name=f"data.project.{field}",
+                definition={
+                    "description": cleandoc(RedefiningStaticFieldAsDynamic.__doc__),
+                    "see": RedefiningStaticFieldAsDynamic._URL,
+                },
+                rule="PEP 621",
+            )
 
     return pyproject
 
