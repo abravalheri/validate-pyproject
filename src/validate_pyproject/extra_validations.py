@@ -12,12 +12,12 @@ T = TypeVar("T", bound=Mapping)
 
 
 class RedefiningStaticFieldAsDynamic(ValidationError):
-    """According to PEP 621:
+    _DESC = """According to PEP 621:
 
     Build back-ends MUST raise an error if the metadata specifies a field
     statically as well as being listed in dynamic.
     """
-
+    __doc__ = _DESC
     _URL = (
         "https://packaging.python.org/en/latest/specifications/"
         "declaring-project-metadata/#dynamic"
@@ -40,7 +40,7 @@ def validate_project_dynamic(pyproject: T) -> T:
                 },
                 name=f"data.project.{field}",
                 definition={
-                    "description": cleandoc(RedefiningStaticFieldAsDynamic.__doc__),
+                    "description": cleandoc(RedefiningStaticFieldAsDynamic._DESC),
                     "see": RedefiningStaticFieldAsDynamic._URL,
                 },
                 rule="PEP 621",
