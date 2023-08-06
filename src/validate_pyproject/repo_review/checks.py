@@ -9,10 +9,6 @@ from .. import api
 __all__ = ["VPP001", "repo_review_checks"]
 
 
-def __dir__() -> list[str]:
-    return __all__
-
-
 class VPP001:
     """Validate pyproject.toml"""
 
