@@ -129,8 +129,9 @@ class _ErrorFormatting:
 
     def _expand_details(self) -> str:
         optional = []
-        desc_lines = self.ex.definition.pop("$$description", [])
-        desc = self.ex.definition.pop("description", None) or " ".join(desc_lines)
+        definition = self.ex.definition or {}
+        desc_lines = definition.pop("$$description", [])
+        desc = definition.pop("description", None) or " ".join(desc_lines)
         if desc:
             description = "\n".join(
                 wrap(
@@ -142,7 +143,7 @@ class _ErrorFormatting:
                 )
             )
             optional.append(f"DESCRIPTION:\n{description}")
-        schema = json.dumps(self.ex.definition, indent=4)
+        schema = json.dumps(definition, indent=4)
         value = json.dumps(self.ex.value, indent=4)
         defaults = [
             f"GIVEN VALUE:\n{indent(value, '    ')}",

@@ -98,15 +98,16 @@ def list_from_entry_points(
 
 
 class ErrorLoadingPlugin(RuntimeError):
-    """There was an error loading '{plugin}'.
+    _DESC = """There was an error loading '{plugin}'.
     Please make sure you have installed a version of the plugin that is compatible
     with {package} {version}. You can also try uninstalling it.
     """
+    __doc__ = _DESC
 
     def __init__(self, plugin: str = "", entry_point: Optional[EntryPoint] = None):
         if entry_point and not plugin:
             plugin = getattr(entry_point, "module", entry_point.name)
 
         sub = dict(package=__package__, version=__version__, plugin=plugin)
-        msg = dedent(self.__doc__ or "").format(**sub).splitlines()
+        msg = dedent(self._DESC).format(**sub).splitlines()
         super().__init__(f"{msg[0]}\n{' '.join(msg[1:])}")
