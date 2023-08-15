@@ -6,11 +6,18 @@ omit =
     */validate_pyproject/__main__.py
     */validate_pyproject/**/__main__.py
     */validate_pyproject/_vendor/*
+plugins =
+  coverage_conditional_plugin
 
 [paths]
 source =
     src/
     */site-packages/
+
+[coverage_conditional_plugin]
+omit =
+  "sys_version_info < (3, 10)":
+      "src/validate_pyproject/repo_review.py"
 
 [report]
 # Regexes for lines to exclude from consideration
