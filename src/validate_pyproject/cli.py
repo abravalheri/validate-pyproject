@@ -144,7 +144,7 @@ def parse_args(
     enabled = params.pop("enable", ())
     disabled = params.pop("disable", ())
     params["plugins"] = select_plugins(plugins, enabled, disabled)
-    return params_class(**params)
+    return params_class(**params)  # type: ignore[call-overload]
 
 
 def select_plugins(
