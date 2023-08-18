@@ -183,5 +183,5 @@ def test_multiple_files(tmp_path, capsys):
 @pytest.mark.skipif(sys.version_info[:2] < (3, 11), reason="requires 3.11+")
 def test_parser_is_tomllib():
     """Make sure Python >= 3.11 uses tomllib instead of tomli"""
-    module_name = inspect.getmodule(cli.loads).__name__
+    module_name = inspect.getmodule(cli.tomllib.loads).__name__
     assert module_name.startswith("tomllib")
