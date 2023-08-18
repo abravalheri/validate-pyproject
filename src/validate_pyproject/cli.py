@@ -23,7 +23,7 @@ from typing import (
 )
 
 from . import __version__
-from ._tomllib import TOMLDecodeError, loads
+from . import _tomllib as tomllib
 from .api import Validator
 from .errors import ValidationError
 from .plugins import PluginWrapper
@@ -32,7 +32,7 @@ from .plugins import list_from_entry_points as list_plugins_from_entry_points
 _logger = logging.getLogger(__package__)
 T = TypeVar("T", bound=NamedTuple)
 
-_REGULAR_EXCEPTIONS = (ValidationError, TOMLDecodeError)
+_REGULAR_EXCEPTIONS = (ValidationError, tomllib.TOMLDecodeError)
 
 
 @contextmanager
@@ -220,7 +220,7 @@ def _run_on_file(validator: Validator, params: CliParams, file: io.TextIOBase):
     if file in (sys.stdin, _STDIN):
         print("Expecting input via `stdin`...", file=sys.stderr, flush=True)
 
-    toml_equivalent = loads(file.read())
+    toml_equivalent = tomllib.loads(file.read())
     validator(toml_equivalent)
     if params.dump_json:
         print(json.dumps(toml_equivalent, indent=2))
