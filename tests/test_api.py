@@ -4,9 +4,8 @@ from functools import partial, wraps
 import fastjsonschema as FJS
 import pytest
 
+from validate_pyproject import _tomllib as tomllib
 from validate_pyproject import api, errors, plugins, types
-
-from .helpers import toml_
 
 PYPA_SPECS = "https://packaging.python.org/en/latest/specifications"
 
@@ -85,7 +84,7 @@ class TestValidator:
 
     @property
     def valid_example(self):
-        return toml_.loads(self.example_toml)
+        return tomllib.loads(self.example_toml)
 
     @property
     def invalid_example(self):
