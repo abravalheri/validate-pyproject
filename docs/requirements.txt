@@ -1,8 +1,8 @@
 # Requirements file for ReadTheDocs, check .readthedocs.yml.
 # To build the module reference correctly, make sure every external package
 # under `install_requires` in `setup.cfg` is also listed here!
-furo>=2021.10.9
-sphinx>=3.2.1
+furo>=2023.08.17
+sphinx>=7.2.2
 sphinx-argparse>=0.3.1
 sphinx-copybutton
 sphinx-jsonschema>=1.16.11
