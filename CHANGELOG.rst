@@ -6,6 +6,12 @@ Changelog
    Development Version
    ====================
 
+Version 0.14
+============
+
+- Ensure reporting show more detailed error messages for ``RedefiningStaticFieldAsDynamic``, #104
+- Add support for ``repo-review``, by @henryiii in #105
+
 Version 0.13
 ============
 
