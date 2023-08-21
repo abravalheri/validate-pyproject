@@ -1,14 +1,4 @@
-import sys
 from pathlib import Path
-
-if sys.version_info[:2] >= (3, 11):
-    import tomllib
-
-    toml_ = tomllib
-else:
-    import tomli
-
-    toml_ = tomli
 
 HERE = Path(__file__).parent
 EXAMPLES = HERE / "examples"

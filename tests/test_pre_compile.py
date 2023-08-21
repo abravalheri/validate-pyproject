@@ -9,9 +9,10 @@ from pathlib import Path
 import pytest
 from fastjsonschema import JsonSchemaValueException
 
+from validate_pyproject import _tomllib as tomllib
 from validate_pyproject.pre_compile import cli, pre_compile
 
-from .helpers import EXAMPLES, INVALID, error_file, examples, invalid_examples, toml_
+from .helpers import EXAMPLES, INVALID, error_file, examples, invalid_examples
 
 MAIN_FILE = "hello_world.py"  # Let's use something different that `__init__.py`
 
@@ -138,7 +139,7 @@ def pre_compiled_validate(monkeypatch):
 @pytest.mark.parametrize("example", examples())
 @pytest.mark.parametrize("pre_compiled", _PRE_COMPILED)
 def test_examples_api(tmp_path, pre_compiled_validate, example, pre_compiled):
-    toml_equivalent = toml_.loads((EXAMPLES / example).read_text())
+    toml_equivalent = tomllib.loads((EXAMPLES / example).read_text())
     pre_compiled_path = pre_compiled(Path(tmp_path))
     assert pre_compiled_validate(pre_compiled_path, toml_equivalent) is not None
 
@@ -148,7 +149,7 @@ def test_examples_api(tmp_path, pre_compiled_validate, example, pre_compiled):
 def test_invalid_examples_api(tmp_path, pre_compiled_validate, example, pre_compiled):
     example_file = INVALID / example
     expected_error = error_file(example_file).read_text("utf-8")
-    toml_equivalent = toml_.loads(example_file.read_text())
+    toml_equivalent = tomllib.loads(example_file.read_text())
     pre_compiled_path = pre_compiled(Path(tmp_path))
     with pytest.raises(JsonSchemaValueException) as exc_info:
         pre_compiled_validate(pre_compiled_path, toml_equivalent)
