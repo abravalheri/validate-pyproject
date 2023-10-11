@@ -1,14 +1,14 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema",
 
-  "$id": "https://setuptools.pypa.io/en/latest/deprecated/distutils/",
+  "$id": "https://setuptools.pypa.io/en/latest/deprecated/distutils/configfile.html",
   "title": "``tool.distutils`` table",
   "$$description": [
+    "**EXPERIMENTAL** (NOT OFFICIALLY SUPPORTED): Use ``tool.distutils``",
+    "subtables to configure arguments for ``distutils`` commands.",
     "Originally, ``distutils`` allowed developers to configure arguments for",
-    "``setup.py`` scripts via `distutils configuration files",
-    "<https://setuptools.pypa.io/en/latest/deprecated/distutils/>`_",
-    "(**EXPERIMENTAL** - NOT OFFICIALLY SUPPORTED).",
-    "``tool.distutils`` subtables could be used with the same purpose.",
+    "``setup.py`` commands via `distutils configuration files",
+    "<https://setuptools.pypa.io/en/latest/deprecated/distutils/configfile.html>`_.",
     "See also `the old Python docs <https://docs.python.org/3.11/install/>_`."
   ],
 
