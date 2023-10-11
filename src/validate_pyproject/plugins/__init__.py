@@ -47,6 +47,9 @@ class PluginWrapper:
             return ""
         return Template(tpl).safe_substitute(tool=self.tool, id=self.id)
 
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}({self.tool!r}, {self._load_fn!r})"
+
 
 def iterate_entry_points(group=ENTRYPOINT_GROUP) -> Iterable[EntryPoint]:
     """Produces a generator yielding an EntryPoint object for each plugin registered
