@@ -141,7 +141,8 @@ class SchemaRegistry(Mapping[str, Schema]):
         if sid in self._schemas:
             raise errors.SchemaWithDuplicatedId(sid)
         version = schema.get("$schema")
-        if version and version != self.spec_version:
+        # Support schemas with missing trailing # (incorrect, but required before 0.15)
+        if version and version.rstrip("#") != self.spec_version.rstrip("#"):
             raise errors.InvalidSchemaVersion(reference, version, self.spec_version)
         return schema
 

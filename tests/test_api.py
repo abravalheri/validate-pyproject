@@ -41,13 +41,21 @@ class TestRegistry:
         assert "setuptools" in tool["properties"]
         assert "$ref" in tool["properties"]["setuptools"]
 
-    def fake_plugin(self, name, schema_version=7):
+    def fake_plugin(self, name, schema_version=7, end="#"):
         schema = {
             "$id": f"https://example.com/{name}.schema.json",
-            "$schema": f"http://json-schema.org/draft-{schema_version:02d}/schema",
+            "$schema": f"http://json-schema.org/draft-{schema_version:02d}/schema{end}",
             "type": "object",
         }
         return types.Schema(schema)
+
+    @pytest.mark.parametrize("end", ["", "#"], ids=["no#", "with#"])
+    def test_schema_ending(self, end):
+        fn = wraps(self.fake_plugin)(partial(self.fake_plugin, end=end))
+        plg = plugins.PluginWrapper("plugin", fn)
+        registry = api.SchemaRegistry([plg])
+        main_schema = registry[registry.main]
+        assert main_schema["$schema"] == "http://json-schema.org/draft-07/schema#"
 
     def test_incompatible_versions(self):
         fn = wraps(self.fake_plugin)(partial(self.fake_plugin, schema_version=8))
