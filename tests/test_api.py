@@ -22,12 +22,12 @@ def test_load():
 
 def test_load_plugin():
     spec = api.load_builtin_plugin("distutils")
-    assert spec["$id"] == "https://docs.python.org/3/install/"
+    assert spec["$id"].startswith("https://setuptools.pypa.io")
+    assert "deprecated/distutils" in spec["$id"]
 
     spec = api.load_builtin_plugin("setuptools")
-    assert (
-        spec["$id"] == "https://setuptools.pypa.io/en/latest/references/keywords.html"
-    )
+    assert spec["$id"].startswith("https://setuptools.pypa.io")
+    assert "pyproject" in spec["$id"]
 
 
 class TestRegistry:

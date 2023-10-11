@@ -105,9 +105,10 @@ class TestDisable:
 
     @pytest.mark.parametrize("tool, other_tool", zip(TOOLS, reversed(TOOLS)))
     def test_parse(self, valid_example, tool, other_tool):
-        params = parse_args([str(valid_example), "-D", tool])
-        assert len(params.plugins) == 1
-        assert params.plugins[0].tool == other_tool
+        all_plugins = parse_args([str(valid_example), "-D", tool]).plugins
+        our_plugins = [p for p in all_plugins if p.id.startswith("validate_pyproject")]
+        assert len(our_plugins) == 1
+        assert our_plugins[0].tool == other_tool
 
     def test_valid(self, valid_example):
         assert cli.run([str(valid_example), "-D", "distutils"]) == 0

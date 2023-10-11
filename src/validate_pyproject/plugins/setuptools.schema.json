@@ -1,20 +1,19 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema",
 
-  "$id": "https://setuptools.pypa.io/en/latest/references/keywords.html",
+  "$id": "https://setuptools.pypa.io/en/latest/userguide/pyproject_config.html",
   "title": "``tool.setuptools`` table",
   "$$description": [
-    "Please notice for the time being the ``setuptools`` project does not specify",
-    "a way of configuring builds via ``pyproject.toml``.",
-    "Therefore this schema should be taken just as a *\"thought experiment\"* on how",
-    "this *might be done*, by following the principles established in",
-    "`ini2toml <https://ini2toml.readthedocs.io/en/latest/setuptools_pep621.html>`_.",
+    "``setuptools``-specific configurations that can be set by users that require",
+    "customization.",
+    "These configurations are completely optional and probably can be skipped when",
+    "creating simple packages. They are equivalent to some of the `Keywords",
+    "<https://setuptools.pypa.io/en/latest/references/keywords.html>`_",
+    "used by the ``setup.py`` file, and can be set via the ``tool.setuptools`` table.",
     "It considers only ``setuptools`` `parameters",
-    "<https://setuptools.pypa.io/en/latest/userguide/declarative_config.html>`_",
-    "that can currently be configured via ``setup.cfg`` and are not covered by :pep:`621`",
-    "but intentionally excludes ``dependency_links`` and ``setup_requires``.",
-    "NOTE: ``scripts`` was renamed to ``script-files`` to avoid confusion with",
-    "entry-point based scripts (defined in :pep:`621`)."
+    "<https://setuptools.pypa.io/en/latest/userguide/pyproject_config.html#setuptools-specific-configuration>`_",
+    "that are not covered by :pep:`621`; and intentionally excludes ``dependency_links``",
+    "and ``setup_requires`` (incompatible with modern workflows/standards)."
   ],
 
   "type": "object",
@@ -41,12 +40,22 @@
       "items": {"type": "string", "format": "pep508-identifier"}
     },
     "zip-safe": {
-      "description":
+      "$$description": [
         "Whether the project can be safely installed and run from a zip file.",
+        "**OBSOLETE**: only relevant for ``pkg_resources``, ``easy_install`` and",
+        "``setup.py install`` in the context of ``eggs`` (**DEPRECATED**)."
+      ],
       "type": "boolean"
     },
     "script-files": {
-      "description": "Legacy way of defining scripts (entry-points are preferred).",
+      "$$description": [
+        "Legacy way of defining scripts (entry-points are preferred).",
+        "Equivalent to the ``script`` keyword in ``setup.py``",
+        "(it was renamed to avoid confusion with entry-point based ``project.scripts``",
+        "defined in :pep:`621`).",
+        "**DISCOURAGED**: generic script wrappers are tricky and may not work properly.",
+        "Whenever possible, please use ``project.scripts`` instead."
+      ],
       "type": "array",
       "items": {"type": "string"},
       "$comment": "TODO: is this field deprecated/should be removed?"
@@ -54,7 +63,9 @@
     "eager-resources": {
       "$$description": [
         "Resources that should be extracted together, if any of them is needed,",
-        "or if any C extensions included in the project are imported."
+        "or if any C extensions included in the project are imported.",
+        "**OBSOLETE**: only relevant for ``pkg_resources``, ``easy_install`` and",
+        "``setup.py install`` in the context of ``eggs`` (**DEPRECATED**)."
       ],
       "type": "array",
       "items": {"type": "string"}
@@ -138,7 +149,8 @@
     "namespace-packages": {
       "type": "array",
       "items": {"type": "string", "format": "python-module-name"},
-      "$comment": "https://setuptools.pypa.io/en/latest/userguide/package_discovery.html"
+      "$comment": "https://setuptools.pypa.io/en/latest/userguide/package_discovery.html",
+      "description": "**DEPRECATED**: use implicit namespaces instead (:pep:`420`)."
     },
     "py-modules": {
       "description": "Modules that setuptools will manipulate",
@@ -148,10 +160,13 @@
     },
     "data-files": {
       "$$description": [
-        "**DEPRECATED**: dict-like structure where each key represents a directory and",
+        "``dict``-like structure where each key represents a directory and",
         "the value is a list of glob patterns that should be installed in them.",
-        "Please notice this don't work with wheels. See `data files support",
-        "<https://setuptools.pypa.io/en/latest/userguide/datafiles.html>`_"
+        "**DISCOURAGED**: please notice this might not work as expected with wheels.",
+        "Whenever possible, consider using data files inside the package directories",
+        "(or create a new namespace package that only contains data files).",
+        "See `data files support",
+        "<https://setuptools.pypa.io/en/latest/userguide/datafiles.html>`_."
       ],
       "type": "object",
       "patternProperties": {
@@ -176,8 +191,8 @@
       "type": "array",
       "items": {"type": "string"},
       "$$description": [
-        "PROVISIONAL: List of glob patterns for all license files being distributed.",
-        "(might become standard with PEP 639).",
+        "**PROVISIONAL**: list of glob patterns for all license files being distributed.",
+        "(likely to become standard with :pep:`639`).",
         "By default: ``['LICEN[CS]E*', 'COPYING*', 'NOTICE*', 'AUTHORS*']``"
       ],
       "$comment": "TODO: revise if PEP 639 is accepted. Probably ``project.license-files``?"
@@ -190,7 +205,8 @@
         "version": {
           "$$description": [
             "A version dynamically loaded via either the ``attr:`` or ``file:``",
-            "directives. Please make sure the given file or attribute respects :pep:`440`."
+            "directives. Please make sure the given file or attribute respects :pep:`440`.",
+            "Also ensure to set ``project.dynamic`` accordingly."
           ],
           "oneOf": [
             {"$ref": "#/definitions/attr-directive"},
@@ -199,13 +215,15 @@
         },
         "classifiers": {"$ref": "#/definitions/file-directive"},
         "description": {"$ref": "#/definitions/file-directive"},
-        "dependencies": {"$ref": "#/definitions/file-directive"},
         "entry-points": {"$ref": "#/definitions/file-directive"},
+        "dependencies": {"$ref": "#/definitions/file-directive-for-dependencies"},
         "optional-dependencies": {
           "type": "object",
           "propertyNames": {"format": "python-identifier"},
           "additionalProperties": false,
-          "patternProperties": {".+": {"$ref": "#/definitions/file-directive"}}
+          "patternProperties": {
+            ".+": {"$ref": "#/definitions/file-directive-for-dependencies"}
+          }
         },
         "readme": {
           "anyOf": [
@@ -222,7 +240,7 @@
     "package-name": {
       "$id": "#/definitions/package-name",
       "title": "Valid package name",
-      "description": "Valid package name (importable or PEP 561).",
+      "description": "Valid package name (importable or :pep:`561`).",
       "type": "string",
       "anyOf": [
         {"format": "python-module-name"},
@@ -245,6 +263,22 @@
         }
       },
       "required": ["file"]
+    },
+    "file-directive-for-dependencies": {
+      "title": "'file:' directive for dependencies",
+      "allOf": [
+        {
+          "$$description": [
+            "**BETA**: subset of the ``requirements.txt`` format",
+            "without ``pip`` flags and options",
+            "(one :pep:`508`-compliant string per line,",
+            "lines that are blank or start with ``#`` are excluded).",
+            "See `dynamic metadata",
+            "<https://setuptools.pypa.io/en/latest/userguide/pyproject_config.html#dynamic-metadata>`_."
+          ]
+        },
+        {"$ref": "#/definitions/file-directive"}
+      ]
     },
     "attr-directive": {
       "title": "'attr:' directive",
