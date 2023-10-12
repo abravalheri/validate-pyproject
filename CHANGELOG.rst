@@ -6,6 +6,12 @@ Changelog
    Development Version
    ====================
 
+Version 0.15
+============
+- Update ``setuptools`` schema definitions, #112
+- Add ``__repr__`` to plugin wrapper, by @henryiii #114
+- Fix standard ``$schema`` ending ``#``, by @henryiii #113
+
 Version 0.14
 ============
 
