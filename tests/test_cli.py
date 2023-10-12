@@ -75,8 +75,8 @@ def invalid_example(tmp_path):
 class TestEnable:
     TOOLS = ("setuptools", "distutils")
 
-    @pytest.mark.parametrize("tool, other_tool", zip(TOOLS, reversed(TOOLS)))
-    def test_parse(self, valid_example, tool, other_tool):
+    @pytest.mark.parametrize("tool", TOOLS)
+    def test_parse(self, valid_example, tool):
         params = parse_args([str(valid_example), "-E", tool])
         assert len(params.plugins) == 1
         assert params.plugins[0].tool == tool
