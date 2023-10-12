@@ -226,9 +226,10 @@
           }
         },
         "readme": {
+          "type": "object",
           "anyOf": [
             {"$ref": "#/definitions/file-directive"},
-            {"properties": {"content-type": {"type": "string"}}}
+            {"type": "object", "properties": {"content-type": {"type": "string"}}}
           ],
           "required": ["file"]
         }
