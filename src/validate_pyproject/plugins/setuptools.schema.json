@@ -229,7 +229,13 @@
           "type": "object",
           "anyOf": [
             {"$ref": "#/definitions/file-directive"},
-            {"type": "object", "properties": {"content-type": {"type": "string"}}}
+            {
+              "type": "object",
+              "properties": {
+                "content-type": {"type": "string"},
+                "file": { "$ref": "#/definitions/file-directive/properties/file" }
+              },
+              "additionalProperties": false}
           ],
           "required": ["file"]
         }

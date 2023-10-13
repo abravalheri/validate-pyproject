@@ -1,0 +1,4 @@
+[tool.setuptools.dynamic.readme]
+file = ["README.md"]
+content-type = "text/plain"
+something-else = "not supposed to be here"
