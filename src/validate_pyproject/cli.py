@@ -99,12 +99,20 @@ META: Dict[str, dict] = {
         action="store_true",
         help="Print the JSON equivalent to the given TOML",
     ),
+    "tool": dict(
+        flags=("-t", "--tool"),
+        nargs="+",
+        dest="tool",
+        default=(),
+        help="External tools file/url(s) to load, of the form name=URL#path",
+    ),
 }
 
 
 class CliParams(NamedTuple):
     input_file: List[io.TextIOBase]
     plugins: List[PluginWrapper]
+    tool: List[str]
     loglevel: int = logging.WARNING
     dump_json: bool = False
 
@@ -205,7 +213,7 @@ def run(args: Sequence[str] = ()):
     plugins: List[PluginWrapper] = list_plugins_from_entry_points()
     params: CliParams = parse_args(args, plugins)
     setup_logging(params.loglevel)
-    validator = Validator(plugins=params.plugins)
+    validator = Validator(plugins=params.plugins, load_tools=params.tool)
 
     exceptions = _ExceptionGroup()
     for file in params.input_file:

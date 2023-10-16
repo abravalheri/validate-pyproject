@@ -4,10 +4,12 @@ Retrieve JSON schemas for validating dicts representing a ``pyproject.toml`` fil
 import json
 import logging
 import sys
+import urllib.parse
+import urllib.request
 from enum import Enum
 from functools import partial, reduce
 from itertools import chain
-from types import MappingProxyType, ModuleType
+from types import MappingProxyType, ModuleType, SimpleNamespace
 from typing import (
     TYPE_CHECKING,
     Callable,
@@ -191,10 +193,27 @@ class Validator:
         plugins: Union[Sequence["PluginWrapper"], AllPlugins] = ALL_PLUGINS,
         format_validators: Mapping[str, FormatValidationFn] = FORMAT_FUNCTIONS,
         extra_validations: Sequence[ValidationFn] = EXTRA_VALIDATIONS,
+        load_tools: Sequence[str] = (),
     ):
         self._code_cache: Optional[str] = None
         self._cache: Optional[ValidationFn] = None
         self._schema: Optional[Schema] = None
+        self._external = {}
+
+        for tool in load_tools:
+            tool_name, _, tool_uri = tool.partition("=")
+            tool_info = urllib.parse.urlparse(tool_uri)
+            if tool_info.netloc:
+                url = f"{tool_info.scheme}://{tool_info.netloc}/{tool_info.path}"
+                with urllib.request.urlopen(url) as f:
+                    contents = json.load(f)
+            else:
+                with open(tool_info.path, "rb") as f:
+                    contents = json.load(f)
+            if tool_info.fragment:
+                for fragment in tool_info.fragment.split("/"):
+                    contents = contents[fragment]
+            self._external[tool_name] = contents
 
         # Let's make the following options readonly
         self._format_validators = MappingProxyType(format_validators)
@@ -206,6 +225,15 @@ class Validator:
             self._plugins = tuple(list_from_entry_points())
         else:
             self._plugins = tuple(plugins)  # force immutability / read only
+
+        if self._external:
+            self._plugins = (
+                *self._plugins,
+                *(
+                    SimpleNamespace(id=k, tool=k, schema=v, help_text=f"{k} <external>")
+                    for k, v in self._external.items()
+                ),
+            )
 
         self._schema_registry = SchemaRegistry(self._plugins)
         self.handlers = RefHandler(self._schema_registry)
