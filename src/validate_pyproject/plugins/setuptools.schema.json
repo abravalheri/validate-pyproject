@@ -100,7 +100,7 @@
       "type": "object",
       "additionalProperties": false,
       "propertyNames": {
-        "oneOf": [{"const": ""}, {"$ref": "#/definitions/package-name"}]
+        "anyOf": [{"const": ""}, {"$ref": "#/definitions/package-name"}]
       },
       "patternProperties": {
         "^.*$": {"type": "string" }
@@ -116,7 +116,7 @@
       "type": "object",
       "additionalProperties": false,
       "propertyNames": {
-        "oneOf": [{"format": "python-module-name"}, {"const": "*"}]
+        "anyOf": [{"type": "string", "format": "python-module-name"}, {"const": "*"}]
       },
       "patternProperties": {
         "^.*$": {"type": "array", "items": {"type": "string"}}
@@ -140,7 +140,7 @@
       "type": "object",
       "additionalProperties": false,
       "propertyNames": {
-        "oneOf": [{"format": "python-module-name"}, {"const": "*"}]
+        "anyOf": [{"type": "string", "format": "python-module-name"}, {"const": "*"}]
       },
       "patternProperties": {
           "^.*$": {"type": "array", "items": {"type": "string"}}
@@ -219,7 +219,7 @@
         "dependencies": {"$ref": "#/definitions/file-directive-for-dependencies"},
         "optional-dependencies": {
           "type": "object",
-          "propertyNames": {"format": "python-identifier"},
+          "propertyNames": {"type": "string", "format": "python-identifier"},
           "additionalProperties": false,
           "patternProperties": {
             ".+": {"$ref": "#/definitions/file-directive-for-dependencies"}
@@ -250,8 +250,8 @@
       "description": "Valid package name (importable or :pep:`561`).",
       "type": "string",
       "anyOf": [
-        {"format": "python-module-name"},
-        {"format": "pep561-stub-name"}
+        {"type": "string", "format": "python-module-name"},
+        {"type": "string", "format": "pep561-stub-name"}
       ]
     },
     "file-directive": {
@@ -297,7 +297,7 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "attr": {"format": "python-qualified-identifier"}
+        "attr": {"type": "string", "format": "python-qualified-identifier"}
       },
       "required": ["attr"]
     },
