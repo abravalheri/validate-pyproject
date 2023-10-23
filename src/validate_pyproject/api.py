@@ -12,6 +12,7 @@ from itertools import chain
 from types import MappingProxyType, ModuleType, SimpleNamespace
 from typing import (
     TYPE_CHECKING,
+    Any,
     Callable,
     Dict,
     Iterator,
@@ -187,6 +188,24 @@ class RefHandler(Mapping[str, Callable[[str], Schema]]):
         return self._registry.__getitem__
 
 
+def load_from_uri(tool_uri: str) -> Any:
+    tool_info = urllib.parse.urlparse(tool_uri)
+    if tool_info.netloc:
+        url = f"{tool_info.scheme}://{tool_info.netloc}/{tool_info.path}"
+        with urllib.request.urlopen(url) as f:  # noqa: S310
+            contents = json.load(f)
+    else:
+        with open(tool_info.path, "rb") as f:
+            contents = json.load(f)
+    for fragment in tool_info.fragment.split("/"):
+        if fragment:
+            schema = contents["$schema"]
+            contents = contents[fragment]
+            contents["$schema"] = schema
+
+    return contents
+
+
 class Validator:
     def __init__(
         self,
@@ -202,18 +221,7 @@ class Validator:
 
         for tool in load_tools:
             tool_name, _, tool_uri = tool.partition("=")
-            tool_info = urllib.parse.urlparse(tool_uri)
-            if tool_info.netloc:
-                url = f"{tool_info.scheme}://{tool_info.netloc}/{tool_info.path}"
-                with urllib.request.urlopen(url) as f:
-                    contents = json.load(f)
-            else:
-                with open(tool_info.path, "rb") as f:
-                    contents = json.load(f)
-            if tool_info.fragment:
-                for fragment in tool_info.fragment.split("/"):
-                    contents = contents[fragment]
-            self._external[tool_name] = contents
+            self._external[tool_name] = load_from_uri(tool_uri)
 
         # Let's make the following options readonly
         self._format_validators = MappingProxyType(format_validators)
@@ -230,7 +238,12 @@ class Validator:
             self._plugins = (
                 *self._plugins,
                 *(
-                    SimpleNamespace(id=k, tool=k, schema=v, help_text=f"{k} <external>")
+                    SimpleNamespace(
+                        id=v.get("$id", f"external:{k}"),
+                        tool=k,
+                        schema=v,
+                        help_text=f"{k} <external>",
+                    )
                     for k, v in self._external.items()
                 ),
             )

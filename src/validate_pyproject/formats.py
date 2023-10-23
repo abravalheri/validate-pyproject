@@ -285,3 +285,7 @@ def uint16(value: int) -> bool:
 
 def uint(value: int) -> bool:
     return 0 <= value < 2**64
+
+
+def int(value: int) -> bool:
+    return -(2**63) <= value < 2**63
