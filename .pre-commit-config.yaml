@@ -41,7 +41,7 @@ repos:
   - id: isort
 
 - repo: https://github.com/psf/black
-  rev: 23.9.1
+  rev: 23.10.0
   hooks:
   - id: black
     language_version: python3
@@ -50,7 +50,7 @@ repos:
   rev: 1.16.0
   hooks:
   - id: blacken-docs
-    additional_dependencies: [black==22.*]
+    additional_dependencies: [black==23.*]
 
 - repo: https://github.com/PyCQA/flake8
   rev: 6.1.0
