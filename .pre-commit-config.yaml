@@ -25,8 +25,8 @@ repos:
   - id: codespell
     args: [-w]
 
-- repo: https://github.com/charliermarsh/ruff-pre-commit
-  rev: v0.0.292
+- repo: https://github.com/astral-sh/ruff-pre-commit
+  rev: v0.1.1  # Ruff version.
   hooks:
   - id: ruff
     args: [--fix, --show-fixes]
