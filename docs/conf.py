@@ -52,7 +52,8 @@ try:
 
     apidoc.main(args)
 except Exception as e:
-    print("Running `sphinx-apidoc` failed!\n{}".format(e))
+    print("Running `sphinx-apidoc` failed!")
+    print(e)
 
 # -- General configuration ---------------------------------------------------
 
@@ -119,7 +120,7 @@ repository = "https://github.com/abravalheri/validate-pyproject"
 #
 # version: The short X.Y version.
 # release: The full version, including alpha/beta/rc tags.
-# If you don’t need the separation provided between version and release,
+# If you don't need the separation provided between version and release,
 # just set them both to the same value.
 version = __version__
 

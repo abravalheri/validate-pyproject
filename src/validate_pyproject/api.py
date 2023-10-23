@@ -33,7 +33,7 @@ _logger = logging.getLogger(__name__)
 _chain_iter = chain.from_iterable
 
 if TYPE_CHECKING:  # pragma: no cover
-    from .plugins import PluginWrapper  # noqa
+    from .plugins import PluginWrapper
 
 
 try:  # pragma: no cover

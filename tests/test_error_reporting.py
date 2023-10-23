@@ -105,7 +105,7 @@ EXAMPLES = {
                 {
                     "type": "string"
                 }
-        """,  # noqa
+        """,
     },
 }
 

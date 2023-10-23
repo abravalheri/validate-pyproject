@@ -15,7 +15,7 @@ else:  # pragma: no cover
     import importlib_metadata as _M
 
 if TYPE_CHECKING:  # pragma: no cover
-    from ..plugins import PluginWrapper  # noqa
+    from ..plugins import PluginWrapper
 
 
 _logger = logging.getLogger(__name__)

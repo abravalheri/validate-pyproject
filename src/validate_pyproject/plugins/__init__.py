@@ -57,12 +57,14 @@ def iterate_entry_points(group=ENTRYPOINT_GROUP) -> Iterable[EntryPoint]:
 
     This method can be used in conjunction with :obj:`load_from_entry_point` to filter
     the plugins before actually loading them.
-    """  # noqa
+    """
     entries = entry_points()
     if hasattr(entries, "select"):  # pragma: no cover
         # The select method was introduced in importlib_metadata 3.9 (and Python 3.10)
         # and the previous dict interface was declared deprecated
-        select = cast(Any, getattr(entries, "select"))  # typecheck gymnastics # noqa
+        select = cast(
+            Any, getattr(entries, "select")  # noqa: B009
+        )  # typecheck gymnastics
         entries_: Iterable[EntryPoint] = select(group=group)
     else:  # pragma: no cover
         # TODO: Once Python 3.10 becomes the oldest version supported, this fallback and
@@ -94,7 +96,7 @@ def list_from_entry_points(
         filtering: function returning a boolean deciding if the entry point should be
             loaded and included (or not) in the final list. A ``True`` return means the
             plugin should be included.
-    """  # noqa
+    """
     return [
         load_from_entry_point(e) for e in iterate_entry_points(group) if filtering(e)
     ]
@@ -111,6 +113,6 @@ class ErrorLoadingPlugin(RuntimeError):
         if entry_point and not plugin:
             plugin = getattr(entry_point, "module", entry_point.name)
 
-        sub = dict(package=__package__, version=__version__, plugin=plugin)
+        sub = {"package": __package__, "version": __version__, "plugin": plugin}
         msg = dedent(self._DESC).format(**sub).splitlines()
         super().__init__(f"{msg[0]}\n{' '.join(msg[1:])}")
