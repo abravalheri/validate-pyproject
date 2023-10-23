@@ -6,3 +6,17 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools_scm]
 # See configuration details in https://github.com/pypa/setuptools_scm
 version_scheme = "no-guess-dev"
+
+[tool.mypy]
+pretty = true
+show_error_codes = true
+show_error_context = true
+show_traceback = true
+ignore_missing_imports = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+
+[tool.pytest.ini_options]
+addopts = ["--cov", "validate_pyproject", "--cov-report", "term-missing", "--verbose"]
+norecursedirs = ["dist", "build", ".tox"]
+testpaths = ["tests"]
