@@ -1,4 +1,4 @@
-# General config
+# --- General config ---
 select = [
   "E", "F", "W", # flake8
   "B",           # flake8-bugbear
@@ -36,7 +36,7 @@ src = ["src"]
 "tests/test_plugins.py" = ["C419"]
 "tests/test_pre_compile.py" = ["S603"]
 
-# --- Compatibility ---
+# --- Tool-related config ---
 
 [isort]
 known-third-party = ["validate_pyproject._vendor"]
