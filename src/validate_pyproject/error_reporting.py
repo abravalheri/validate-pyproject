@@ -154,7 +154,7 @@ class _ErrorFormatting:
 
 
 class _SummaryWriter:
-    _IGNORE = {"description", "default", "title", "examples"}
+    _IGNORE = frozenset(("description", "default", "title", "examples"))
 
     def __init__(self, jargon: Optional[Dict[str, str]] = None):
         self.jargon: Dict[str, str] = jargon or {}
