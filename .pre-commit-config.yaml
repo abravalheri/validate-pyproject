@@ -74,3 +74,11 @@ repos:
         main()
     additional_dependencies:
       - validate-pyproject[all]>=0.13
+
+- repo: https://github.com/python-jsonschema/check-jsonschema
+  rev: 0.27.0
+  hooks:
+    - id: check-metaschema
+      files: \.schema\.json$
+    - id: check-readthedocs
+    - id: check-github-workflows
