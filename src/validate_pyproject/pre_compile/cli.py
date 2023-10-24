@@ -1,3 +1,6 @@
+# ruff: noqa: C408
+# Unnecessary `dict` call (rewrite as a literal)
+
 import json
 import logging
 import sys

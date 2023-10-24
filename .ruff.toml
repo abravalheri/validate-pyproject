@@ -21,20 +21,15 @@ select = [
   "UP",          # pyupgrade
   "YTT",         # flake8-2020
 ]
-extend-ignore = ["B904", "C408", "RUF100"]
+ignore = [
+  "E501",    # line too long
+  "SIM105",  # contextlib.supress (3.7 feature)
+]
 target-version = "py37"
 src = ["src"]
 
 [per-file-ignores]
-"docs/conf.py" = ["RUF003", "SIM105", "UP032"]
-"src/validate_pyproject/api.py" = ["RUF100"]
-"src/validate_pyproject/cli.py" = ["C403"]
-"src/validate_pyproject/formats.py" = ["S310"]
-"src/validate_pyproject/plugins/__init__.py" = ["RUF100"]
-"src/validate_pyproject/pre_compile/__init__.py" = ["RUF100"]
-"tests/*" = ["PLC1901", "S101"]
-"tests/test_plugins.py" = ["C419"]
-"tests/test_pre_compile.py" = ["S603"]
+"tests/*" = ["S"] # Assert okay in tests
 
 # --- Tool-related config ---
 

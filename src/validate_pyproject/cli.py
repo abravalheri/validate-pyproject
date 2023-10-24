@@ -2,6 +2,9 @@
 # published under the MPL-2.0 license)
 # https://github.com/abravalheri/ini2toml/blob/49897590a9254646434b7341225932e54f9626a3/LICENSE.txt
 
+# ruff: noqa: C408
+# Unnecessary `dict` call (rewrite as a literal)
+
 import argparse
 import io
 import json
@@ -109,7 +112,7 @@ class CliParams(NamedTuple):
 def __meta__(plugins: Sequence[PluginWrapper]) -> Dict[str, dict]:
     """'Hyper parameters' to instruct :mod:`argparse` how to create the CLI"""
     meta = {k: v.copy() for k, v in META.items()}
-    meta["enable"]["choices"] = set([p.tool for p in plugins])
+    meta["enable"]["choices"] = {p.tool for p in plugins}
     meta["input_file"]["default"] = [_STDIN]  # lazily defined to facilitate testing
     return meta
 
@@ -178,14 +181,14 @@ def exceptions2exit():
         for prefix, ex in group:
             print(prefix)
             _logger.error(str(ex) + "\n")
-        raise SystemExit(1)
+        raise SystemExit(1) from None
     except _REGULAR_EXCEPTIONS as ex:
         _logger.error(str(ex))
-        raise SystemExit(1)
+        raise SystemExit(1) from None
     except Exception as ex:  # pragma: no cover
         _logger.error(f"{ex.__class__.__name__}: {ex}\n")
         _logger.debug("Please check the following information:", exc_info=True)
-        raise SystemExit(1)
+        raise SystemExit(1) from None
 
 
 def run(args: Sequence[str] = ()):

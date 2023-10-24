@@ -39,7 +39,7 @@ def test_iterate_entry_points():
     plugin_iter = plugins.iterate_entry_points()
     assert hasattr(plugin_iter, "__iter__")
     pluging_list = list(plugin_iter)
-    assert all([is_entry_point(e) for e in pluging_list])
+    assert all(is_entry_point(e) for e in pluging_list)
     name_list = [e.name for e in pluging_list]
     for ext in EXISTING:
         assert ext in name_list
