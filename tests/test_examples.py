@@ -1,3 +1,4 @@
+import json
 import logging
 from pathlib import Path
 
@@ -17,7 +18,15 @@ def test_examples_api(example: Path) -> None:
 
 
 def test_examples_cli(example: Path) -> None:
-    assert cli.run(["--dump-json", str(example)]) == 0  # no errors
+    args = []
+    test_config = example.with_name("test_config.json")
+    if test_config.is_file():
+        with test_config.open(encoding="utf-8") as f:
+            test_config = json.load(f)
+        tools = test_config.get("tools", {})
+        args += [f"--tool={k}={v}" for k, v in tools.items()]
+
+    assert cli.run(["--dump-json", str(example), *args]) == 0  # no errors
 
 
 def test_invalid_examples_api(invalid_example: Path) -> None:

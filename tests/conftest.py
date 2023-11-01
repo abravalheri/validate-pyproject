@@ -12,23 +12,27 @@ from typing import List
 import pytest
 
 HERE = Path(__file__).parent.resolve()
-EXAMPLES = HERE / "examples"
-INVALID = HERE / "invalid-examples"
 
 
-def examples() -> List[str]:
-    return [str(f.relative_to(EXAMPLES)) for f in EXAMPLES.glob("**/*.toml")]
+def collect(base: Path) -> List[str]:
+    return [str(f.relative_to(base)) for f in base.glob("**/*.toml")]
 
 
-def invalid_examples() -> List[str]:
-    return [str(f.relative_to(INVALID)) for f in INVALID.glob("**/*.toml")]
-
-
-@pytest.fixture(params=examples())
+@pytest.fixture(params=collect(HERE / "examples"))
 def example(request) -> Path:
-    return EXAMPLES / request.param
+    return HERE / "examples" / request.param
 
 
-@pytest.fixture(params=invalid_examples())
+@pytest.fixture(params=collect(HERE / "invalid-examples"))
 def invalid_example(request) -> Path:
-    return INVALID / request.param
+    return HERE / "invalid-examples" / request.param
+
+
+@pytest.fixture(params=collect(HERE / "remote/examples"))
+def remote_example(request) -> Path:
+    return HERE / "remote/examples" / request.param
+
+
+@pytest.fixture(params=collect(HERE / "remote/invalid-examples"))
+def remote_invalid_example(request) -> Path:
+    return HERE / "remote/invalid-examples" / request.param
