@@ -9,7 +9,7 @@ import urllib.request
 from enum import Enum
 from functools import partial, reduce
 from itertools import chain
-from types import MappingProxyType, ModuleType, SimpleNamespace
+from types import MappingProxyType, ModuleType
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -36,7 +36,7 @@ _logger = logging.getLogger(__name__)
 _chain_iter = chain.from_iterable
 
 if TYPE_CHECKING:  # pragma: no cover
-    from .plugins import PluginWrapper
+    from .plugins import PluginProtocol
 
 
 try:  # pragma: no cover
@@ -93,7 +93,7 @@ class SchemaRegistry(Mapping[str, Schema]):
     itself, all schemas provided by plugins **MUST** have a top level ``$id``.
     """
 
-    def __init__(self, plugins: Sequence["PluginWrapper"] = ()):
+    def __init__(self, plugins: Sequence["PluginProtocol"] = ()):
         self._schemas: Dict[str, Tuple[str, str, Schema]] = {}
         # (which part of the TOML, who defines, schema)
 
@@ -188,28 +188,35 @@ class RefHandler(Mapping[str, Callable[[str], Schema]]):
         return self._registry.__getitem__
 
 
-def load_from_uri(tool_uri: str) -> Any:
+def load_from_uri(tool_uri: str) -> tuple[str, Any]:
     tool_info = urllib.parse.urlparse(tool_uri)
     if tool_info.netloc:
         url = f"{tool_info.scheme}://{tool_info.netloc}/{tool_info.path}"
-        with urllib.request.urlopen(url) as f:  # noqa: S310
+        if not url.startswith(("http:", "https:")):
+            raise ValueError("URL must start with 'http:' or 'https:'")
+        with urllib.request.urlopen(url) as f:
             contents = json.load(f)
     else:
         with open(tool_info.path, "rb") as f:
             contents = json.load(f)
-    for fragment in tool_info.fragment.split("/"):
-        if fragment:
-            schema = contents["$schema"]
-            contents = contents[fragment]
-            contents["$schema"] = schema
+    return tool_info.fragment, contents
 
-    return contents
+
+class RemotePlugin:
+    def __init__(self, tool: str, fragment: str, schema: Dict[str, Any]):
+        self.id = schema.get("$id", f"external:{tool}")
+        self.tool = tool
+        self.schema = schema
+        self.help_text = f"{tool} <external>"
+        self._fragment = fragment  # Unused ATM
 
 
 class Validator:
+    _plugins: Sequence["PluginProtocol"]
+
     def __init__(
         self,
-        plugins: Union[Sequence["PluginWrapper"], AllPlugins] = ALL_PLUGINS,
+        plugins: Union[Sequence["PluginProtocol"], AllPlugins] = ALL_PLUGINS,
         format_validators: Mapping[str, FormatValidationFn] = FORMAT_FUNCTIONS,
         extra_validations: Sequence[ValidationFn] = EXTRA_VALIDATIONS,
         load_tools: Sequence[str] = (),
@@ -238,12 +245,7 @@ class Validator:
             self._plugins = (
                 *self._plugins,
                 *(
-                    SimpleNamespace(
-                        id=v.get("$id", f"external:{k}"),
-                        tool=k,
-                        schema=v,
-                        help_text=f"{k} <external>",
-                    )
+                    RemotePlugin(tool=k, fragment=v[0], schema=v[1])
                     for k, v in self._external.items()
                 ),
             )

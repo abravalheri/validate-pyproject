@@ -1,16 +1,6 @@
 from pathlib import Path
 
-HERE = Path(__file__).parent
-EXAMPLES = HERE / "examples"
-INVALID = HERE / "invalid-examples"
-
-
-def examples():
-    return [str(f.relative_to(EXAMPLES)) for f in EXAMPLES.glob("**/*.toml")]
-
-
-def invalid_examples():
-    return [str(f.relative_to(INVALID)) for f in INVALID.glob("**/*.toml")]
+HERE = Path(__file__).parent.resolve()
 
 
 def error_file(p: Path) -> Path:
