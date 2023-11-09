@@ -1,6 +1,10 @@
 # --- General config ---
-select = [
-  "E", "F", "W", # flake8
+src = ["src"]
+target-version = "py37"
+
+# --- Linting config ---
+[lint]
+extend-select = [
   "B",           # flake8-bugbear
   "C4",          # flake8-comprehensions
   "C90",         # McCabe cyclomatic complexity
@@ -22,19 +26,16 @@ select = [
   "YTT",         # flake8-2020
 ]
 ignore = [
-  "E501",    # line too long
   "SIM105",  # contextlib.supress (3.7 feature)
 ]
-target-version = "py37"
-src = ["src"]
 
-[per-file-ignores]
+[lint.per-file-ignores]
 "tests/*" = ["S"] # Assert okay in tests
 
 # --- Tool-related config ---
 
-[isort]
+[lint.isort]
 known-third-party = ["validate_pyproject._vendor"]
 
-[pylint]
+[lint.pylint]
 allow-magic-value-types = ["int", "str"]
