@@ -1,10 +1,12 @@
 import builtins
+import importlib
 import re
 import shutil
 import subprocess
 import sys
 from inspect import cleandoc
 from pathlib import Path
+from typing import Sequence
 
 import pytest
 from fastjsonschema import JsonSchemaValueException
@@ -12,7 +14,7 @@ from fastjsonschema import JsonSchemaValueException
 from validate_pyproject import _tomllib as tomllib
 from validate_pyproject.pre_compile import cli, pre_compile
 
-from .helpers import error_file
+from .helpers import error_file, get_test_config
 
 MAIN_FILE = "hello_world.py"  # Let's use something different that `__init__.py`
 
@@ -96,13 +98,14 @@ def test_vendoring_cli(tmp_path):
 PRE_COMPILED_NAME = "_validation"
 
 
-def api_pre_compile(tmp_path) -> Path:
-    return pre_compile(Path(tmp_path / PRE_COMPILED_NAME))
+def api_pre_compile(tmp_path, *, load_tools: Sequence[str]) -> Path:
+    return pre_compile(Path(tmp_path / PRE_COMPILED_NAME), load_tools=load_tools)
 
 
-def cli_pre_compile(tmp_path) -> Path:
+def cli_pre_compile(tmp_path, *, load_tools: Sequence[str]) -> Path:
+    args = [f"--tool={t}" for t in load_tools]
     path = Path(tmp_path / PRE_COMPILED_NAME)
-    cli.run(["-O", str(path)])
+    cli.run([*args, "-O", str(path)])
     return path
 
 
@@ -113,6 +116,7 @@ _PRE_COMPILED = (api_pre_compile, cli_pre_compile)
 def pre_compiled_validate(monkeypatch):
     def _validate(vendored_path, toml_equivalent):
         assert PRE_COMPILED_NAME not in sys.modules
+        importlib.invalidate_caches()
         with monkeypatch.context() as m:
             # Make sure original imports are not used
             _disable_import(m, "fastjsonschema")
@@ -131,6 +135,13 @@ def pre_compiled_validate(monkeypatch):
                 )
                 raise new_ex from ex
             finally:
+                all_modules = [
+                    mod
+                    for mod in sys.modules
+                    if mod.startswith(f"{PRE_COMPILED_NAME}.")
+                ]
+                for mod in all_modules:
+                    del sys.modules[mod]
                 del sys.modules[PRE_COMPILED_NAME]
 
     return _validate
@@ -138,8 +149,11 @@ def pre_compiled_validate(monkeypatch):
 
 @pytest.mark.parametrize("pre_compiled", _PRE_COMPILED)
 def test_examples_api(tmp_path, pre_compiled_validate, example, pre_compiled):
+    tools = get_test_config(example).get("tools", {})
+    load_tools = [f"{k}={v}" for k, v in tools.items()]
+
     toml_equivalent = tomllib.loads(example.read_text())
-    pre_compiled_path = pre_compiled(Path(tmp_path))
+    pre_compiled_path = pre_compiled(Path(tmp_path), load_tools=load_tools)
     assert pre_compiled_validate(pre_compiled_path, toml_equivalent) is not None
 
 
@@ -147,9 +161,12 @@ def test_examples_api(tmp_path, pre_compiled_validate, example, pre_compiled):
 def test_invalid_examples_api(
     tmp_path, pre_compiled_validate, invalid_example, pre_compiled
 ):
+    tools = get_test_config(invalid_example).get("tools", {})
+    load_tools = [f"{k}={v}" for k, v in tools.items()]
+
     expected_error = error_file(invalid_example).read_text("utf-8")
     toml_equivalent = tomllib.loads(invalid_example.read_text())
-    pre_compiled_path = pre_compiled(Path(tmp_path))
+    pre_compiled_path = pre_compiled(Path(tmp_path), load_tools=load_tools)
     with pytest.raises(JsonSchemaValueException) as exc_info:
         pre_compiled_validate(pre_compiled_path, toml_equivalent)
     exception_message = str(exc_info.value)

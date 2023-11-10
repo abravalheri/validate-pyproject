@@ -1,0 +1,2 @@
+`tool.poetry.description` must match pattern ^[^
+]*$

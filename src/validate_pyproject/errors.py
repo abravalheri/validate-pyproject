@@ -9,6 +9,21 @@ from fastjsonschema import (
 from .error_reporting import ValidationError
 
 
+class URLMissingTool(RuntimeError):
+    _DESC = """\
+    The '--tool' option requires a tool name.
+
+    Correct form is '--tool=<tool-name>={url}', with an optional
+    '#json/pointer' at the end.
+    """
+    __doc__ = _DESC
+
+    def __init__(self, url: str):
+        msg = dedent(self._DESC).strip()
+        msg = msg.format(url=url)
+        super().__init__(msg)
+
+
 class InvalidSchemaVersion(JsonSchemaDefinitionException):
     _DESC = """\
     All schemas used in the validator should be specified using the same version \

@@ -188,7 +188,7 @@ class RefHandler(Mapping[str, Callable[[str], Schema]]):
         return self._registry.__getitem__
 
 
-def load_from_uri(tool_uri: str) -> tuple[str, Any]:
+def load_from_uri(tool_uri: str) -> Tuple[str, Any]:
     tool_info = urllib.parse.urlparse(tool_uri)
     if tool_info.netloc:
         url = f"{tool_info.scheme}://{tool_info.netloc}/{tool_info.path}"
@@ -228,6 +228,8 @@ class Validator:
 
         for tool in load_tools:
             tool_name, _, tool_uri = tool.partition("=")
+            if not tool_uri:
+                raise errors.URLMissingTool(tool)
             self._external[tool_name] = load_from_uri(tool_uri)
 
         # Let's make the following options readonly

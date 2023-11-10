@@ -28,12 +28,14 @@ TEXT_REPLACEMENTS = MappingProxyType(
 )
 
 
-def pre_compile(
+def pre_compile(  # noqa: PLR0913
     output_dir: Union[str, os.PathLike] = ".",
     main_file: str = "__init__.py",
     original_cmd: str = "",
     plugins: Union[api.AllPlugins, Sequence["PluginWrapper"]] = api.ALL_PLUGINS,
     text_replacements: Mapping[str, str] = TEXT_REPLACEMENTS,
+    *,
+    load_tools: Sequence[str] = (),
 ) -> Path:
     """Populate the given ``output_dir`` with all files necessary to perform
     the validation.
@@ -45,7 +47,7 @@ def pre_compile(
     out.mkdir(parents=True, exist_ok=True)
     replacements = {**TEXT_REPLACEMENTS, **text_replacements}
 
-    validator = api.Validator(plugins)
+    validator = api.Validator(plugins, load_tools=load_tools)
     header = "\n".join(NOCHECK_HEADERS)
     code = replace_text(validator.generated_code, replacements)
     _write(out / "fastjsonschema_validations.py", header + code)

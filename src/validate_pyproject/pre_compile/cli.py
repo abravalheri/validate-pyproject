@@ -58,6 +58,13 @@ META: Dict[str, dict] = {
         "for example: \n"
         '-R \'{"from packaging import": "from .._vendor.packaging import"}\'',
     ),
+    "tool": dict(
+        flags=("-t", "--tool"),
+        nargs="+",
+        dest="tool",
+        default=(),
+        help="External tools file/url(s) to load, of the form name=URL#path",
+    ),
 }
 
 
@@ -74,6 +81,7 @@ class CliParams(NamedTuple):
     main_file: str = "__init__.py"
     replacements: Mapping[str, str] = MappingProxyType({})
     loglevel: int = logging.WARNING
+    tool: Sequence[str] = ()
 
 
 def parser_spec(plugins: Sequence[PluginWrapper]) -> Dict[str, dict]:
@@ -91,7 +99,14 @@ def run(args: Sequence[str] = ()):
     desc = 'Generate files for "pre-compiling" `validate-pyproject`'
     prms = cli.parse_args(args, plugins, desc, parser_spec, CliParams)
     cli.setup_logging(prms.loglevel)
-    pre_compile(prms.output_dir, prms.main_file, cmd, prms.plugins, prms.replacements)
+    pre_compile(
+        prms.output_dir,
+        prms.main_file,
+        cmd,
+        prms.plugins,
+        prms.replacements,
+        load_tools=prms.tool,
+    )
     return 0
 
 
