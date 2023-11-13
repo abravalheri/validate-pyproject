@@ -26,13 +26,13 @@ repos:
     args: [-w]
 
 - repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.1.4  # Ruff version.
+  rev: v0.1.5  # Ruff version.
   hooks:
   - id: ruff
     args: [--fix, --show-fixes]
 
 - repo: https://github.com/psf/black
-  rev: 23.10.1
+  rev: 23.11.0
   hooks:
   - id: black
     language_version: python3
