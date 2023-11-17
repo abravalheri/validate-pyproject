@@ -273,3 +273,15 @@ def python_entrypoint_reference(value: str) -> bool:
     module_parts = module.split(".")
     identifiers = _chain(module_parts, obj.split(".")) if rest else module_parts
     return all(python_identifier(i.strip()) for i in identifiers)
+
+
+def uint8(value: int) -> bool:
+    return 0 <= value < 2**8
+
+
+def uint16(value: int) -> bool:
+    return 0 <= value < 2**16
+
+
+def uint(value: int) -> bool:
+    return 0 <= value < 2**64
