@@ -14,7 +14,11 @@ source =
 
 [report]
 # Regexes for lines to exclude from consideration
-exclude_also =
+exclude_lines =
+    # Have to re-enable the standard pragma
+    # (exclude_also would be better, but not available on Python 3.6)
+    pragma: no cover
+
     # Don't complain about missing debug-only code:
     def __repr__
 
