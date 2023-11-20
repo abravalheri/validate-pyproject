@@ -1,6 +1,7 @@
 """
 Retrieve JSON schemas for validating dicts representing a ``pyproject.toml`` file.
 """
+import io
 import json
 import logging
 import sys
@@ -49,6 +50,16 @@ try:  # pragma: no cover
 
 except ImportError:  # pragma: no cover
     from importlib.resources import read_text
+
+if sys.platform == "emscripten" and "pyodide" in sys.modules:
+    from pyodide.http import open_url
+else:
+
+    def open_url(url: str) -> io.StringIO:
+        if not url.startswith(("http:", "https:")):
+            raise ValueError("URL must start with 'http:' or 'https:'")
+        with urllib.request.urlopen(url) as response:  # noqa: S310
+            return io.StringIO(response.read().decode("utf-8"))
 
 
 T = TypeVar("T", bound=Mapping)
@@ -190,9 +201,7 @@ def load_from_uri(tool_uri: str) -> Tuple[str, Any]:
     tool_info = urllib.parse.urlparse(tool_uri)
     if tool_info.netloc:
         url = f"{tool_info.scheme}://{tool_info.netloc}{tool_info.path}"
-        if not url.startswith(("http:", "https:")):
-            raise ValueError("URL must start with 'http:' or 'https:'")
-        with urllib.request.urlopen(url) as f:  # noqa: S310
+        with open_url(url) as f:
             contents = json.load(f)
     else:
         with open(tool_info.path, "rb") as f:
