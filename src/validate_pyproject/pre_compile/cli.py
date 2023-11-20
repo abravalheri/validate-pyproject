@@ -60,9 +60,8 @@ META: Dict[str, dict] = {
     ),
     "tool": dict(
         flags=("-t", "--tool"),
-        nargs="+",
+        action="append",
         dest="tool",
-        default=(),
         help="External tools file/url(s) to load, of the form name=URL#path",
     ),
 }

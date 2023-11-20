@@ -101,9 +101,8 @@ META: Dict[str, dict] = {
     ),
     "tool": dict(
         flags=("-t", "--tool"),
-        nargs="+",
+        action="append",
         dest="tool",
-        default=(),
         help="External tools file/url(s) to load, of the form name=URL#path",
     ),
 }
@@ -155,6 +154,7 @@ def parse_args(
     enabled = params.pop("enable", ())
     disabled = params.pop("disable", ())
     params["plugins"] = select_plugins(plugins, enabled, disabled)
+    params["tool"] = params["tool"] or []
     return params_class(**params)  # type: ignore[call-overload]
 
 

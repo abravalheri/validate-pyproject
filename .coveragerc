@@ -27,7 +27,8 @@ exclude_also =
     if __name__ == .__main__.:
 
     if TYPE_CHECKING:
-    if typing.TYPE_CHECKING:
+    if typing\.TYPE_CHECKING:
+    ^\s+\.\.\.$
 
     # Support for Pyodide (WASM)
     if sys\.platform == .emscripten. and .pyodide. in sys\.modules:

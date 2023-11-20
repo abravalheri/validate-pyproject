@@ -1,0 +1,6 @@
+{
+    "tools": {
+        "localtool": "tests/examples/localtool/localtool.schema.json",
+        "nestedtool": "tests/examples/localtool/nestedtool.schema.json#/properties/nestedtool"
+    }
+}
