@@ -1,0 +1,6 @@
+[tool.cibuildwheel]
+build = "*"
+
+[[tool.cibuildwheel.overrides]]
+select = "cp312-*"
+test-command = "pytest"

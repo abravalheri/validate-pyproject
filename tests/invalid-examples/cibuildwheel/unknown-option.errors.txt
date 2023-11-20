@@ -1,0 +1,1 @@
+`tool.cibuildwheel` must not contain {'no-a-read-option'} properties

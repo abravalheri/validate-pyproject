@@ -12,7 +12,7 @@ from textwrap import dedent
 from typing import Any, Callable, Iterable, List, Optional
 
 from .. import __version__
-from ..types import Plugin
+from ..types import Plugin, Schema
 
 if sys.version_info[:2] >= (3, 8):  # pragma: no cover
     # TODO: Import directly (no need for conditional) when `python_requires = >= 3.8`
@@ -33,19 +33,23 @@ ENTRYPOINT_GROUP = "validate_pyproject.tool_schema"
 
 class PluginProtocol(Protocol):
     @property
-    def id(self):
+    def id(self) -> str:
         ...
 
     @property
-    def tool(self):
+    def tool(self) -> str:
         ...
 
     @property
-    def schema(self):
+    def schema(self) -> Schema:
         ...
 
     @property
     def help_text(self) -> str:
+        ...
+
+    @property
+    def fragment(self) -> str:
         ...
 
 
@@ -55,16 +59,20 @@ class PluginWrapper:
         self._load_fn = load_fn
 
     @property
-    def id(self):
+    def id(self) -> str:
         return f"{self._load_fn.__module__}.{self._load_fn.__name__}"
 
     @property
-    def tool(self):
+    def tool(self) -> str:
         return self._tool
 
     @property
-    def schema(self):
+    def schema(self) -> Schema:
         return self._load_fn(self.tool)
+
+    @property
+    def fragment(self) -> str:
+        return ""
 
     @property
     def help_text(self) -> str:

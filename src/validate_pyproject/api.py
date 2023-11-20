@@ -4,6 +4,7 @@ Retrieve JSON schemas for validating dicts representing a ``pyproject.toml`` fil
 import json
 import logging
 import sys
+import typing
 import urllib.parse
 import urllib.request
 from enum import Enum
@@ -11,7 +12,6 @@ from functools import partial, reduce
 from itertools import chain
 from types import MappingProxyType, ModuleType
 from typing import (
-    TYPE_CHECKING,
     Any,
     Callable,
     Dict,
@@ -22,7 +22,6 @@ from typing import (
     Tuple,
     TypeVar,
     Union,
-    cast,
 )
 
 import fastjsonschema as FJS
@@ -35,12 +34,12 @@ from .types import FormatValidationFn, Schema, ValidationFn
 _logger = logging.getLogger(__name__)
 _chain_iter = chain.from_iterable
 
-if TYPE_CHECKING:  # pragma: no cover
+if typing.TYPE_CHECKING:  # pragma: no cover
     from .plugins import PluginProtocol
 
 
 try:  # pragma: no cover
-    if sys.version_info[:2] < (3, 7) or TYPE_CHECKING:  # See #22
+    if sys.version_info[:2] < (3, 7) or typing.TYPE_CHECKING:  # See #22
         from importlib_resources import files
     else:
         from importlib.resources import files
@@ -97,7 +96,7 @@ class SchemaRegistry(Mapping[str, Schema]):
         self._schemas: Dict[str, Tuple[str, str, Schema]] = {}
         # (which part of the TOML, who defines, schema)
 
-        top_level = cast(dict, load(TOP_LEVEL_SCHEMA))  # Make it mutable
+        top_level = typing.cast(dict, load(TOP_LEVEL_SCHEMA))  # Make it mutable
         self._spec_version = top_level["$schema"]
         top_properties = top_level["properties"]
         tool_properties = top_properties["tool"].setdefault("properties", {})
@@ -111,16 +110,15 @@ class SchemaRegistry(Mapping[str, Schema]):
         self._schemas = {sid: ("project", origin, project_table_schema)}
 
         # Add tools using Plugins
-
         for plugin in plugins:
-            pid, tool, schema = plugin.id, plugin.tool, plugin.schema
             if plugin.tool in tool_properties:
                 _logger.warning(f"{plugin.id} overwrites `tool.{plugin.tool}` schema")
             else:
-                _logger.info(f"{pid} defines `tool.{tool}` schema")
-            sid = self._ensure_compatibility(tool, schema)["$id"]
-            tool_properties[tool] = {"$ref": sid}
-            self._schemas[sid] = (f"tool.{tool}", pid, schema)
+                _logger.info(f"{plugin.id} defines `tool.{plugin.tool}` schema")
+            sid = self._ensure_compatibility(plugin.tool, plugin.schema)["$id"]
+            sref = f"{sid}#{plugin.fragment}" if plugin.fragment else sid
+            tool_properties[plugin.tool] = {"$ref": sref}
+            self._schemas[sid] = (f"tool.{plugin.tool}", plugin.id, plugin.schema)
 
         self._main_id = sid = top_level["$id"]
         main_schema = Schema(top_level)
@@ -191,10 +189,10 @@ class RefHandler(Mapping[str, Callable[[str], Schema]]):
 def load_from_uri(tool_uri: str) -> Tuple[str, Any]:
     tool_info = urllib.parse.urlparse(tool_uri)
     if tool_info.netloc:
-        url = f"{tool_info.scheme}://{tool_info.netloc}/{tool_info.path}"
+        url = f"{tool_info.scheme}://{tool_info.netloc}{tool_info.path}"
         if not url.startswith(("http:", "https:")):
             raise ValueError("URL must start with 'http:' or 'https:'")
-        with urllib.request.urlopen(url) as f:
+        with urllib.request.urlopen(url) as f:  # noqa: S310
             contents = json.load(f)
     else:
         with open(tool_info.path, "rb") as f:
@@ -203,12 +201,18 @@ def load_from_uri(tool_uri: str) -> Tuple[str, Any]:
 
 
 class RemotePlugin:
-    def __init__(self, tool: str, fragment: str, schema: Dict[str, Any]):
-        self.id = schema.get("$id", f"external:{tool}")
+    def __init__(self, tool: str, fragment: str, schema: Schema):
+        self.id = schema["$id"]
         self.tool = tool
         self.schema = schema
         self.help_text = f"{tool} <external>"
-        self._fragment = fragment  # Unused ATM
+        self.fragment = fragment
+
+
+if typing.TYPE_CHECKING:
+    from .plugins import PluginProtocol
+
+    _: PluginProtocol = typing.cast(RemotePlugin, None)
 
 
 class Validator:
@@ -290,7 +294,7 @@ class Validator:
         if self._cache is None:
             compiled = FJS.compile(self.schema, self.handlers, dict(self.formats))
             fn = partial(compiled, custom_formats=self._format_validators)
-            self._cache = cast(ValidationFn, fn)
+            self._cache = typing.cast(ValidationFn, fn)
 
         with detailed_errors():
             self._cache(pyproject)

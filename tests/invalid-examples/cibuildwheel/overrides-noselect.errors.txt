@@ -1,0 +1,1 @@
+`tool.cibuildwheel.overrides[0]` must contain ['select'] properties

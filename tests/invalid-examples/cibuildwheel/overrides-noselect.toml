@@ -1,0 +1,6 @@
+[tool.cibuildwheel]
+build = "*"
+
+[[tool.cibuildwheel.overrides]]
+test-command = "pytest"
+test-extras = "test"
