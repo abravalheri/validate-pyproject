@@ -61,7 +61,7 @@ repos:
       - validate-pyproject[all]>=0.13
 
 - repo: https://github.com/python-jsonschema/check-jsonschema
-  rev: 0.27.1
+  rev: 0.27.2
   hooks:
     - id: check-metaschema
       files: \.schema\.json$
