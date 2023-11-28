@@ -185,7 +185,7 @@ def test_missing_toolname(tmp_path, capsys):
     example = write_example(tmp_path, name="valid-pyproject.toml")
     with pytest.raises(
         errors.URLMissingTool,
-        match=r"Correct form is '--tool=<tool-name>=http://json\.schemastore\.org/poetry\.toml', with an optional",
+        match=r"Correct form is '--tool <tool-name>=http://json\.schemastore\.org/poetry\.toml', with an optional",
     ):
         cli.run(["--tool=http://json.schemastore.org/poetry.toml", str(example)])
 

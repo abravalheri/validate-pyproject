@@ -13,7 +13,7 @@ class URLMissingTool(RuntimeError):
     _DESC = """\
     The '--tool' option requires a tool name.
 
-    Correct form is '--tool=<tool-name>={url}', with an optional
+    Correct form is '--tool <tool-name>={url}', with an optional
     '#json/pointer' at the end.
     """
     __doc__ = _DESC
