@@ -1,3 +1,4 @@
+import builtins
 import logging
 import os
 import re
@@ -275,13 +276,17 @@ def python_entrypoint_reference(value: str) -> bool:
     return all(python_identifier(i.strip()) for i in identifiers)
 
 
-def uint8(value: int) -> bool:
+def uint8(value: builtins.int) -> bool:
     return 0 <= value < 2**8
 
 
-def uint16(value: int) -> bool:
+def uint16(value: builtins.int) -> bool:
     return 0 <= value < 2**16
 
 
-def uint(value: int) -> bool:
+def uint(value: builtins.int) -> bool:
     return 0 <= value < 2**64
+
+
+def int(value: builtins.int) -> bool:
+    return -(2**63) <= value < 2**63

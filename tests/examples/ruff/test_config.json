@@ -1,0 +1,5 @@
+{
+    "tools": {
+        "ruff": "https://json.schemastore.org/ruff.json"
+    }
+}

@@ -190,6 +190,14 @@ def test_missing_toolname(tmp_path, capsys):
         cli.run(["--tool=http://json.schemastore.org/poetry.toml", str(example)])
 
 
+def test_bad_url(tmp_path, capsys):
+    example = write_example(tmp_path, name="valid-pyproject.toml")
+    with pytest.raises(ValueError, match="URL must start with 'http:' or 'https:'"):
+        cli.run(
+            ["--tool", "poetry=file://json.schemastore.org/poetry.toml", str(example)]
+        )
+
+
 @pytest.mark.skipif(sys.version_info[:2] < (3, 11), reason="requires 3.11+")
 def test_parser_is_tomllib():
     """Make sure Python >= 3.11 uses tomllib instead of tomli"""
