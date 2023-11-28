@@ -39,7 +39,7 @@ try:  # pragma: no cover
     else:
         from importlib.resources import files
 
-    def read_text(package: Union[str, ModuleType], resource) -> str:
+    def read_text(package: Union[str, ModuleType], resource: str) -> str:
         return files(package).joinpath(resource).read_text(encoding="utf-8")
 
 except ImportError:  # pragma: no cover
@@ -164,16 +164,17 @@ class RefHandler(Mapping[str, Callable[[str], Schema]]):
         self._uri_schemas = ["http", "https"]
         self._registry = registry
 
-    def __contains__(self, key) -> bool:
-        return_val = isinstance(key, str)
-        if return_val and key not in self._uri_schemas:
-            self._uri_schemas.append(key)
-        return return_val
+    def __contains__(self, key: object) -> bool:
+        if isinstance(key, str):
+            if key not in self._uri_schemas:
+                self._uri_schemas.append(key)
+            return True
+        return False
 
     def __iter__(self) -> Iterator[str]:
         return iter(self._uri_schemas)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self._uri_schemas)
 
     def __getitem__(self, key: str) -> Callable[[str], Schema]:

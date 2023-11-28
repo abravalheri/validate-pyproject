@@ -137,14 +137,14 @@ class _TroveClassifier:
 
     downloaded: typing.Union[None, "Literal[False]", typing.Set[str]]
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.downloaded = None
         self._skip_download = False
         # None => not cached yet
         # False => cache not available
         self.__name__ = "trove_classifier"  # Emulate a public function
 
-    def _disable_download(self):
+    def _disable_download(self) -> None:
         # This is a private API. Only setuptools has the consent of using it.
         self._skip_download = True
 

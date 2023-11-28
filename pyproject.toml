@@ -8,12 +8,15 @@ build-backend = "setuptools.build_meta"
 version_scheme = "no-guess-dev"
 
 [tool.mypy]
+check_untyped_defs = true
+disallow_untyped_defs = true
 pretty = true
 show_error_codes = true
 show_error_context = true
-show_traceback = true
 ignore_missing_imports = true
+show_traceback = true
 warn_redundant_casts = true
+warn_unused_configs = true
 warn_unused_ignores = true
 
 [tool.pytest.ini_options]

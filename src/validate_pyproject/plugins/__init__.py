@@ -12,7 +12,6 @@ from textwrap import dedent
 from typing import Any, Callable, Iterable, List, Optional
 
 from .. import __version__
-from ..types import Plugin, Schema
 
 if sys.version_info[:2] >= (3, 8):  # pragma: no cover
     # TODO: Import directly (no need for conditional) when `python_requires = >= 3.8`
@@ -21,6 +20,8 @@ else:  # pragma: no cover
     from importlib_metadata import EntryPoint, entry_points
 
 if typing.TYPE_CHECKING:
+    from ..types import Plugin, Schema
+
     if sys.version_info < (3, 8):
         from typing_extensions import Protocol
     else:
@@ -41,7 +42,7 @@ class PluginProtocol(Protocol):
         ...
 
     @property
-    def schema(self) -> Schema:
+    def schema(self) -> "Schema":
         ...
 
     @property
@@ -54,7 +55,7 @@ class PluginProtocol(Protocol):
 
 
 class PluginWrapper:
-    def __init__(self, tool: str, load_fn: Plugin):
+    def __init__(self, tool: str, load_fn: "Plugin"):
         self._tool = tool
         self._load_fn = load_fn
 
@@ -67,7 +68,7 @@ class PluginWrapper:
         return self._tool
 
     @property
-    def schema(self) -> Schema:
+    def schema(self) -> "Schema":
         return self._load_fn(self.tool)
 
     @property
@@ -89,7 +90,7 @@ if typing.TYPE_CHECKING:
     _: PluginProtocol = typing.cast(PluginWrapper, None)
 
 
-def iterate_entry_points(group=ENTRYPOINT_GROUP) -> Iterable[EntryPoint]:
+def iterate_entry_points(group: str = ENTRYPOINT_GROUP) -> Iterable[EntryPoint]:
     """Produces a generator yielding an EntryPoint object for each plugin registered
     via ``setuptools`` `entry point`_ mechanism.
 
