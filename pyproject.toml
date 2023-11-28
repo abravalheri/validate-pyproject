@@ -8,16 +8,18 @@ build-backend = "setuptools.build_meta"
 version_scheme = "no-guess-dev"
 
 [tool.mypy]
-check_untyped_defs = true
-disallow_untyped_defs = true
 pretty = true
-show_error_codes = true
 show_error_context = true
-ignore_missing_imports = true
 show_traceback = true
-warn_redundant_casts = true
-warn_unused_configs = true
-warn_unused_ignores = true
+strict = true
+# Scaling back on some of the strictness for now
+disallow_any_generics = false
+disallow_subclassing_any = false
+warn_return_any = false
+
+[[tool.mypy.overrides]]
+module = ["fastjsonschema"]
+ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 addopts = ["--cov", "validate_pyproject", "--cov-report", "term-missing", "--verbose", "--strict-markers"]

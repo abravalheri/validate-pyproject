@@ -240,7 +240,7 @@ def run(args: Sequence[str] = ()) -> int:
 
 
 def _run_on_file(validator: Validator, params: CliParams, file: io.TextIOBase) -> None:
-    if file in (sys.stdin, _STDIN):
+    if file in (sys.stdin, _STDIN):  # type: ignore[comparison-overlap]
         print("Expecting input via `stdin`...", file=sys.stderr, flush=True)
 
     toml_equivalent = tomllib.loads(file.read())
