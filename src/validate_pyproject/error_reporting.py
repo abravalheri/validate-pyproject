@@ -92,7 +92,7 @@ class _ErrorFormatting:
     def __init__(self, ex: JsonSchemaValueException):
         self.ex = ex
         self.name = f"`{self._simplify_name(ex.name)}`"
-        self._original_message = self.ex.message.replace(ex.name, self.name)
+        self._original_message: str = self.ex.message.replace(ex.name, self.name)
         self._summary = ""
         self._details = ""
 

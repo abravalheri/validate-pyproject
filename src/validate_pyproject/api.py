@@ -40,7 +40,7 @@ try:  # pragma: no cover
         from importlib.resources import files
 
     def read_text(package: Union[str, ModuleType], resource: str) -> str:
-        return files(package).joinpath(resource).read_text(encoding="utf-8")
+        return files(package).joinpath(resource).read_text(encoding="utf-8")  # type: ignore[no-any-return]
 
 except ImportError:  # pragma: no cover
     from importlib.resources import read_text
@@ -92,7 +92,7 @@ class SchemaRegistry(Mapping[str, Schema]):
         # (which part of the TOML, who defines, schema)
 
         top_level = typing.cast(dict, load(TOP_LEVEL_SCHEMA))  # Make it mutable
-        self._spec_version = top_level["$schema"]
+        self._spec_version: str = top_level["$schema"]
         top_properties = top_level["properties"]
         tool_properties = top_properties["tool"].setdefault("properties", {})
 
@@ -115,10 +115,10 @@ class SchemaRegistry(Mapping[str, Schema]):
             tool_properties[plugin.tool] = {"$ref": sref}
             self._schemas[sid] = (f"tool.{plugin.tool}", plugin.id, plugin.schema)
 
-        self._main_id = sid = top_level["$id"]
+        self._main_id: str = top_level["$id"]
         main_schema = Schema(top_level)
         origin = f"{__name__} - build metadata"
-        self._schemas[sid] = ("<$ROOT>", origin, main_schema)
+        self._schemas[self._main_id] = ("<$ROOT>", origin, main_schema)
 
     @property
     def spec_version(self) -> str:

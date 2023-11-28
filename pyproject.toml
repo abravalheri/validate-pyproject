@@ -15,7 +15,6 @@ strict = true
 # Scaling back on some of the strictness for now
 disallow_any_generics = false
 disallow_subclassing_any = false
-warn_return_any = false
 
 [[tool.mypy.overrides]]
 module = ["fastjsonschema"]

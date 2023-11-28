@@ -124,7 +124,7 @@ def _download_classifiers() -> str:
     with urlopen(url, context=context) as response:  # noqa: S310 (audit URLs)
         headers = Message()
         headers["content_type"] = response.getheader("content-type", "text/plain")
-        return response.read().decode(headers.get_param("charset", "utf-8"))
+        return response.read().decode(headers.get_param("charset", "utf-8"))  # type: ignore[no-any-return]
 
 
 class _TroveClassifier:
