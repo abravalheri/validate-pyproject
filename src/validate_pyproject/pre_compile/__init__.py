@@ -15,7 +15,7 @@ else:  # pragma: no cover
     import importlib_metadata as _M
 
 if TYPE_CHECKING:  # pragma: no cover
-    from ..plugins import PluginWrapper
+    from ..plugins import PluginProtocol
 
 
 _logger = logging.getLogger(__name__)
@@ -32,10 +32,10 @@ def pre_compile(  # noqa: PLR0913
     output_dir: Union[str, os.PathLike] = ".",
     main_file: str = "__init__.py",
     original_cmd: str = "",
-    plugins: Union[api.AllPlugins, Sequence["PluginWrapper"]] = api.ALL_PLUGINS,
+    plugins: Union[api.AllPlugins, Sequence["PluginProtocol"]] = api.ALL_PLUGINS,
     text_replacements: Mapping[str, str] = TEXT_REPLACEMENTS,
     *,
-    load_tools: Sequence[str] = (),
+    extra_plugins: Sequence["PluginProtocol"] = (),
 ) -> Path:
     """Populate the given ``output_dir`` with all files necessary to perform
     the validation.
@@ -47,7 +47,7 @@ def pre_compile(  # noqa: PLR0913
     out.mkdir(parents=True, exist_ok=True)
     replacements = {**TEXT_REPLACEMENTS, **text_replacements}
 
-    validator = api.Validator(plugins, load_tools=load_tools)
+    validator = api.Validator(plugins, extra_plugins=extra_plugins)
     header = "\n".join(NOCHECK_HEADERS)
     code = replace_text(validator.generated_code, replacements)
     _write(out / "fastjsonschema_validations.py", header + code)

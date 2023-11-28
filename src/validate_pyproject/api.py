@@ -1,19 +1,14 @@
 """
 Retrieve JSON schemas for validating dicts representing a ``pyproject.toml`` file.
 """
-import io
 import json
 import logging
 import sys
 import typing
-import urllib.parse
-import urllib.request
 from enum import Enum
 from functools import partial, reduce
-from itertools import chain
 from types import MappingProxyType, ModuleType
 from typing import (
-    Any,
     Callable,
     Dict,
     Iterator,
@@ -33,7 +28,6 @@ from .extra_validations import EXTRA_VALIDATIONS
 from .types import FormatValidationFn, Schema, ValidationFn
 
 _logger = logging.getLogger(__name__)
-_chain_iter = chain.from_iterable
 
 if typing.TYPE_CHECKING:  # pragma: no cover
     from .plugins import PluginProtocol
@@ -50,16 +44,6 @@ try:  # pragma: no cover
 
 except ImportError:  # pragma: no cover
     from importlib.resources import read_text
-
-if sys.platform == "emscripten" and "pyodide" in sys.modules:
-    from pyodide.http import open_url
-else:
-
-    def open_url(url: str) -> io.StringIO:
-        if not url.startswith(("http:", "https:")):
-            raise ValueError("URL must start with 'http:' or 'https:'")
-        with urllib.request.urlopen(url) as response:  # noqa: S310
-            return io.StringIO(response.read().decode("utf-8"))
 
 
 T = TypeVar("T", bound=Mapping)
@@ -197,33 +181,6 @@ class RefHandler(Mapping[str, Callable[[str], Schema]]):
         return self._registry.__getitem__
 
 
-def load_from_uri(tool_uri: str) -> Tuple[str, Any]:
-    tool_info = urllib.parse.urlparse(tool_uri)
-    if tool_info.netloc:
-        url = f"{tool_info.scheme}://{tool_info.netloc}{tool_info.path}"
-        with open_url(url) as f:
-            contents = json.load(f)
-    else:
-        with open(tool_info.path, "rb") as f:
-            contents = json.load(f)
-    return tool_info.fragment, contents
-
-
-class RemotePlugin:
-    def __init__(self, tool: str, fragment: str, schema: Schema):
-        self.id = schema["$id"]
-        self.tool = tool
-        self.schema = schema
-        self.help_text = f"{tool} <external>"
-        self.fragment = fragment
-
-
-if typing.TYPE_CHECKING:
-    from .plugins import PluginProtocol
-
-    _: PluginProtocol = typing.cast(RemotePlugin, None)
-
-
 class Validator:
     _plugins: Sequence["PluginProtocol"]
 
@@ -232,18 +189,12 @@ class Validator:
         plugins: Union[Sequence["PluginProtocol"], AllPlugins] = ALL_PLUGINS,
         format_validators: Mapping[str, FormatValidationFn] = FORMAT_FUNCTIONS,
         extra_validations: Sequence[ValidationFn] = EXTRA_VALIDATIONS,
-        load_tools: Sequence[str] = (),
+        *,
+        extra_plugins: Sequence["PluginProtocol"] = (),
     ):
         self._code_cache: Optional[str] = None
         self._cache: Optional[ValidationFn] = None
         self._schema: Optional[Schema] = None
-        self._external = {}
-
-        for tool in load_tools:
-            tool_name, _, tool_uri = tool.partition("=")
-            if not tool_uri:
-                raise errors.URLMissingTool(tool)
-            self._external[tool_name] = load_from_uri(tool_uri)
 
         # Let's make the following options readonly
         self._format_validators = MappingProxyType(format_validators)
@@ -252,18 +203,9 @@ class Validator:
         if plugins is ALL_PLUGINS:
             from .plugins import list_from_entry_points
 
-            self._plugins = tuple(list_from_entry_points())
-        else:
-            self._plugins = tuple(plugins)  # force immutability / read only
+            plugins = list_from_entry_points()
 
-        if self._external:
-            self._plugins = (
-                *self._plugins,
-                *(
-                    RemotePlugin(tool=k, fragment=v[0], schema=v[1])
-                    for k, v in self._external.items()
-                ),
-            )
+        self._plugins = (*plugins, *extra_plugins)
 
         self._schema_registry = SchemaRegistry(self._plugins)
         self.handlers = RefHandler(self._schema_registry)

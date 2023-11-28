@@ -31,6 +31,7 @@ from .api import Validator
 from .errors import ValidationError
 from .plugins import PluginWrapper
 from .plugins import list_from_entry_points as list_plugins_from_entry_points
+from .remote import RemotePlugin
 
 _logger = logging.getLogger(__package__)
 T = TypeVar("T", bound=NamedTuple)
@@ -213,7 +214,8 @@ def run(args: Sequence[str] = ()):
     plugins: List[PluginWrapper] = list_plugins_from_entry_points()
     params: CliParams = parse_args(args, plugins)
     setup_logging(params.loglevel)
-    validator = Validator(plugins=params.plugins, load_tools=params.tool)
+    tool_plugins = [RemotePlugin.from_str(t) for t in params.tool]
+    validator = Validator(params.plugins, extra_plugins=tool_plugins)
 
     exceptions = _ExceptionGroup()
     for file in params.input_file:

@@ -13,6 +13,7 @@ from fastjsonschema import JsonSchemaValueException
 
 from validate_pyproject import _tomllib as tomllib
 from validate_pyproject.pre_compile import cli, pre_compile
+from validate_pyproject.remote import RemotePlugin
 
 from .helpers import error_file, get_test_config
 
@@ -99,7 +100,8 @@ PRE_COMPILED_NAME = "_validation"
 
 
 def api_pre_compile(tmp_path, *, load_tools: Sequence[str]) -> Path:
-    return pre_compile(Path(tmp_path / PRE_COMPILED_NAME), load_tools=load_tools)
+    plugins = [RemotePlugin.from_str(v) for v in load_tools]
+    return pre_compile(Path(tmp_path / PRE_COMPILED_NAME), extra_plugins=plugins)
 
 
 def cli_pre_compile(tmp_path, *, load_tools: Sequence[str]) -> Path:

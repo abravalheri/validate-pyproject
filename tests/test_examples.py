@@ -6,16 +6,17 @@ import pytest
 from validate_pyproject import _tomllib as tomllib
 from validate_pyproject import api, cli
 from validate_pyproject.error_reporting import ValidationError
+from validate_pyproject.remote import RemotePlugin
 
 from .helpers import error_file, get_test_config
 
 
 def test_examples_api(example: Path) -> None:
     tools = get_test_config(example).get("tools", {})
-    load_tools = [f"{k}={v}" for k, v in tools.items()]
+    load_tools = [RemotePlugin.from_str(f"{k}={v}") for k, v in tools.items()]
 
     toml_equivalent = tomllib.loads(example.read_text())
-    validator = api.Validator(load_tools=load_tools)
+    validator = api.Validator(extra_plugins=load_tools)
     assert validator(toml_equivalent) is not None
 
 
@@ -28,11 +29,11 @@ def test_examples_cli(example: Path) -> None:
 
 def test_invalid_examples_api(invalid_example: Path) -> None:
     tools = get_test_config(invalid_example).get("tools", {})
-    load_tools = [f"{k}={v}" for k, v in tools.items()]
+    load_tools = [RemotePlugin.from_str(f"{k}={v}") for k, v in tools.items()]
 
     expected_error = error_file(invalid_example).read_text("utf-8")
     toml_equivalent = tomllib.loads(invalid_example.read_text())
-    validator = api.Validator(load_tools=load_tools)
+    validator = api.Validator(extra_plugins=load_tools)
     with pytest.raises(ValidationError) as exc_info:
         validator(toml_equivalent)
     exception_message = str(exc_info.value)

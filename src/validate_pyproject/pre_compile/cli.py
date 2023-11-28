@@ -12,6 +12,7 @@ from typing import Any, Dict, List, Mapping, NamedTuple, Sequence
 from .. import cli
 from ..plugins import PluginWrapper
 from ..plugins import list_from_entry_points as list_plugins_from_entry_points
+from ..remote import RemotePlugin
 from . import pre_compile
 
 if sys.platform == "win32":  # pragma: no cover
@@ -98,13 +99,16 @@ def run(args: Sequence[str] = ()):
     desc = 'Generate files for "pre-compiling" `validate-pyproject`'
     prms = cli.parse_args(args, plugins, desc, parser_spec, CliParams)
     cli.setup_logging(prms.loglevel)
+
+    tool_plugins = [RemotePlugin.from_str(t) for t in prms.tool]
+
     pre_compile(
         prms.output_dir,
         prms.main_file,
         cmd,
         prms.plugins,
         prms.replacements,
-        load_tools=prms.tool,
+        extra_plugins=tool_plugins,
     )
     return 0
 
