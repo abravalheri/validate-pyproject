@@ -31,6 +31,7 @@ from .api import Validator
 from .errors import ValidationError
 from .plugins import PluginWrapper
 from .plugins import list_from_entry_points as list_plugins_from_entry_points
+from .remote import RemotePlugin
 
 _logger = logging.getLogger(__package__)
 T = TypeVar("T", bound=NamedTuple)
@@ -99,12 +100,19 @@ META: Dict[str, dict] = {
         action="store_true",
         help="Print the JSON equivalent to the given TOML",
     ),
+    "tool": dict(
+        flags=("-t", "--tool"),
+        action="append",
+        dest="tool",
+        help="External tools file/url(s) to load, of the form name=URL#path",
+    ),
 }
 
 
 class CliParams(NamedTuple):
     input_file: List[io.TextIOBase]
     plugins: List[PluginWrapper]
+    tool: List[str]
     loglevel: int = logging.WARNING
     dump_json: bool = False
 
@@ -147,6 +155,7 @@ def parse_args(
     enabled = params.pop("enable", ())
     disabled = params.pop("disable", ())
     params["plugins"] = select_plugins(plugins, enabled, disabled)
+    params["tool"] = params["tool"] or []
     return params_class(**params)  # type: ignore[call-overload]
 
 
@@ -205,7 +214,8 @@ def run(args: Sequence[str] = ()):
     plugins: List[PluginWrapper] = list_plugins_from_entry_points()
     params: CliParams = parse_args(args, plugins)
     setup_logging(params.loglevel)
-    validator = Validator(plugins=params.plugins)
+    tool_plugins = [RemotePlugin.from_str(t) for t in params.tool]
+    validator = Validator(params.plugins, extra_plugins=tool_plugins)
 
     exceptions = _ExceptionGroup()
     for file in params.input_file:

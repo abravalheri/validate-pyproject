@@ -1,0 +1,5 @@
+[tool.localtool]
+one = 1
+
+[tool.nestedtool]
+two = 2

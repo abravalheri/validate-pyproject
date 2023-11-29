@@ -16,11 +16,11 @@ source =
 # Regexes for lines to exclude from consideration
 exclude_lines =
     # Have to re-enable the standard pragma
+    # (exclude_also would be better, but not available on Python 3.6)
     pragma: no cover
 
     # Don't complain about missing debug-only code:
     def __repr__
-    if self\.debug
 
     # Don't complain if tests don't hit defensive assertion code:
     raise AssertionError
@@ -31,4 +31,8 @@ exclude_lines =
     if __name__ == .__main__.:
 
     if TYPE_CHECKING:
-    if typing.TYPE_CHECKING:
+    if typing\.TYPE_CHECKING:
+    ^\s+\.\.\.$
+
+    # Support for Pyodide (WASM)
+    if sys\.platform == .emscripten. and .pyodide. in sys\.modules:

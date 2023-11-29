@@ -4,12 +4,11 @@ Retrieve JSON schemas for validating dicts representing a ``pyproject.toml`` fil
 import json
 import logging
 import sys
+import typing
 from enum import Enum
 from functools import partial, reduce
-from itertools import chain
 from types import MappingProxyType, ModuleType
 from typing import (
-    TYPE_CHECKING,
     Callable,
     Dict,
     Iterator,
@@ -19,7 +18,6 @@ from typing import (
     Tuple,
     TypeVar,
     Union,
-    cast,
 )
 
 import fastjsonschema as FJS
@@ -30,14 +28,13 @@ from .extra_validations import EXTRA_VALIDATIONS
 from .types import FormatValidationFn, Schema, ValidationFn
 
 _logger = logging.getLogger(__name__)
-_chain_iter = chain.from_iterable
 
-if TYPE_CHECKING:  # pragma: no cover
-    from .plugins import PluginWrapper
+if typing.TYPE_CHECKING:  # pragma: no cover
+    from .plugins import PluginProtocol
 
 
 try:  # pragma: no cover
-    if sys.version_info[:2] < (3, 7) or TYPE_CHECKING:  # See #22
+    if sys.version_info[:2] < (3, 7) or typing.TYPE_CHECKING:  # See #22
         from importlib_resources import files
     else:
         from importlib.resources import files
@@ -90,11 +87,11 @@ class SchemaRegistry(Mapping[str, Schema]):
     itself, all schemas provided by plugins **MUST** have a top level ``$id``.
     """
 
-    def __init__(self, plugins: Sequence["PluginWrapper"] = ()):
+    def __init__(self, plugins: Sequence["PluginProtocol"] = ()):
         self._schemas: Dict[str, Tuple[str, str, Schema]] = {}
         # (which part of the TOML, who defines, schema)
 
-        top_level = cast(dict, load(TOP_LEVEL_SCHEMA))  # Make it mutable
+        top_level = typing.cast(dict, load(TOP_LEVEL_SCHEMA))  # Make it mutable
         self._spec_version = top_level["$schema"]
         top_properties = top_level["properties"]
         tool_properties = top_properties["tool"].setdefault("properties", {})
@@ -108,16 +105,15 @@ class SchemaRegistry(Mapping[str, Schema]):
         self._schemas = {sid: ("project", origin, project_table_schema)}
 
         # Add tools using Plugins
-
         for plugin in plugins:
-            pid, tool, schema = plugin.id, plugin.tool, plugin.schema
             if plugin.tool in tool_properties:
                 _logger.warning(f"{plugin.id} overwrites `tool.{plugin.tool}` schema")
             else:
-                _logger.info(f"{pid} defines `tool.{tool}` schema")
-            sid = self._ensure_compatibility(tool, schema)["$id"]
-            tool_properties[tool] = {"$ref": sid}
-            self._schemas[sid] = (f"tool.{tool}", pid, schema)
+                _logger.info(f"{plugin.id} defines `tool.{plugin.tool}` schema")
+            sid = self._ensure_compatibility(plugin.tool, plugin.schema)["$id"]
+            sref = f"{sid}#{plugin.fragment}" if plugin.fragment else sid
+            tool_properties[plugin.tool] = {"$ref": sref}
+            self._schemas[sid] = (f"tool.{plugin.tool}", plugin.id, plugin.schema)
 
         self._main_id = sid = top_level["$id"]
         main_schema = Schema(top_level)
@@ -186,11 +182,15 @@ class RefHandler(Mapping[str, Callable[[str], Schema]]):
 
 
 class Validator:
+    _plugins: Sequence["PluginProtocol"]
+
     def __init__(
         self,
-        plugins: Union[Sequence["PluginWrapper"], AllPlugins] = ALL_PLUGINS,
+        plugins: Union[Sequence["PluginProtocol"], AllPlugins] = ALL_PLUGINS,
         format_validators: Mapping[str, FormatValidationFn] = FORMAT_FUNCTIONS,
         extra_validations: Sequence[ValidationFn] = EXTRA_VALIDATIONS,
+        *,
+        extra_plugins: Sequence["PluginProtocol"] = (),
     ):
         self._code_cache: Optional[str] = None
         self._cache: Optional[ValidationFn] = None
@@ -203,9 +203,9 @@ class Validator:
         if plugins is ALL_PLUGINS:
             from .plugins import list_from_entry_points
 
-            self._plugins = tuple(list_from_entry_points())
-        else:
-            self._plugins = tuple(plugins)  # force immutability / read only
+            plugins = list_from_entry_points()
+
+        self._plugins = (*plugins, *extra_plugins)
 
         self._schema_registry = SchemaRegistry(self._plugins)
         self.handlers = RefHandler(self._schema_registry)
@@ -245,7 +245,7 @@ class Validator:
         if self._cache is None:
             compiled = FJS.compile(self.schema, self.handlers, dict(self.formats))
             fn = partial(compiled, custom_formats=self._format_validators)
-            self._cache = cast(ValidationFn, fn)
+            self._cache = typing.cast(ValidationFn, fn)
 
         with detailed_errors():
             self._cache(pyproject)

@@ -6,12 +6,13 @@
 """
 
 import sys
+import typing
 from string import Template
 from textwrap import dedent
-from typing import Any, Callable, Iterable, List, Optional, cast
+from typing import Any, Callable, Iterable, List, Optional
 
 from .. import __version__
-from ..types import Plugin
+from ..types import Plugin, Schema
 
 if sys.version_info[:2] >= (3, 8):  # pragma: no cover
     # TODO: Import directly (no need for conditional) when `python_requires = >= 3.8`
@@ -19,8 +20,37 @@ if sys.version_info[:2] >= (3, 8):  # pragma: no cover
 else:  # pragma: no cover
     from importlib_metadata import EntryPoint, entry_points
 
+if typing.TYPE_CHECKING:
+    if sys.version_info < (3, 8):
+        from typing_extensions import Protocol
+    else:
+        from typing import Protocol
+else:
+    Protocol = object
 
 ENTRYPOINT_GROUP = "validate_pyproject.tool_schema"
+
+
+class PluginProtocol(Protocol):
+    @property
+    def id(self) -> str:
+        ...
+
+    @property
+    def tool(self) -> str:
+        ...
+
+    @property
+    def schema(self) -> Schema:
+        ...
+
+    @property
+    def help_text(self) -> str:
+        ...
+
+    @property
+    def fragment(self) -> str:
+        ...
 
 
 class PluginWrapper:
@@ -29,16 +59,20 @@ class PluginWrapper:
         self._load_fn = load_fn
 
     @property
-    def id(self):
+    def id(self) -> str:
         return f"{self._load_fn.__module__}.{self._load_fn.__name__}"
 
     @property
-    def tool(self):
+    def tool(self) -> str:
         return self._tool
 
     @property
-    def schema(self):
+    def schema(self) -> Schema:
         return self._load_fn(self.tool)
+
+    @property
+    def fragment(self) -> str:
+        return ""
 
     @property
     def help_text(self) -> str:
@@ -49,6 +83,10 @@ class PluginWrapper:
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}({self.tool!r}, {self.id})"
+
+
+if typing.TYPE_CHECKING:
+    _: PluginProtocol = typing.cast(PluginWrapper, None)
 
 
 def iterate_entry_points(group=ENTRYPOINT_GROUP) -> Iterable[EntryPoint]:
@@ -62,7 +100,7 @@ def iterate_entry_points(group=ENTRYPOINT_GROUP) -> Iterable[EntryPoint]:
     if hasattr(entries, "select"):  # pragma: no cover
         # The select method was introduced in importlib_metadata 3.9 (and Python 3.10)
         # and the previous dict interface was declared deprecated
-        select = cast(
+        select = typing.cast(
             Any, getattr(entries, "select")  # noqa: B009
         )  # typecheck gymnastics
         entries_: Iterable[EntryPoint] = select(group=group)

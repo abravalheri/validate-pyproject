@@ -1,0 +1,5 @@
+{
+    "tools": {
+        "poetry": "https://json.schemastore.org/poetry.json"
+    }
+}

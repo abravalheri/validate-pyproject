@@ -1,32 +1,39 @@
 import logging
+from pathlib import Path
 
 import pytest
 
 from validate_pyproject import _tomllib as tomllib
 from validate_pyproject import api, cli
 from validate_pyproject.error_reporting import ValidationError
+from validate_pyproject.remote import RemotePlugin
 
-from .helpers import EXAMPLES, INVALID, error_file, examples, invalid_examples
+from .helpers import error_file, get_test_config
 
 
-@pytest.mark.parametrize("example", examples())
-def test_examples_api(example):
-    toml_equivalent = tomllib.loads((EXAMPLES / example).read_text())
-    validator = api.Validator()
+def test_examples_api(example: Path) -> None:
+    tools = get_test_config(example).get("tools", {})
+    load_tools = [RemotePlugin.from_str(f"{k}={v}") for k, v in tools.items()]
+
+    toml_equivalent = tomllib.loads(example.read_text())
+    validator = api.Validator(extra_plugins=load_tools)
     assert validator(toml_equivalent) is not None
 
 
-@pytest.mark.parametrize("example", examples())
-def test_examples_cli(example):
-    assert cli.run(["--dump-json", str(EXAMPLES / example)]) == 0  # no errors
+def test_examples_cli(example: Path) -> None:
+    tools = get_test_config(example).get("tools", {})
+    args = [f"--tool={k}={v}" for k, v in tools.items()]
+
+    assert cli.run(["--dump-json", str(example), *args]) == 0  # no errors
 
 
-@pytest.mark.parametrize("example", invalid_examples())
-def test_invalid_examples_api(example):
-    example_file = INVALID / example
-    expected_error = error_file(example_file).read_text("utf-8")
-    toml_equivalent = tomllib.loads(example_file.read_text())
-    validator = api.Validator()
+def test_invalid_examples_api(invalid_example: Path) -> None:
+    tools = get_test_config(invalid_example).get("tools", {})
+    load_tools = [RemotePlugin.from_str(f"{k}={v}") for k, v in tools.items()]
+
+    expected_error = error_file(invalid_example).read_text("utf-8")
+    toml_equivalent = tomllib.loads(invalid_example.read_text())
+    validator = api.Validator(extra_plugins=load_tools)
     with pytest.raises(ValidationError) as exc_info:
         validator(toml_equivalent)
     exception_message = str(exc_info.value)
@@ -36,13 +43,14 @@ def test_invalid_examples_api(example):
         assert error in summary
 
 
-@pytest.mark.parametrize("example", invalid_examples())
-def test_invalid_examples_cli(example, caplog):
+def test_invalid_examples_cli(invalid_example: Path, caplog) -> None:
+    tools = get_test_config(invalid_example).get("tools", {})
+    args = [f"--tool={k}={v}" for k, v in tools.items()]
+
     caplog.set_level(logging.DEBUG)
-    example_file = INVALID / example
-    expected_error = error_file(example_file).read_text("utf-8")
+    expected_error = error_file(invalid_example).read_text("utf-8")
     with pytest.raises(SystemExit) as exc_info:
-        cli.main([str(example_file)])
+        cli.main([str(invalid_example), *args])
     assert exc_info.value.args == (1,)
     for error in expected_error.splitlines():
         assert error in caplog.text

@@ -1,0 +1,2 @@
+[tool.ruff]
+not-a-real-option = true

@@ -1,10 +1,38 @@
 """
-    Dummy conftest.py for validate_pyproject.
+    conftest.py for validate_pyproject.
 
-    If you don't know what this is for, just leave it empty.
     Read more about conftest.py under:
     - https://docs.pytest.org/en/stable/fixture.html
     - https://docs.pytest.org/en/stable/writing_plugins.html
 """
 
-# import pytest
+from pathlib import Path
+from typing import List
+
+import pytest
+
+HERE = Path(__file__).parent.resolve()
+
+
+def collect(base: Path) -> List[str]:
+    return [str(f.relative_to(base)) for f in base.glob("**/*.toml")]
+
+
+@pytest.fixture(params=collect(HERE / "examples"))
+def example(request) -> Path:
+    return HERE / "examples" / request.param
+
+
+@pytest.fixture(params=collect(HERE / "invalid-examples"))
+def invalid_example(request) -> Path:
+    return HERE / "invalid-examples" / request.param
+
+
+@pytest.fixture(params=collect(HERE / "remote/examples"))
+def remote_example(request) -> Path:
+    return HERE / "remote/examples" / request.param
+
+
+@pytest.fixture(params=collect(HERE / "remote/invalid-examples"))
+def remote_invalid_example(request) -> Path:
+    return HERE / "remote/invalid-examples" / request.param

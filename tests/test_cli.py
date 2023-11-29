@@ -9,7 +9,7 @@ from uuid import uuid4
 import pytest
 from fastjsonschema import JsonSchemaValueException
 
-from validate_pyproject import cli, plugins
+from validate_pyproject import cli, errors, plugins
 
 
 class TestHelp:
@@ -179,6 +179,23 @@ def test_multiple_files(tmp_path, capsys):
     captured = captured.replace(repl, "invalid file:")
     assert number_valid == N
     assert number_invalid == N + 3
+
+
+def test_missing_toolname(tmp_path, capsys):
+    example = write_example(tmp_path, name="valid-pyproject.toml")
+    with pytest.raises(
+        errors.URLMissingTool,
+        match=r"Correct form is '--tool <tool-name>=http://json\.schemastore\.org/poetry\.toml', with an optional",
+    ):
+        cli.run(["--tool=http://json.schemastore.org/poetry.toml", str(example)])
+
+
+def test_bad_url(tmp_path, capsys):
+    example = write_example(tmp_path, name="valid-pyproject.toml")
+    with pytest.raises(ValueError, match="URL must start with 'http:' or 'https:'"):
+        cli.run(
+            ["--tool", "poetry=file://json.schemastore.org/poetry.toml", str(example)]
+        )
 
 
 @pytest.mark.skipif(sys.version_info[:2] < (3, 11), reason="requires 3.11+")
