@@ -31,6 +31,16 @@ def test_load_from_entry_point__error():
         plugins.load_from_entry_point(fake)
 
 
+def test_load_from_entry_point_fragment():
+    entry = "validate_pyproject.api:load_builtin_plugin"
+    real = EntryPoint(
+        "cibuildwheel#/properties/tool/properties", entry, ENTRYPOINT_GROUP
+    )
+    p = plugins.load_from_entry_point(real)
+    assert p.fragment == "/properties/tool/properties"
+    assert p.tool == "cibuildwheel"
+
+
 def is_entry_point(ep):
     return all(hasattr(ep, attr) for attr in ("name", "load"))
 
