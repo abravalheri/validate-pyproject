@@ -31,7 +31,7 @@ from .api import Validator
 from .errors import ValidationError
 from .plugins import PluginWrapper
 from .plugins import list_from_entry_points as list_plugins_from_entry_points
-from .remote import RemotePlugin
+from .remote import RemotePlugin, load_store
 
 _logger = logging.getLogger(__package__)
 T = TypeVar("T", bound=NamedTuple)
@@ -106,6 +106,10 @@ META: Dict[str, dict] = {
         dest="tool",
         help="External tools file/url(s) to load, of the form name=URL#path",
     ),
+    "store": dict(
+        flags=("--store",),
+        help="Load a pyproject.toml file and read all the $ref's into tools",
+    ),
 }
 
 
@@ -113,6 +117,7 @@ class CliParams(NamedTuple):
     input_file: List[io.TextIOBase]
     plugins: List[PluginWrapper]
     tool: List[str]
+    store: str
     loglevel: int = logging.WARNING
     dump_json: bool = False
 
@@ -156,6 +161,7 @@ def parse_args(
     disabled = params.pop("disable", ())
     params["plugins"] = select_plugins(plugins, enabled, disabled)
     params["tool"] = params["tool"] or []
+    params["store"] = params["store"] or ""
     return params_class(**params)  # type: ignore[call-overload]
 
 
@@ -215,6 +221,8 @@ def run(args: Sequence[str] = ()):
     params: CliParams = parse_args(args, plugins)
     setup_logging(params.loglevel)
     tool_plugins = [RemotePlugin.from_str(t) for t in params.tool]
+    if params.store:
+        tool_plugins.extend(load_store(params.store))
     validator = Validator(params.plugins, extra_plugins=tool_plugins)
 
     exceptions = _ExceptionGroup()

@@ -17,6 +17,6 @@ warn_redundant_casts = true
 warn_unused_ignores = true
 
 [tool.pytest.ini_options]
-addopts = ["--cov", "validate_pyproject", "--cov-report", "term-missing", "--verbose"]
+addopts = ["--cov", "validate_pyproject", "--cov-report", "term-missing", "--verbose", "--strict-markers"]
 norecursedirs = ["dist", "build", ".tox"]
 testpaths = ["tests"]

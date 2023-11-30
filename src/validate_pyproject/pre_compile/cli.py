@@ -12,7 +12,7 @@ from typing import Any, Dict, List, Mapping, NamedTuple, Sequence
 from .. import cli
 from ..plugins import PluginWrapper
 from ..plugins import list_from_entry_points as list_plugins_from_entry_points
-from ..remote import RemotePlugin
+from ..remote import RemotePlugin, load_store
 from . import pre_compile
 
 if sys.platform == "win32":  # pragma: no cover
@@ -65,6 +65,10 @@ META: Dict[str, dict] = {
         dest="tool",
         help="External tools file/url(s) to load, of the form name=URL#path",
     ),
+    "store": dict(
+        flags=("--store",),
+        help="Load a pyproject.toml file and read all the $ref's into tools",
+    ),
 }
 
 
@@ -82,6 +86,7 @@ class CliParams(NamedTuple):
     replacements: Mapping[str, str] = MappingProxyType({})
     loglevel: int = logging.WARNING
     tool: Sequence[str] = ()
+    store: str = ""
 
 
 def parser_spec(plugins: Sequence[PluginWrapper]) -> Dict[str, dict]:
@@ -101,6 +106,8 @@ def run(args: Sequence[str] = ()):
     cli.setup_logging(prms.loglevel)
 
     tool_plugins = [RemotePlugin.from_str(t) for t in prms.tool]
+    if prms.store:
+        tool_plugins.extend(load_store(prms.store))
 
     pre_compile(
         prms.output_dir,
