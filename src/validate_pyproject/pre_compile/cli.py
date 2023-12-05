@@ -67,7 +67,7 @@ META: Dict[str, dict] = {
     ),
     "store": dict(
         flags=("--store",),
-        help="Load a pyproject.toml file and read all the $ref's into tools",
+        help="Load a pyproject.json file and read all the $ref's into tools",
     ),
 }
 
