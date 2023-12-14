@@ -1,0 +1,1 @@
+`tool.ruff` must not contain {'not-a-real-option'} properties

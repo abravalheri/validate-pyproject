@@ -6,16 +6,14 @@ import subprocess
 import sys
 from inspect import cleandoc
 from pathlib import Path
-from typing import Sequence
 
 import pytest
 from fastjsonschema import JsonSchemaValueException
 
 from validate_pyproject import _tomllib as tomllib
 from validate_pyproject.pre_compile import cli, pre_compile
-from validate_pyproject.remote import RemotePlugin
 
-from .helpers import error_file, get_test_config
+from .helpers import error_file, get_tools, get_tools_as_args
 
 MAIN_FILE = "hello_world.py"  # Let's use something different that `__init__.py`
 
@@ -99,13 +97,13 @@ def test_vendoring_cli(tmp_path):
 PRE_COMPILED_NAME = "_validation"
 
 
-def api_pre_compile(tmp_path, *, load_tools: Sequence[str]) -> Path:
-    plugins = [RemotePlugin.from_str(v) for v in load_tools]
+def api_pre_compile(tmp_path, *, example: Path) -> Path:
+    plugins = get_tools(example)
     return pre_compile(Path(tmp_path / PRE_COMPILED_NAME), extra_plugins=plugins)
 
 
-def cli_pre_compile(tmp_path, *, load_tools: Sequence[str]) -> Path:
-    args = [f"--tool={t}" for t in load_tools]
+def cli_pre_compile(tmp_path, *, example: Path) -> Path:
+    args = get_tools_as_args(example)
     path = Path(tmp_path / PRE_COMPILED_NAME)
     cli.run([*args, "-O", str(path)])
     return path
@@ -151,11 +149,8 @@ def pre_compiled_validate(monkeypatch):
 
 @pytest.mark.parametrize("pre_compiled", _PRE_COMPILED)
 def test_examples_api(tmp_path, pre_compiled_validate, example, pre_compiled):
-    tools = get_test_config(example).get("tools", {})
-    load_tools = [f"{k}={v}" for k, v in tools.items()]
-
     toml_equivalent = tomllib.loads(example.read_text())
-    pre_compiled_path = pre_compiled(Path(tmp_path), load_tools=load_tools)
+    pre_compiled_path = pre_compiled(Path(tmp_path), example=example)
     assert pre_compiled_validate(pre_compiled_path, toml_equivalent) is not None
 
 
@@ -163,12 +158,9 @@ def test_examples_api(tmp_path, pre_compiled_validate, example, pre_compiled):
 def test_invalid_examples_api(
     tmp_path, pre_compiled_validate, invalid_example, pre_compiled
 ):
-    tools = get_test_config(invalid_example).get("tools", {})
-    load_tools = [f"{k}={v}" for k, v in tools.items()]
-
     expected_error = error_file(invalid_example).read_text("utf-8")
     toml_equivalent = tomllib.loads(invalid_example.read_text())
-    pre_compiled_path = pre_compiled(Path(tmp_path), load_tools=load_tools)
+    pre_compiled_path = pre_compiled(Path(tmp_path), example=invalid_example)
     with pytest.raises(JsonSchemaValueException) as exc_info:
         pre_compiled_validate(pre_compiled_path, toml_equivalent)
     exception_message = str(exc_info.value)

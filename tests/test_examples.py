@@ -6,14 +6,12 @@ import pytest
 from validate_pyproject import _tomllib as tomllib
 from validate_pyproject import api, cli
 from validate_pyproject.error_reporting import ValidationError
-from validate_pyproject.remote import RemotePlugin
 
-from .helpers import error_file, get_test_config
+from .helpers import error_file, get_tools, get_tools_as_args
 
 
 def test_examples_api(example: Path) -> None:
-    tools = get_test_config(example).get("tools", {})
-    load_tools = [RemotePlugin.from_str(f"{k}={v}") for k, v in tools.items()]
+    load_tools = get_tools(example)
 
     toml_equivalent = tomllib.loads(example.read_text())
     validator = api.Validator(extra_plugins=load_tools)
@@ -21,15 +19,13 @@ def test_examples_api(example: Path) -> None:
 
 
 def test_examples_cli(example: Path) -> None:
-    tools = get_test_config(example).get("tools", {})
-    args = [f"--tool={k}={v}" for k, v in tools.items()]
+    args = get_tools_as_args(example)
 
     assert cli.run(["--dump-json", str(example), *args]) == 0  # no errors
 
 
 def test_invalid_examples_api(invalid_example: Path) -> None:
-    tools = get_test_config(invalid_example).get("tools", {})
-    load_tools = [RemotePlugin.from_str(f"{k}={v}") for k, v in tools.items()]
+    load_tools = get_tools(invalid_example)
 
     expected_error = error_file(invalid_example).read_text("utf-8")
     toml_equivalent = tomllib.loads(invalid_example.read_text())
@@ -44,8 +40,7 @@ def test_invalid_examples_api(invalid_example: Path) -> None:
 
 
 def test_invalid_examples_cli(invalid_example: Path, caplog) -> None:
-    tools = get_test_config(invalid_example).get("tools", {})
-    args = [f"--tool={k}={v}" for k, v in tools.items()]
+    args = get_tools_as_args(invalid_example)
 
     caplog.set_level(logging.DEBUG)
     expected_error = error_file(invalid_example).read_text("utf-8")
