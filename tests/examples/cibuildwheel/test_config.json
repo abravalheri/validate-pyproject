@@ -1,5 +1,5 @@
 {
     "tools": {
-        "cibuildwheel": "https://json.schemastore.org/cibuildwheel.json#/properties/tool/properties/cibuildwheel"
+        "cibuildwheel": "https://json.schemastore.org/partial-cibuildwheel.json"
     }
 }
