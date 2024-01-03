@@ -8,8 +8,6 @@ build-backend = "setuptools.build_meta"
 version_scheme = "no-guess-dev"
 
 [tool.mypy]
-pretty = true
-show_error_context = true
 show_traceback = true
 strict = true
 # Scaling back on some of the strictness for now
