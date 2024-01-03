@@ -26,13 +26,13 @@ repos:
     args: [-w]
 
 - repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.1.8  # Ruff version
+  rev: v0.1.9  # Ruff version
   hooks:
   - id: ruff
     args: [--fix, --show-fixes]
 
 - repo: https://github.com/psf/black-pre-commit-mirror
-  rev: 23.12.0
+  rev: 23.12.1
   hooks:
   - id: black
 
