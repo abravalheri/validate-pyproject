@@ -6,6 +6,7 @@ import sys
 
 import pytest
 
+import validate_pyproject.api
 from validate_pyproject import plugins
 from validate_pyproject.plugins import ENTRYPOINT_GROUP, ErrorLoadingPlugin
 
@@ -31,11 +32,15 @@ def test_load_from_entry_point__error():
         plugins.load_from_entry_point(fake)
 
 
-def test_load_from_entry_point_fragment():
-    entry = "validate_pyproject.api:load_builtin_plugin"
-    real = EntryPoint(
-        "cibuildwheel#/properties/tool/properties", entry, ENTRYPOINT_GROUP
+def test_load_from_entry_point_fragment(monkeypatch):
+    monkeypatch.setattr(
+        validate_pyproject.api.load_builtin_plugin,
+        "fragment",
+        "/properties/tool/properties",
+        raising=False,
     )
+    entry = "validate_pyproject.api:load_builtin_plugin"
+    real = EntryPoint("cibuildwheel", entry, ENTRYPOINT_GROUP)
     p = plugins.load_from_entry_point(real)
     assert p.fragment == "/properties/tool/properties"
     assert p.tool == "cibuildwheel"

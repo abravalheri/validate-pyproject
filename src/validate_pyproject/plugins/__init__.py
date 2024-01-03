@@ -117,8 +117,8 @@ def load_from_entry_point(entry_point: EntryPoint) -> PluginWrapper:
     """Carefully load the plugin, raising a meaningful message in case of errors"""
     try:
         fn = entry_point.load()
-        name, _, fragment = entry_point.name.partition("#")
-        return PluginWrapper(name, fn, fragment=fragment)
+        fragment = getattr(fn, "fragment", "")
+        return PluginWrapper(entry_point.name, fn, fragment=fragment)
     except Exception as ex:
         raise ErrorLoadingPlugin(entry_point=entry_point) from ex
 
