@@ -54,7 +54,7 @@ class RemotePlugin:
         self.help_text = f"{tool} <external>"
 
     @classmethod
-    def from_url(cls, tool: str, url: str):
+    def from_url(cls, tool: str, url: str) -> "Self":
         fragment, schema = load_from_uri(url)
         return cls(tool=tool, schema=schema, fragment=fragment)
 

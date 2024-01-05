@@ -29,7 +29,7 @@ else:  # pragma: no cover
 _logger = logging.getLogger(__package__)
 
 
-def JSON_dict(name: str, value: str):
+def JSON_dict(name: str, value: str) -> Dict[str, Any]:
     try:
         return ensure_dict(name, json.loads(value))
     except json.JSONDecodeError as ex:
@@ -98,7 +98,7 @@ def parser_spec(plugins: Sequence[PluginWrapper]) -> Dict[str, dict]:
     return meta
 
 
-def run(args: Sequence[str] = ()):
+def run(args: Sequence[str] = ()) -> int:
     args = args if args else sys.argv[1:]
     cmd = f"python -m {__package__} " + arg_join(args)
     plugins = list_plugins_from_entry_points()
