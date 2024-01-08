@@ -153,8 +153,8 @@ Implement your changes
 
    Please make sure to see the validation messages from |pre-commit|_ and fix
    any eventual issues.
-   This should automatically use ruff_/black_ to check/fix the code style
-   in a way that is compatible with the project.
+   This should automatically use ruff_ to check/fix the code style in a way
+   that is compatible with the project.
 
    .. important:: Don't forget to add unit tests and documentation in case your
       contribution adds an additional feature and is not just a bugfix.
@@ -275,7 +275,6 @@ on PyPI_, the following steps can be used to release a new version for
 .. |tox| replace:: ``tox``
 
 
-.. _black: https://pypi.org/project/black/
 .. _contribution-guide.org: https://www.contribution-guide.org/
 .. _creating a PR: https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request
 .. _descriptive commit message: https://chris.beams.io/posts/git-commit
