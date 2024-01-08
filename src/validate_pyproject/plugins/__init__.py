@@ -102,7 +102,8 @@ def iterate_entry_points(group: str = ENTRYPOINT_GROUP) -> Iterable[EntryPoint]:
         # The select method was introduced in importlib_metadata 3.9 (and Python 3.10)
         # and the previous dict interface was declared deprecated
         select = typing.cast(
-            Any, getattr(entries, "select")  # noqa: B009
+            Any,
+            getattr(entries, "select"),  # noqa: B009
         )  # typecheck gymnastics
         entries_: Iterable[EntryPoint] = select(group=group)
     else:  # pragma: no cover
