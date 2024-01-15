@@ -124,7 +124,7 @@ macos_task:
 
 freebsd_task:
   name: test (freebsd - 3.9)
-  freebsd_instance: {image_family: freebsd-13-1}
+  freebsd_instance: {image_family: freebsd-13-2}
   install_script:
     - pkg remove -y python lang/python
     - pkg install -y git python39 py39-pip py39-gdbm py39-sqlite3 py39-tox py39-pipx py39-tomli
