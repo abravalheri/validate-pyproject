@@ -127,8 +127,9 @@ freebsd_task:
   freebsd_instance: {image_family: freebsd-14-0}
   install_script:
     - pkg remove -y python lang/python
-    - pkg install -y git python39 py39-pip py39-gdbm py39-sqlite3 py39-tox py39-pipx py39-tomli
+    - pkg install -y git python39 py39-pip py39-gdbm py39-sqlite3 py39-tox py39-tomli
     - ln -s /usr/local/bin/python3.9 /usr/local/bin/python
+    - python -m pip install pipx
   <<: *test-template
 
 windows_task:
