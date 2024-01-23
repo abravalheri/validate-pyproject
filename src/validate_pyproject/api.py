@@ -202,9 +202,9 @@ class Validator:
         self._extra_validations = tuple(extra_validations)
 
         if plugins is ALL_PLUGINS:
-            from .plugins import list_from_entry_points
+            from .plugins import list_plugins_from_entry_points
 
-            plugins = list_from_entry_points()
+            plugins = list_plugins_from_entry_points()
 
         self._plugins = (*plugins, *extra_plugins)
 

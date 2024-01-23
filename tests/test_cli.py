@@ -36,7 +36,7 @@ class TestHelp:
 
 
 def parse_args(args):
-    plg = plugins.list_from_entry_points()
+    plg = plugins.list_plugins_from_entry_points()
     return cli.parse_args(args, plg)
 
 
