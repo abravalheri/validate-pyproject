@@ -14,10 +14,10 @@ def test_load():
     spec = api.load("pyproject_toml")
     assert isinstance(spec, Mapping)
 
-    assert spec["$id"] == f"{PYPA_SPECS}/declaring-build-dependencies/"
+    assert spec["$id"] == f"{PYPA_SPECS}/dependency-specifiers/"
 
     spec = api.load("project_metadata")
-    assert spec["$id"] == f"{PYPA_SPECS}/declaring-project-metadata/"
+    assert spec["$id"] == f"{PYPA_SPECS}/pyproject-toml/"
 
 
 def test_load_plugin():
@@ -36,7 +36,7 @@ class TestRegistry:
         registry = api.SchemaRegistry(plg)
         main_schema = registry[registry.main]
         project = main_schema["properties"]["project"]
-        assert project["$ref"] == f"{PYPA_SPECS}/declaring-project-metadata/"
+        assert project["$ref"] == f"{PYPA_SPECS}/pyproject-toml/"
         tool = main_schema["properties"]["tool"]
         assert "setuptools" in tool["properties"]
         assert "$ref" in tool["properties"]["setuptools"]

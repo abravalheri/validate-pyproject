@@ -181,7 +181,7 @@ For details and usage information on PyScaffold see https://pyscaffold.org/.
 .. _PEP 517: https://peps.python.org/pep-0517/
 .. _PEP 518: https://peps.python.org/pep-0518/
 .. _PEP 621: https://peps.python.org/pep-0621/
-.. _pipx: https://pypa.github.io/pipx/
+.. _pipx: https://pipx.pypa.io/stable/
 .. _project: https://packaging.python.org/tutorials/managing-dependencies/
 .. _setuptools: https://setuptools.pypa.io/en/stable/
 .. _used JSON schemas: https://validate-pyproject.readthedocs.io/en/latest/schemas.html

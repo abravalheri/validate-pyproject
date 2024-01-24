@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
 
-  "$id": "https://packaging.python.org/en/latest/specifications/declaring-build-dependencies/",
+  "$id": "https://packaging.python.org/en/latest/specifications/dependency-specifiers/",
   "title": "Data structure for ``pyproject.toml`` files",
   "$$description": [
     "File format containing build-time configurations for the Python ecosystem. ",
@@ -55,7 +55,7 @@
     },
 
     "project": {
-      "$ref": "https://packaging.python.org/en/latest/specifications/declaring-project-metadata/"
+      "$ref": "https://packaging.python.org/en/latest/specifications/pyproject-toml/"
     },
 
     "tool": {
