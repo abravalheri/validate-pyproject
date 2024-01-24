@@ -20,7 +20,7 @@ class RedefiningStaticFieldAsDynamic(ValidationError):
     __doc__ = _DESC
     _URL = (
         "https://packaging.python.org/en/latest/specifications/"
-        "declaring-project-metadata/#dynamic"
+        "pyproject-toml/#dynamic"
     )
 
 
