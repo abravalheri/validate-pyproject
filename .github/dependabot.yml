@@ -6,7 +6,7 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     groups:
-      GitHub_Actions:
+      actions:
         patterns:
           - "*"  # Group all Actions updates into a single larger pull request
     schedule:
