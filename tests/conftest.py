@@ -14,6 +14,10 @@ import pytest
 HERE = Path(__file__).parent.resolve()
 
 
+def pytest_configure(config):
+    config.addinivalue_line("markers", "uses_network: tests may try to download files")
+
+
 def collect(base: Path) -> List[str]:
     return [str(f.relative_to(base)) for f in base.glob("**/*.toml")]
 

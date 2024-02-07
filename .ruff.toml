@@ -30,7 +30,10 @@ ignore = [
 ]
 
 [lint.per-file-ignores]
-"tests/*" = ["S"] # Assert okay in tests
+"tests/*" = [
+  "S",        # Assert okay in tests
+  "PLR2004",  # Magic value comparison is actually desired in tests
+]
 
 # --- Tool-related config ---
 
