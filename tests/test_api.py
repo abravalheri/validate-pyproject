@@ -14,7 +14,7 @@ def test_load():
     spec = api.load("pyproject_toml")
     assert isinstance(spec, Mapping)
 
-    assert spec["$id"] == f"{PYPA_SPECS}/dependency-specifiers/"
+    assert spec["$id"] == f"{PYPA_SPECS}/declaring-build-dependencies/"
 
     spec = api.load("project_metadata")
     assert spec["$id"] == f"{PYPA_SPECS}/pyproject-toml/"
