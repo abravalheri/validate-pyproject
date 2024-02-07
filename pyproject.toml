@@ -19,6 +19,9 @@ module = ["fastjsonschema"]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]
-addopts = ["--cov", "validate_pyproject", "--cov-report", "term-missing", "--verbose", "--strict-markers"]
+addopts = "--verbose --strict-markers"
 norecursedirs = ["dist", "build", ".tox"]
 testpaths = ["tests"]
+
+[tool.pytest-enabler.cov]
+addopts = "--cov validate_pyproject --cov-report term-missing"
