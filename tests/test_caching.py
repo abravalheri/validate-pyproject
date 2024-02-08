@@ -9,7 +9,7 @@ from validate_pyproject import caching, http, remote
 
 @pytest.fixture(autouse=True)
 def no_cache_env_var(monkeypatch):
-    monkeypatch.delenv("VALIDATE_PYPROJECT_CACHE_REMOTE")
+    monkeypatch.delenv("VALIDATE_PYPROJECT_CACHE_REMOTE", raising=False)
 
 
 def fn1(arg: str) -> io.StringIO:
