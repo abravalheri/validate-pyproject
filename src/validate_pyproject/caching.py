@@ -1,3 +1,5 @@
+# This module is intentionally kept minimal,
+# so that it can be imported without triggering imports outside stdlib.
 import hashlib
 import io
 import logging
