@@ -42,11 +42,11 @@ def test_as_file(tmp_path):
         caching.as_file(fn2, "hello-world", tmp_path)
 
 
-def test_as_file_no_cache(tmp_path):
+def test_as_file_no_cache():
     # If no cache directory is passed, the orig function should
     # be called straight away:
     with pytest.raises(RuntimeError, match="should not be called"):
-        caching.as_file(fn2, "hello-world", tmp_path)
+        caching.as_file(fn2, "hello-world")
 
 
 def test_path_for_no_cache(monkeypatch):
