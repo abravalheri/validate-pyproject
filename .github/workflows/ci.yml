@@ -49,7 +49,7 @@ jobs:
           path: dist/
           retention-days: 1
       - name: Download files used for testing
-        run: python.10 tools/cache_urls_for_tests.py
+        run: python3.10 tools/cache_urls_for_tests.py
       - name: Store downloaded files
         uses: actions/upload-artifact@v4
         with:
