@@ -84,7 +84,10 @@ class PluginWrapper:
         return Template(tpl).safe_substitute(tool=self.tool, id=self.id)
 
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}({self.tool!r}, {self.id})"
+        args = [repr(self.tool), self.id]
+        if self.fragment:
+            args.append(f"fragment={self.fragment!r}")
+        return f"{self.__class__.__name__}({', '.join(args)})"
 
 
 if typing.TYPE_CHECKING:
