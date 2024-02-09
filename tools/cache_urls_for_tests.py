@@ -46,5 +46,5 @@ if __name__ == "__main__":
     if not cache:
         raise SystemExit("Please define VALIDATE_PYPROJECT_CACHE_REMOTE")
 
-    Path(cache).mkdir(exist_ok=True)
+    Path(cache).mkdir(parents=True, exist_ok=True)
     download_all(cache)
