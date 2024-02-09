@@ -39,8 +39,8 @@ try:  # pragma: no cover
     else:
         from importlib.resources import files
 
-    def read_text(package: Union[str, ModuleType], resource) -> str:
-        return files(package).joinpath(resource).read_text(encoding="utf-8")
+    def read_text(package: Union[str, ModuleType], resource: str) -> str:
+        return files(package).joinpath(resource).read_text(encoding="utf-8")  # type: ignore[no-any-return]
 
 except ImportError:  # pragma: no cover
     from importlib.resources import read_text
@@ -92,7 +92,7 @@ class SchemaRegistry(Mapping[str, Schema]):
         # (which part of the TOML, who defines, schema)
 
         top_level = typing.cast(dict, load(TOP_LEVEL_SCHEMA))  # Make it mutable
-        self._spec_version = top_level["$schema"]
+        self._spec_version: str = top_level["$schema"]
         top_properties = top_level["properties"]
         tool_properties = top_properties["tool"].setdefault("properties", {})
 
@@ -115,10 +115,10 @@ class SchemaRegistry(Mapping[str, Schema]):
             tool_properties[plugin.tool] = {"$ref": sref}
             self._schemas[sid] = (f"tool.{plugin.tool}", plugin.id, plugin.schema)
 
-        self._main_id = sid = top_level["$id"]
+        self._main_id: str = top_level["$id"]
         main_schema = Schema(top_level)
         origin = f"{__name__} - build metadata"
-        self._schemas[sid] = ("<$ROOT>", origin, main_schema)
+        self._schemas[self._main_id] = ("<$ROOT>", origin, main_schema)
 
     @property
     def spec_version(self) -> str:
@@ -164,16 +164,17 @@ class RefHandler(Mapping[str, Callable[[str], Schema]]):
         self._uri_schemas = ["http", "https"]
         self._registry = registry
 
-    def __contains__(self, key) -> bool:
-        return_val = isinstance(key, str)
-        if return_val and key not in self._uri_schemas:
-            self._uri_schemas.append(key)
-        return return_val
+    def __contains__(self, key: object) -> bool:
+        if isinstance(key, str):
+            if key not in self._uri_schemas:
+                self._uri_schemas.append(key)
+            return True
+        return False
 
     def __iter__(self) -> Iterator[str]:
         return iter(self._uri_schemas)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self._uri_schemas)
 
     def __getitem__(self, key: str) -> Callable[[str], Schema]:

@@ -21,7 +21,7 @@ VERSION_PATTERN = r"""
         (?P<release>[0-9]+(?:\.[0-9]+)*)                  # release segment
         (?P<pre>                                          # pre-release
             [-_\.]?
-            (?P<pre_l>(a|b|c|rc|alpha|beta|pre|preview))
+            (?P<pre_l>alpha|a|beta|b|preview|pre|c|rc)
             [-_\.]?
             (?P<pre_n>[0-9]+)?
         )?
@@ -124,7 +124,7 @@ def _download_classifiers() -> str:
     with urlopen(url, context=context) as response:  # noqa: S310 (audit URLs)
         headers = Message()
         headers["content_type"] = response.getheader("content-type", "text/plain")
-        return response.read().decode(headers.get_param("charset", "utf-8"))
+        return response.read().decode(headers.get_param("charset", "utf-8"))  # type: ignore[no-any-return]
 
 
 class _TroveClassifier:
@@ -137,14 +137,14 @@ class _TroveClassifier:
 
     downloaded: typing.Union[None, "Literal[False]", typing.Set[str]]
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.downloaded = None
         self._skip_download = False
         # None => not cached yet
         # False => cache not available
         self.__name__ = "trove_classifier"  # Emulate a public function
 
-    def _disable_download(self):
+    def _disable_download(self) -> None:
         # This is a private API. Only setuptools has the consent of using it.
         self._skip_download = True
 

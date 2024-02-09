@@ -6,6 +6,17 @@ Changelog
    Development Version
    ====================
 
+Version 0.16
+============
+- Fix setuptools ``readme`` field , #116
+- Fix ``oneOf <> anyOf`` in setuptools schema, #117
+- Add previously omitted type keywords for string values, #117
+- Add schema validator check, #118
+- Add ``SchemaStore`` conversion script, #119
+- Allow tool(s) to be specified via URL (added CLI option: ``--tool``), #121
+- Support ``uint`` formats (as used by Ruff's schema), #128
+- Allow schemas to be loaded from ``SchemaStore`` (added CLI option: ``--store``), #133
+
 Version 0.15
 ============
 - Update ``setuptools`` schema definitions, #112

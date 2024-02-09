@@ -16,6 +16,7 @@ from textwrap import dedent, wrap
 from typing import (
     Callable,
     Dict,
+    Generator,
     Iterator,
     List,
     NamedTuple,
@@ -40,7 +41,7 @@ _REGULAR_EXCEPTIONS = (ValidationError, tomllib.TOMLDecodeError)
 
 
 @contextmanager
-def critical_logging():
+def critical_logging() -> Generator[None, None, None]:
     """Make sure the logging level is set even before parsing the CLI args"""
     try:
         yield
@@ -160,10 +161,10 @@ def parse_args(
     params = vars(parser.parse_args(args))
     enabled = params.pop("enable", ())
     disabled = params.pop("disable", ())
-    params["plugins"] = select_plugins(plugins, enabled, disabled)
     params["tool"] = params["tool"] or []
     params["store"] = params["store"] or ""
-    return params_class(**params)  # type: ignore[call-overload]
+    params["plugins"] = select_plugins(plugins, enabled, disabled)
+    return params_class(**params)  # type: ignore[call-overload, no-any-return]
 
 
 def select_plugins(
@@ -179,7 +180,7 @@ def select_plugins(
     return available
 
 
-def setup_logging(loglevel: int):
+def setup_logging(loglevel: int) -> None:
     """Setup basic logging
 
     Args:
@@ -190,7 +191,7 @@ def setup_logging(loglevel: int):
 
 
 @contextmanager
-def exceptions2exit():
+def exceptions2exit() -> Generator[None, None, None]:
     try:
         yield
     except _ExceptionGroup as group:
@@ -207,7 +208,7 @@ def exceptions2exit():
         raise SystemExit(1) from None
 
 
-def run(args: Sequence[str] = ()):
+def run(args: Sequence[str] = ()) -> int:
     """Wrapper allowing :obj:`Translator` to be called in a CLI fashion.
 
     Instead of returning the value from :func:`Translator.translate`, it prints the
@@ -238,8 +239,8 @@ def run(args: Sequence[str] = ()):
     return 0
 
 
-def _run_on_file(validator: Validator, params: CliParams, file: io.TextIOBase):
-    if file in (sys.stdin, _STDIN):
+def _run_on_file(validator: Validator, params: CliParams, file: io.TextIOBase) -> None:
+    if file in (sys.stdin, _STDIN):  # type: ignore[comparison-overlap]
         print("Expecting input via `stdin`...", file=sys.stderr, flush=True)
 
     toml_equivalent = tomllib.loads(file.read())
@@ -258,7 +259,7 @@ class Formatter(argparse.RawTextHelpFormatter):
     # order to create our own formatter, we are left no choice other then overwrite a
     # "private" method considered to be an implementation detail.
 
-    def _split_lines(self, text, width):
+    def _split_lines(self, text: str, width: int) -> List[str]:
         return list(chain.from_iterable(wrap(x, width) for x in text.splitlines()))
 
 
@@ -287,17 +288,17 @@ def _format_file(file: io.TextIOBase) -> str:
 class _ExceptionGroup(Exception):
     _members: List[Tuple[str, Exception]]
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._members = []
         super().__init__()
 
-    def add(self, prefix: str, ex: Exception):
+    def add(self, prefix: str, ex: Exception) -> None:
         self._members.append((prefix, ex))
 
     def __iter__(self) -> Iterator[Tuple[str, Exception]]:
         return iter(self._members)
 
-    def raise_if_any(self):
+    def raise_if_any(self) -> None:
         number = len(self._members)
         if number == 1:
             print(self._members[0][0])

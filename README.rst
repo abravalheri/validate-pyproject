@@ -136,6 +136,22 @@ extending the validation with your own plugins_.
    If you consider contributing to this project, have a look on our
    `contribution guides`_.
 
+Plugins
+=======
+
+The `validate-pyproject-schema-store`_ plugin has a vendored copy of
+pyproject.toml related `SchemaStore`_ entries.  You can even install this using
+the ``[store]`` extra:
+
+    $ pipx install 'validate-pyproject[all,store]'
+
+Some of the tools in SchemaStore also have integrated validate-pyproject
+plugins, like ``cibuildwheel`` and ``scikit-build-core``. However, unless you
+want to pin an exact version of those tools, the SchemaStore copy is lighter
+weight than installing the entire package.
+
+If you want to write a custom plugin for your tool, please consider also contributing a copy to SchemaStore.
+
 pre-commit
 ==========
 
@@ -146,9 +162,11 @@ pre-commit
     ---
     repos:
       - repo: https://github.com/abravalheri/validate-pyproject
-        rev: main
+        rev: <insert current version here>
         hooks:
           - id: validate-pyproject
+          # Optional extra validations from SchemaStore:
+          additional_dependencies: ["validate-pyproject-schema-store[all]"]
 
 By default, this ``pre-commit`` hook will only validate the ``pyproject.toml``
 file at the root of the project repository.
@@ -158,6 +176,8 @@ the ``files`` parameter.
 You can also use ``pre-commit autoupdate`` to update to the latest stable
 version of ``validate-pyproject`` (recommended).
 
+You can also use `validate-pyproject-schema-store`_ as a pre-commit hook, which
+allows pre-commit to pin and update that instead of ``validate-pyproject`` itself.
 
 Note
 ====
@@ -181,10 +201,12 @@ For details and usage information on PyScaffold see https://pyscaffold.org/.
 .. _PEP 517: https://peps.python.org/pep-0517/
 .. _PEP 518: https://peps.python.org/pep-0518/
 .. _PEP 621: https://peps.python.org/pep-0621/
-.. _pipx: https://pypa.github.io/pipx/
+.. _pipx: https://pipx.pypa.io/stable/
 .. _project: https://packaging.python.org/tutorials/managing-dependencies/
 .. _setuptools: https://setuptools.pypa.io/en/stable/
 .. _used JSON schemas: https://validate-pyproject.readthedocs.io/en/latest/schemas.html
 .. _pre-compiled way: https://validate-pyproject.readthedocs.io/en/latest/embedding.html
 .. _plugins: https://validate-pyproject.readthedocs.io/en/latest/dev-guide.html
 .. _virtual environment: https://realpython.com/python-virtual-environments-a-primer/
+.. _validate-pyproject-schema-store: https://github.com/henryiii/validate-pyproject-schema-store
+.. _SchemaStore: https://www.schemastore.org
