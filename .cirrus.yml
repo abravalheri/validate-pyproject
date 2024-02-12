@@ -43,7 +43,7 @@ env:
   <<: *task-template
   dist_cache: {folder: dist, fingerprint_script: echo $CIRRUS_BUILD_ID}  # download
   test_files_cache:
-    folder: $VALIDATE_PYPROJECT_CACHE_REMOTE
+    folder: ${VALIDATE_PYPROJECT_CACHE_REMOTE}
     fingerprint_script: echo $CIRRUS_BUILD_ID
     populate_script: python tools/cache_urls_for_tests.py
     reupload_on_changes: true
