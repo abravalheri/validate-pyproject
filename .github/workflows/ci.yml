@@ -20,7 +20,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  VALIDATE_PYPROJECT_CACHE_REMOTE: ~/.cache/validate-pyproject
+  VALIDATE_PYPROJECT_CACHE_REMOTE: tests/.cache
 
 
 jobs:
