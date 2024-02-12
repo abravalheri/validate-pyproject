@@ -19,6 +19,10 @@ concurrency:
     ${{ github.event.pull_request.number || github.sha }}
   cancel-in-progress: true
 
+env:
+  VALIDATE_PYPROJECT_CACHE_REMOTE: ~/.cache/validate-pyproject
+
+
 jobs:
   prepare:
     runs-on: ubuntu-latest
@@ -44,6 +48,14 @@ jobs:
           name: python-distribution-files
           path: dist/
           retention-days: 1
+      - name: Download files used for testing
+        run: python3.10 tools/cache_urls_for_tests.py
+      - name: Store downloaded files
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-download-files
+          path: ${{ env.VALIDATE_PYPROJECT_CACHE_REMOTE }}
+          retention-days: 1
 
   test:
     needs: prepare
@@ -65,6 +77,11 @@ jobs:
       - name: Retrieve pre-built distribution files
         uses: actions/download-artifact@v4
         with: {name: python-distribution-files, path: dist/}
+      - name: Retrieve test download files
+        uses: actions/download-artifact@v4
+        with:
+          name: test-download-files
+          path: ${{ env.VALIDATE_PYPROJECT_CACHE_REMOTE }}
       - name: Run tests
         run: >-
           pipx run tox

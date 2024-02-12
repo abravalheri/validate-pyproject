@@ -14,6 +14,8 @@ env:
   CI_BUILD_URL: https://cirrus-ci.com/build/${CIRRUS_BUILD_ID}
   COVERALLS_PARALLEL: "true"
   COVERALLS_FLAG_NAME: ${CIRRUS_TASK_NAME}
+  # Project-specific
+  VALIDATE_PYPROJECT_CACHE_REMOTE: tests/.cache
 
 # ---- Templates ----
 
@@ -40,6 +42,11 @@ env:
   depends_on: [build]
   <<: *task-template
   dist_cache: {folder: dist, fingerprint_script: echo $CIRRUS_BUILD_ID}  # download
+  test_files_cache:
+    folder: ${VALIDATE_PYPROJECT_CACHE_REMOTE}
+    fingerprint_script: echo $CIRRUS_BUILD_ID
+    populate_script: python tools/cache_urls_for_tests.py
+    reupload_on_changes: true
   test_script: >
     tox --installpkg dist/*.whl --
     -n 5 --randomly-seed=42 -rfEx --durations 10 --color yes
