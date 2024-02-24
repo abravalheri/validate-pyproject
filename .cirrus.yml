@@ -140,7 +140,7 @@ freebsd_task:
   <<: *test-template
 
 windows_task:
-  name: test (Windows - 3.9.10)
+  name: test (Windows - 3.9.13)
   windows_container:
     image: "cirrusci/windowsservercore:2019"
     os_version: 2019
