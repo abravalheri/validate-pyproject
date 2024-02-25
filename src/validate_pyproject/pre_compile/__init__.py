@@ -112,7 +112,6 @@ def load_licenses() -> Dict[str, str]:
 
 NOCHECK_HEADERS = (
     "# noqa",
-    "# type: ignore",
     "# ruff: noqa",
     "# flake8: noqa",
     "# pylint: skip-file",
