@@ -117,7 +117,6 @@ NOCHECK_HEADERS = (
     "# flake8: noqa",
     "# pylint: skip-file",
     "# mypy: ignore-errors",
-    "# ruff: noqa",
     "# yapf: disable",
     "# pylama:skip=1",
     "\n\n# *** PLEASE DO NOT MODIFY DIRECTLY: Automatically generated code *** \n\n\n",
