@@ -1,4 +1,5 @@
 """Test summary generation from schema examples"""
+
 import json
 from pathlib import Path
 

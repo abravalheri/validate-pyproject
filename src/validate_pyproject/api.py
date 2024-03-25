@@ -1,6 +1,7 @@
 """
 Retrieve JSON schemas for validating dicts representing a ``pyproject.toml`` file.
 """
+
 import json
 import logging
 import sys
