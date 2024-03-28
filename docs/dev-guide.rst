@@ -77,7 +77,7 @@ specify which ``tool`` subtable it would be checking:
 
 
     available_plugins = [
-        *plugins.list_from_entry_points(),
+        *plugins.list_plugins_from_entry_points(),
         plugins.PluginWrapper("your-tool", your_plugin),
     ]
     validator = api.Validator(available_plugins)

@@ -32,7 +32,7 @@ def test_load_plugin():
 
 class TestRegistry:
     def test_with_plugins(self):
-        plg = plugins.list_from_entry_points()
+        plg = plugins.list_plugins_from_entry_points()
         registry = api.SchemaRegistry(plg)
         main_schema = registry[registry.main]
         project = main_schema["properties"]["project"]
@@ -112,7 +112,7 @@ class TestValidator:
     # ---
 
     def plugin(self, tool):
-        plg = plugins.list_from_entry_points(filtering=lambda e: e.name == tool)
+        plg = plugins.list_plugins_from_entry_points(filtering=lambda e: e.name == tool)
         return plg[0]
 
     TOOLS = ("distutils", "setuptools")

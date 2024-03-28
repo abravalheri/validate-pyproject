@@ -10,8 +10,7 @@ from types import MappingProxyType
 from typing import Any, Dict, List, Mapping, NamedTuple, Sequence
 
 from .. import cli
-from ..plugins import PluginWrapper
-from ..plugins import list_from_entry_points as list_plugins_from_entry_points
+from ..plugins import PluginWrapper, list_plugins_from_entry_points
 from ..remote import RemotePlugin, load_store
 from . import pre_compile
 

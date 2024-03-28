@@ -28,7 +28,7 @@ def repo_review_checks() -> Dict[str, VPP001]:
 
 def repo_review_families(pyproject: Dict[str, Any]) -> Dict[str, Dict[str, str]]:
     has_distutils = "distutils" in pyproject.get("tool", {})
-    plugin_names = (ep.name for ep in plugins.iterate_entry_points())
+    plugin_names = (ep.tool for ep in plugins.list_plugins_from_entry_points())
     plugin_list = (
         f"`[tool.{n}]`" for n in plugin_names if n != "distutils" or has_distutils
     )

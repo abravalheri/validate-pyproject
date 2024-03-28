@@ -30,8 +30,7 @@ from . import __version__
 from . import _tomllib as tomllib
 from .api import Validator
 from .errors import ValidationError
-from .plugins import PluginWrapper
-from .plugins import list_from_entry_points as list_plugins_from_entry_points
+from .plugins import PluginWrapper, list_plugins_from_entry_points
 from .remote import RemotePlugin, load_store
 
 _logger = logging.getLogger(__package__)
