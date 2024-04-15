@@ -2,7 +2,7 @@ exclude: '^src/validate_pyproject/_vendor'
 
 repos:
 - repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v4.5.0
+  rev: v4.6.0
   hooks:
   - id: check-added-large-files
   - id: check-ast
@@ -26,7 +26,7 @@ repos:
     args: [-w]
 
 - repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.3.4  # Ruff version
+  rev: v0.3.7  # Ruff version
   hooks:
   - id: ruff
     args: [--fix, --show-fixes]
@@ -56,7 +56,7 @@ repos:
       - validate-pyproject[all]>=0.13
 
 - repo: https://github.com/python-jsonschema/check-jsonschema
-  rev: 0.28.0
+  rev: 0.28.2
   hooks:
     - id: check-metaschema
       files: \.schema\.json$
