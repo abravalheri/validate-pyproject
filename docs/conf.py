@@ -292,6 +292,7 @@ intersphinx_mapping = {
     "setuptools": ("https://setuptools.pypa.io/en/stable/", None),
     "pyscaffold": ("https://pyscaffold.org/en/stable", None),
     "fastjsonschema": ("https://horejsek.github.io/python-fastjsonschema/", None),
+    "pypa": ("https://packaging.python.org/en/latest/", None),
 }
 extlinks = {
     "issue": (f"{repository}/issues/%s", "issue #%s"),

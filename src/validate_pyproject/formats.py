@@ -1,3 +1,12 @@
+"""
+The functions in this module are used to validate schemas that use the
+`format JSON Schema keyword
+<https://json-schema.org/understanding-json-schema/reference/string#format>`_.
+
+The correspondence is given by replacing the ``_`` character in the name of the
+function with a ``-`` to obtain the format name and vice versa.
+"""
+
 import builtins
 import logging
 import os
@@ -49,6 +58,9 @@ VERSION_REGEX = re.compile(r"^\s*" + VERSION_PATTERN + r"\s*$", re.X | re.I)
 
 
 def pep440(version: str) -> bool:
+    """See :ref:`PyPA's version specification <pypa:version-specifiers>`
+    (initially introduced in :pep:`440`).
+    """
     return VERSION_REGEX.match(version) is not None
 
 
@@ -60,6 +72,9 @@ PEP508_IDENTIFIER_REGEX = re.compile(f"^{PEP508_IDENTIFIER_PATTERN}$", re.I)
 
 
 def pep508_identifier(name: str) -> bool:
+    """See :ref:`PyPA's name specification <pypa:name-format>`
+    (initially introduced in :pep:`508#names`).
+    """
     return PEP508_IDENTIFIER_REGEX.match(name) is not None
 
 
@@ -71,6 +86,9 @@ try:
         from setuptools._vendor.packaging import requirements as _req  # type: ignore
 
     def pep508(value: str) -> bool:
+        """See :ref:`PyPA's dependency specifiers <pypa:dependency-specifiers>`
+        (initially introduced in :pep:`508`).
+        """
         try:
             _req.Requirement(value)
             return True
@@ -89,7 +107,10 @@ except ImportError:  # pragma: no cover
 
 
 def pep508_versionspec(value: str) -> bool:
-    """Expression that can be used to specify/lock versions (including ranges)"""
+    """Expression that can be used to specify/lock versions (including ranges)
+    See ``versionspec`` in :ref:`PyPA's dependency specifiers
+    <pypa:dependency-specifiers>` (initially introduced in :pep:`508`).
+    """
     if any(c in value for c in (";", "]", "@")):
         # In PEP 508:
         # conditional markers, extras and URL specs are not included in the
@@ -105,6 +126,11 @@ def pep508_versionspec(value: str) -> bool:
 
 
 def pep517_backend_reference(value: str) -> bool:
+    """See PyPA's specification for defining build-backend references
+    introduced in :pep:`517#source-trees`.
+
+    This is similar to an entry-point reference (e.g., ``package.module:object``).
+    """
     module, _, obj = value.partition(":")
     identifiers = (i.strip() for i in _chain(module.split("."), obj.split(".")))
     return all(python_identifier(i) for i in identifiers if i)
@@ -181,6 +207,7 @@ try:
     from trove_classifiers import classifiers as _trove_classifiers
 
     def trove_classifier(value: str) -> bool:
+        """See https://pypi.org/classifiers/"""
         return value in _trove_classifiers or value.lower().startswith("private ::")
 
 except ImportError:  # pragma: no cover
@@ -192,6 +219,10 @@ except ImportError:  # pragma: no cover
 
 
 def pep561_stub_name(value: str) -> bool:
+    """Name of a directory containing type stubs.
+    It must follow the name scheme ``<package>-stubs`` as defined in
+    :pep:`561#stub-only-packages`.
+    """
     top, *children = value.split(".")
     if not top.endswith("-stubs"):
         return False
@@ -203,6 +234,10 @@ def pep561_stub_name(value: str) -> bool:
 
 
 def url(value: str) -> bool:
+    """Valid URL (validation uses :obj:`urllib.parse`).
+    For maximum compatibility please make sure to include a ``scheme`` prefix
+    in your URL (e.g. ``http://``).
+    """
     from urllib.parse import urlparse
 
     try:
@@ -231,24 +266,40 @@ ENTRYPOINT_GROUP_REGEX = re.compile(f"^{ENTRYPOINT_GROUP_PATTERN}$", re.I)
 
 
 def python_identifier(value: str) -> bool:
+    """Can be used as identifier in Python.
+    (Validation uses :obj:`str.isidentifier`).
+    """
     return value.isidentifier()
 
 
 def python_qualified_identifier(value: str) -> bool:
+    """
+    Python "dotted identifier", i.e. a sequence of :obj:`python_identifier`
+    concatenated with ``"."`` (e.g.: ``package.module.submodule``).
+    """
     if value.startswith(".") or value.endswith("."):
         return False
     return all(python_identifier(m) for m in value.split("."))
 
 
 def python_module_name(value: str) -> bool:
+    """Module name that can be used in an ``import``-statement in Python.
+    See :obj:`python_qualified_identifier`.
+    """
     return python_qualified_identifier(value)
 
 
 def python_entrypoint_group(value: str) -> bool:
+    """See ``Data model > group`` in the :ref:`PyPA's entry-points specification
+    <pypa:entry-points>`.
+    """
     return ENTRYPOINT_GROUP_REGEX.match(value) is not None
 
 
 def python_entrypoint_name(value: str) -> bool:
+    """See ``Data model > name`` in the :ref:`PyPA's entry-points specification
+    <pypa:entry-points>`.
+    """
     if not ENTRYPOINT_REGEX.match(value):
         return False
     if not RECOMMEDED_ENTRYPOINT_REGEX.match(value):
@@ -259,6 +310,13 @@ def python_entrypoint_name(value: str) -> bool:
 
 
 def python_entrypoint_reference(value: str) -> bool:
+    """Reference to a Python object using in the format:
+
+    > ``importable.module:object.attr``
+
+    See ``Data model >object reference`` in the :ref:`PyPA's entry-points specification
+    <pypa:entry-points>`.
+    """
     module, _, rest = value.partition(":")
     if "[" in rest:
         obj, _, extras_ = rest.partition("[")
@@ -277,16 +335,20 @@ def python_entrypoint_reference(value: str) -> bool:
 
 
 def uint8(value: builtins.int) -> bool:
+    r"""Unsigned 8-bit integer (:math:`0 \leq x < 2^8`)"""
     return 0 <= value < 2**8
 
 
 def uint16(value: builtins.int) -> bool:
+    r"""Unsigned 16-bit integer (:math:`0 \leq x < 2^{16}`)"""
     return 0 <= value < 2**16
 
 
 def uint(value: builtins.int) -> bool:
+    r"""Unsigned 64-bit integer (:math:`0 \leq x < 2^{64}`)"""
     return 0 <= value < 2**64
 
 
 def int(value: builtins.int) -> bool:
+    r"""Signed 64-bit integer (:math:`-2^{63} \leq x < 2^{63}`)"""
     return -(2**63) <= value < 2**63
