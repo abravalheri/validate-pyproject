@@ -13,6 +13,7 @@ MODULE_TEMPLATE = """
    :members:{_members}
    :undoc-members:
    :show-inheritance:
+   :special-members: __call__
 """
 
 __location__ = Path(__file__).parent
