@@ -6,7 +6,7 @@ Users may also import :mod:`validate_pyproject.errors` and :mod:`validate_pyproj
 when handling exceptions or specifying type hints.
 
 In addition to that, special `formats <https://json-schema.org/understanding-json-schema/reference/string#format>`_
-that can be used in the JSON Schema definitions are implemented in :mod:`validate_pyproject.format`.
+that can be used in the JSON Schema definitions are implemented in :mod:`validate_pyproject.formats`.
 
 .. toctree::
    :maxdepth: 2
