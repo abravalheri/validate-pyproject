@@ -61,6 +61,12 @@ The text on the standard is:
 This information is confirmed in a `similar document submitted to the IETF`_.
 
 
+Where do I find information about *format* X?
+=============================================
+
+Please check :doc:`/api/validate_pyproject.formats`.
+
+
 .. _if-then-else: https://json-schema.org/understanding-json-schema/reference/conditionals.html
 .. _issue: https://github.com/pypa/setuptools/issues/2671
 .. _JSON Schema: https://json-schema.org/

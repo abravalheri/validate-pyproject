@@ -62,6 +62,8 @@ EXAMPLES = {
                         }
                     ]
                 }
+
+            For more details about `format` see
         """,
     },
     "description": {

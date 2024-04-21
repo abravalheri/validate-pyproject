@@ -27,25 +27,25 @@ via CLI as indicated in the command below:
 
     # in you terminal
     $ python -m validate_pyproject.pre_compile --help
-    $ python -m validate_pyproject.pre_compile -O dir/for/genereated_files
+    $ python -m validate_pyproject.pre_compile -O dir/for/generated_files
 
 This command will generate a few files under the directory given to the CLI.
 Please notice this directory should, ideally, be empty, and will correspond to
 a "sub-package" in your package (a ``__init__.py`` file will be generated,
 together with a few other ones).
 
-Assuming you have created a ``genereated_files`` directory, and that the value
+Assuming you have created a ``generated_files`` directory, and that the value
 for the ``--main-file`` option in the CLI was kept as the default
 ``__init__.py``, you should be able to invoke the validation function in your
 code by doing:
 
 .. code-block:: python
 
-    from .genereated_files import validate, JsonSchemaValueException
+    from .generated_files import validate, ValidationError
 
     try:
         validate(dict_representing_the_parsed_toml_file)
-    except JsonSchemaValueException:
+    except ValidationError:
         print("Invalid File")
 
 

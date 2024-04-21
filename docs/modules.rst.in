@@ -1,0 +1,17 @@
+Module Reference
+================
+
+The public API of ``validate-pyproject`` is exposed in the :mod:`validate_pyproject.api` module.
+Users may also import :mod:`validate_pyproject.errors` and :mod:`validate_pyproject.types`
+when handling exceptions or specifying type hints.
+
+In addition to that, special `formats <https://json-schema.org/understanding-json-schema/reference/string#format>`_
+that can be used in the JSON Schema definitions are implemented in :mod:`validate_pyproject.formats`.
+
+.. toctree::
+   :maxdepth: 2
+
+   validate_pyproject.api
+   validate_pyproject.errors
+   validate_pyproject.types
+   validate_pyproject.formats

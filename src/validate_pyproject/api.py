@@ -41,6 +41,7 @@ try:  # pragma: no cover
         from importlib.resources import files
 
     def read_text(package: Union[str, ModuleType], resource: str) -> str:
+        """:meta private:"""
         return files(package).joinpath(resource).read_text(encoding="utf-8")  # type: ignore[no-any-return]
 
 except ImportError:  # pragma: no cover
@@ -48,7 +49,7 @@ except ImportError:  # pragma: no cover
 
 
 T = TypeVar("T", bound=Mapping)
-AllPlugins = Enum("AllPlugins", "ALL_PLUGINS")
+AllPlugins = Enum("AllPlugins", "ALL_PLUGINS")  #: :meta private:
 ALL_PLUGINS = AllPlugins.ALL_PLUGINS
 
 TOP_LEVEL_SCHEMA = "pyproject_toml"
@@ -69,11 +70,14 @@ FORMAT_FUNCTIONS = MappingProxyType(_get_public_functions(formats))
 def load(name: str, package: str = __package__, ext: str = ".schema.json") -> Schema:
     """Load the schema from a JSON Schema file.
     The returned dict-like object is immutable.
+
+    :meta private: (low level detail)
     """
     return Schema(json.loads(read_text(package, f"{name}{ext}")))
 
 
 def load_builtin_plugin(name: str) -> Schema:
+    """:meta private: (low level detail)"""
     return load(name, f"{__package__}.plugins")
 
 
@@ -86,6 +90,8 @@ class SchemaRegistry(Mapping[str, Schema]):
 
     Since this object work as a mapping between each schema ``$id`` and the schema
     itself, all schemas provided by plugins **MUST** have a top level ``$id``.
+
+    :meta private: (low level detail)
     """
 
     def __init__(self, plugins: Sequence["PluginProtocol"] = ()):
@@ -159,6 +165,8 @@ class RefHandler(Mapping[str, Callable[[str], Schema]]):
     into a function that receives the schema URI and returns the schema (as parsed JSON)
     (otherwise :mod:`urllib` is used and the URI is assumed to be a valid URL).
     This class will ensure all the URIs are loaded from the local registry.
+
+    :meta private: (low level detail)
     """
 
     def __init__(self, registry: Mapping[str, Schema]):
@@ -244,6 +252,9 @@ class Validator:
         return self._schema_registry[schema_id]
 
     def __call__(self, pyproject: T) -> T:
+        """Checks a parsed ``pyproject.toml`` file (given as :obj:`typing.Mapping`)
+        and raises an exception when it is not a valid.
+        """
         if self._cache is None:
             compiled = FJS.compile(self.schema, self.handlers, dict(self.formats))
             fn = partial(compiled, custom_formats=self._format_validators)
