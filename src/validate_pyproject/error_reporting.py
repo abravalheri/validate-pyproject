@@ -45,6 +45,11 @@ _TOML_JARGON = {
     "property names": "keys",
 }
 
+_FORMATS_HELP = """
+For more details about `format` see
+https://validate-pyproject.readthedocs.io/en/latest/api/validate_pyproject.formats.html
+"""
+
 
 class ValidationError(JsonSchemaValueException):
     """Report violations of a given JSON schema.
@@ -160,7 +165,9 @@ class _ErrorFormatting:
             f"OFFENDING RULE: {self.ex.rule!r}",
             f"DEFINITION:\n{indent(schema, '    ')}",
         ]
-        return "\n\n".join(optional + defaults)
+        msg = "\n\n".join(optional + defaults)
+        epilog = f"\n{_FORMATS_HELP}" if "format" in msg.lower() else ""
+        return msg + epilog
 
 
 class _SummaryWriter:
