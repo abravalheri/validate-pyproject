@@ -1,5 +1,5 @@
 """
-The functions in this module are used to validate schemas that use the
+The functions in this module are used to validate schemas with the
 `format JSON Schema keyword
 <https://json-schema.org/understanding-json-schema/reference/string#format>`_.
 
