@@ -55,14 +55,14 @@ These functions receive as argument the name of the tool subtable and should
 return a JSON schema for the data structure **under** this table (it **should**
 not include the table name itself as a property).
 
-To use a plugin you can pass a ``plugins`` argument to the
+To use a plugin you can pass an ``extra_plugins`` argument to the
 :class:`~validate_pyproject.api.Validator` constructor, but you will need to
 wrap it with :class:`~validate_pyproject.plugins.PluginWrapper` to be able to
 specify which ``tool`` subtable it would be checking:
 
 .. code-block:: python
 
-    from validate_pyproject import api, plugins
+    from validate_pyproject import api
 
 
     def your_plugin(tool_name: str) -> dict:
@@ -77,13 +77,17 @@ specify which ``tool`` subtable it would be checking:
 
 
     available_plugins = [
-        *plugins.list_from_entry_points(),
         plugins.PluginWrapper("your-tool", your_plugin),
     ]
-    validator = api.Validator(available_plugins)
+    validator = api.Validator(extra_plugins=available_plugins)
 
 Please notice that you can also make your plugin "autoloadable" by creating and
 distributing your own Python package as described in the following section.
+
+If you want to disable the automatic discovery of all "autoloadable" plugins you
+can pass ``plugins=[]`` to the constructor; or, for example in the snippet
+above, we could have used ``plugins=...`` instead of ``extra_plugins=...``
+to ensure only the explicitly given plugins are loaded.
 
 
 Distributing Plugins
