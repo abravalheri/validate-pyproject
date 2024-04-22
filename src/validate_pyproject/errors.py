@@ -4,7 +4,8 @@ from :obj:`validate_pyproject.api.Validator.__call__`.
 
 Note that ``validate-pyproject`` derives most of its exceptions from
 :mod:`fastjsonschema`, so it might make sense to also have a look on
-:obj:`JsonSchemaException`, :obj:`JsonSchemaValueException` and
+:obj:`fastjsonschema.JsonSchemaException`,
+:obj:`fastjsonschema.JsonSchemaValueException` and
 :obj:`fastjsonschema.JsonSchemaDefinitionException`.
 )
 """
