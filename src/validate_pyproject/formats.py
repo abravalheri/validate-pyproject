@@ -310,9 +310,9 @@ def python_entrypoint_name(value: str) -> bool:
 
 
 def python_entrypoint_reference(value: str) -> bool:
-    """Reference to a Python object using in the format:
+    """Reference to a Python object using in the format::
 
-    > ``importable.module:object.attr``
+        importable.module:object.attr
 
     See ``Data model >object reference`` in the :ref:`PyPA's entry-points specification
     <pypa:entry-points>`.
