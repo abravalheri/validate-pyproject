@@ -66,7 +66,7 @@ jobs:
         - "3.11"  # newest Python that is stable
         platform:
         - ubuntu-latest
-        - macos-latest
+        - macos-13
         - windows-latest
     runs-on: ${{ matrix.platform }}
     steps:
