@@ -20,12 +20,9 @@ else:  # pragma: no cover
     from importlib_metadata import EntryPoint, entry_points
 
 if typing.TYPE_CHECKING:
-    from ..types import Plugin, Schema
+    from typing import Protocol
 
-    if sys.version_info < (3, 8):
-        from typing_extensions import Protocol
-    else:
-        from typing import Protocol
+    from ..types import Plugin, Schema
 else:
     Protocol = object
 
