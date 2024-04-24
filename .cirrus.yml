@@ -82,10 +82,10 @@ build_task:
   build_script: tox -e clean,build
 
 check_task:
-  name: check (Linux - 3.12)
+  name: check (Linux - 3.10)
   alias: check
   depends_on: [build]
-  container: {image: "python:3.12-bullseye"}  # most recent => better types
+  container: {image: "python:3.10-bullseye"}  # 3.11+ don't understand some code paths
   dist_cache: {folder: dist, fingerprint_script: echo $CIRRUS_BUILD_ID}  # download
   <<: *task-template
   install_script: pip install tox
