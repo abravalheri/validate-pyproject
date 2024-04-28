@@ -50,9 +50,10 @@ class PluginProtocol(Protocol):
 
 
 class PluginWrapper:
-    def __init__(self, tool: str, load_fn: "Plugin"):
+    def __init__(self, tool: str, load_fn: "Plugin", *, fragment: str = ""):
         self._tool = tool
         self._load_fn = load_fn
+        self._fragment = fragment
 
     @property
     def id(self) -> str:
@@ -68,7 +69,7 @@ class PluginWrapper:
 
     @property
     def fragment(self) -> str:
-        return ""
+        return self._fragment
 
     @property
     def help_text(self) -> str:
@@ -78,7 +79,10 @@ class PluginWrapper:
         return Template(tpl).safe_substitute(tool=self.tool, id=self.id)
 
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}({self.tool!r}, {self.id})"
+        args = [repr(self.tool), self.id]
+        if self.fragment:
+            args.append(f"fragment={self.fragment!r}")
+        return f"{self.__class__.__name__}({', '.join(args)})"
 
 
 if typing.TYPE_CHECKING:
@@ -113,7 +117,8 @@ def load_from_entry_point(entry_point: EntryPoint) -> PluginWrapper:
     """Carefully load the plugin, raising a meaningful message in case of errors"""
     try:
         fn = entry_point.load()
-        return PluginWrapper(entry_point.name, fn)
+        fragment = getattr(fn, "fragment", "")
+        return PluginWrapper(entry_point.name, fn, fragment=fragment)
     except Exception as ex:
         raise ErrorLoadingPlugin(entry_point=entry_point) from ex
 
