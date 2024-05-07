@@ -26,7 +26,7 @@ repos:
     args: [-w]
 
 - repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.4.1  # Ruff version
+  rev: v0.4.3  # Ruff version
   hooks:
   - id: ruff
     args: [--fix, --show-fixes]
