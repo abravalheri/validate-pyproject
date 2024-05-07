@@ -219,7 +219,7 @@
         "dependencies": {"$ref": "#/definitions/file-directive-for-dependencies"},
         "optional-dependencies": {
           "type": "object",
-          "propertyNames": {"type": "string", "format": "python-identifier"},
+          "propertyNames": {"type": "string", "format": "pep508-identifier"},
           "additionalProperties": false,
           "patternProperties": {
             ".+": {"$ref": "#/definitions/file-directive-for-dependencies"}

@@ -1,0 +1,7 @@
+[project]
+name = "myproj"
+version = "42"
+dynamic = ["optional-dependencies"]
+
+[tool.setuptools.dynamic.optional-dependencies]
+name-with-hyfens = {file = "extra.txt"}
