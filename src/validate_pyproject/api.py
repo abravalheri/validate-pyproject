@@ -4,7 +4,6 @@ Retrieve JSON schemas for validating dicts representing a ``pyproject.toml`` fil
 
 import json
 import logging
-import sys
 import typing
 from enum import Enum
 from functools import partial, reduce
@@ -35,14 +34,11 @@ if typing.TYPE_CHECKING:  # pragma: no cover
 
 
 try:  # pragma: no cover
-    if sys.version_info[:2] < (3, 7) or typing.TYPE_CHECKING:  # See #22
-        from importlib_resources import files
-    else:
-        from importlib.resources import files
+    from importlib.resources import files
 
     def read_text(package: Union[str, ModuleType], resource: str) -> str:
         """:meta private:"""
-        return files(package).joinpath(resource).read_text(encoding="utf-8")  # type: ignore[no-any-return]
+        return files(package).joinpath(resource).read_text(encoding="utf-8")
 
 except ImportError:  # pragma: no cover
     from importlib.resources import read_text

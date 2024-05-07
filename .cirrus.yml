@@ -85,7 +85,7 @@ check_task:
   name: check (Linux - 3.10)
   alias: check
   depends_on: [build]
-  container: {image: "python:3.10-bullseye"}  # most recent => better types
+  container: {image: "python:3.10-bullseye"}  # 3.11+ don't understand some code paths
   dist_cache: {folder: dist, fingerprint_script: echo $CIRRUS_BUILD_ID}  # download
   <<: *task-template
   install_script: pip install tox
@@ -93,11 +93,6 @@ check_task:
 
 linux_task:
   matrix:
-    - name: test (Linux - 3.6)
-      container: {image: "python:3.6-bullseye"}
-      allow_failures: true  # EoL
-    - name: test (Linux - 3.7)
-      container: {image: "python:3.7-bullseye"}
     - name: test (Linux - 3.8)
       container: {image: "python:3.8-bullseye"}
     - name: test (Linux - 3.9)
@@ -107,7 +102,7 @@ linux_task:
     - name: test (Linux - 3.11)
       container: {image: "python:3.11-bullseye"}
     - name: test (Linux - 3.12)
-      container: {image: "python:3.12-rc-bullseye"}
+      container: {image: "python:3.12-bullseye"}
       allow_failures: true  # Experimental
   install_script:
     - python -m pip install --upgrade pip tox pipx

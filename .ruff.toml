@@ -1,6 +1,6 @@
 # --- General config ---
 src = ["src"]
-target-version = "py37"
+target-version = "py38"
 
 # --- Linting config ---
 [lint]

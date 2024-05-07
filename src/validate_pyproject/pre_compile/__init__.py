@@ -1,6 +1,6 @@
 import logging
 import os
-import sys
+from importlib import metadata as _M
 from pathlib import Path
 from types import MappingProxyType
 from typing import TYPE_CHECKING, Dict, Mapping, Optional, Sequence, Union
@@ -8,11 +8,6 @@ from typing import TYPE_CHECKING, Dict, Mapping, Optional, Sequence, Union
 import fastjsonschema as FJS
 
 from .. import api, dist_name, types
-
-if sys.version_info[:2] >= (3, 8):  # pragma: no cover
-    from importlib import metadata as _M
-else:  # pragma: no cover
-    import importlib_metadata as _M
 
 if TYPE_CHECKING:  # pragma: no cover
     from ..plugins import PluginProtocol
