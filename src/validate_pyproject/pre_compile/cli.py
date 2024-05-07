@@ -17,13 +17,8 @@ from . import pre_compile
 
 if sys.platform == "win32":  # pragma: no cover
     from subprocess import list2cmdline as arg_join
-elif sys.version_info[:2] >= (3, 8):  # pragma: no cover
-    from shlex import join as arg_join
 else:  # pragma: no cover
-    from shlex import quote
-
-    def arg_join(args: Sequence[str]) -> str:
-        return " ".join(quote(x) for x in args)
+    from shlex import join as arg_join
 
 
 _logger = logging.getLogger(__package__)
