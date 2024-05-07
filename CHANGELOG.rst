@@ -8,6 +8,14 @@ Changelog
 
 Version 0.16
 ============
+- Update version regex according to latest packaging version, #153
+- Remove duplicate ``# ruff: noqa``, #158
+- Remove invalid top-of-the-file ``# type: ignore`` statement, #159
+- Align ``tool.setuptools.dynamic.optional-dependencies`` with ``project.optional-dependencies``, #170
+- Bump min Python version to 3.8, #167
+
+Version 0.16
+============
 - Fix setuptools ``readme`` field , #116
 - Fix ``oneOf <> anyOf`` in setuptools schema, #117
 - Add previously omitted type keywords for string values, #117
