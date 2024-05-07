@@ -1,8 +1,7 @@
 # The code in this module is mostly borrowed/adapted from PyScaffold and was originally
 # published under the MIT license
 # The original PyScaffold license can be found in 'NOTICE.txt'
-
-import sys
+from importlib.metadata import EntryPoint  # pragma: no cover
 
 import pytest
 
@@ -13,13 +12,6 @@ EXISTING = (
     "setuptools",
     "distutils",
 )
-
-
-if sys.version_info[:2] >= (3, 8):
-    # TODO: Import directly (no need for conditional) when `python_requires = >= 3.8`
-    from importlib.metadata import EntryPoint  # pragma: no cover
-else:
-    from importlib_metadata import EntryPoint  # pragma: no cover
 
 
 def test_load_from_entry_point__error():

@@ -5,26 +5,14 @@
 .. _entry point: https://setuptools.readthedocs.io/en/latest/userguide/entry_point.html
 """
 
-import sys
 import typing
+from importlib.metadata import EntryPoint, entry_points
 from string import Template
 from textwrap import dedent
-from typing import Any, Callable, Iterable, List, Optional
+from typing import Any, Callable, Iterable, List, Optional, Protocol
 
 from .. import __version__
-
-if sys.version_info[:2] >= (3, 8):  # pragma: no cover
-    # TODO: Import directly (no need for conditional) when `python_requires = >= 3.8`
-    from importlib.metadata import EntryPoint, entry_points
-else:  # pragma: no cover
-    from importlib_metadata import EntryPoint, entry_points
-
-if typing.TYPE_CHECKING:
-    from typing import Protocol
-
-    from ..types import Plugin, Schema
-else:
-    Protocol = object
+from ..types import Plugin, Schema
 
 ENTRYPOINT_GROUP = "validate_pyproject.tool_schema"
 
@@ -37,7 +25,7 @@ class PluginProtocol(Protocol):
     def tool(self) -> str: ...
 
     @property
-    def schema(self) -> "Schema": ...
+    def schema(self) -> Schema: ...
 
     @property
     def help_text(self) -> str: ...
@@ -47,7 +35,7 @@ class PluginProtocol(Protocol):
 
 
 class PluginWrapper:
-    def __init__(self, tool: str, load_fn: "Plugin"):
+    def __init__(self, tool: str, load_fn: Plugin):
         self._tool = tool
         self._load_fn = load_fn
 
@@ -60,7 +48,7 @@ class PluginWrapper:
         return self._tool
 
     @property
-    def schema(self) -> "Schema":
+    def schema(self) -> Schema:
         return self._load_fn(self.tool)
 
     @property
