@@ -1,3 +1,3 @@
 `tool.setuptools.dynamic.optional-dependencies` keys must be named by:
 
-    {type: string, format: 'python-identifier'}
+    {type: string, format: 'pep508-identifier'}
