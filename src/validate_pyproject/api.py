@@ -38,7 +38,7 @@ try:  # pragma: no cover
 
     def read_text(package: Union[str, ModuleType], resource: str) -> str:
         """:meta private:"""
-        return files(package).joinpath(resource).read_text(encoding="utf-8")  # type: ignore[no-any-return]
+        return files(package).joinpath(resource).read_text(encoding="utf-8")
 
 except ImportError:  # pragma: no cover
     from importlib.resources import read_text
