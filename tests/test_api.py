@@ -43,7 +43,7 @@ class TestRegistry:
 
     def fake_plugin(self, name, schema_version=7, end="#"):
         schema = {
-            "$id": id or f"https://example.com/{name}.schema.json",
+            "$id": f"https://example.com/{name}.schema.json",
             "$schema": f"http://json-schema.org/draft-{schema_version:02d}/schema{end}",
             "type": "object",
         }
