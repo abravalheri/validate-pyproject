@@ -43,7 +43,7 @@ class TestRegistry:
 
     def fake_plugin(self, name, schema_version=7, end="#"):
         schema = {
-            "$id": f"https://example.com/{name}.schema.json",
+            "$id": id or f"https://example.com/{name}.schema.json",
             "$schema": f"http://json-schema.org/draft-{schema_version:02d}/schema{end}",
             "type": "object",
         }
@@ -63,10 +63,18 @@ class TestRegistry:
         with pytest.raises(errors.InvalidSchemaVersion):
             api.SchemaRegistry([plg])
 
-    def test_duplicated_id(self):
-        plg = [plugins.PluginWrapper("plg", self.fake_plugin) for _ in range(2)]
+    def test_duplicated_id_different_tools(self):
+        schema = self.fake_plugin("plg")
+        fn = wraps(self.fake_plugin)(lambda *_1, **_2: schema)  # Same ID
+        plg = [plugins.PluginWrapper(f"plg{i}", fn) for i in range(2)]
         with pytest.raises(errors.SchemaWithDuplicatedId):
             api.SchemaRegistry(plg)
+
+    def test_allow_overwrite_same_tool(self):
+        plg = [plugins.PluginWrapper("plg", self.fake_plugin) for _ in range(2)]
+        registry = api.SchemaRegistry(plg)
+        sid = self.fake_plugin("plg")["$id"]
+        assert sid in registry
 
     def test_missing_id(self):
         def _fake_plugin(name):
