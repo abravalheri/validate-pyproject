@@ -109,11 +109,16 @@ class SchemaRegistry(Mapping[str, Schema]):
 
         # Add tools using Plugins
         for plugin in plugins:
+            allow_overwrite: Optional[str] = None
             if plugin.tool in tool_properties:
                 _logger.warning(f"{plugin.id} overwrites `tool.{plugin.tool}` schema")
+                allow_overwrite = plugin.schema.get("$id")
             else:
                 _logger.info(f"{plugin.id} defines `tool.{plugin.tool}` schema")
-            sid = self._ensure_compatibility(plugin.tool, plugin.schema)["$id"]
+            compatible = self._ensure_compatibility(
+                plugin.tool, plugin.schema, allow_overwrite
+            )
+            sid = compatible["$id"]
             sref = f"{sid}#{plugin.fragment}" if plugin.fragment else sid
             tool_properties[plugin.tool] = {"$ref": sref}
             self._schemas[sid] = (f"tool.{plugin.tool}", plugin.id, plugin.schema)
@@ -133,11 +138,13 @@ class SchemaRegistry(Mapping[str, Schema]):
         """Top level schema for validating a ``pyproject.toml`` file"""
         return self._main_id
 
-    def _ensure_compatibility(self, reference: str, schema: Schema) -> Schema:
-        if "$id" not in schema:
+    def _ensure_compatibility(
+        self, reference: str, schema: Schema, allow_overwrite: Optional[str] = None
+    ) -> Schema:
+        if "$id" not in schema or not schema["$id"]:
             raise errors.SchemaMissingId(reference)
         sid = schema["$id"]
-        if sid in self._schemas:
+        if sid in self._schemas and sid != allow_overwrite:
             raise errors.SchemaWithDuplicatedId(sid)
         version = schema.get("$schema")
         # Support schemas with missing trailing # (incorrect, but required before 0.15)
