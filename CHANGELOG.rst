@@ -8,6 +8,10 @@ Changelog
 
 Version 0.16
 ============
+- Allow overwriting schemas referring to the same ``tool``, #175.
+
+Version 0.16
+============
 - Update version regex according to latest packaging version, #153
 - Remove duplicate ``# ruff: noqa``, #158
 - Remove invalid top-of-the-file ``# type: ignore`` statement, #159
