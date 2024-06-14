@@ -267,6 +267,32 @@ def test_invalid_module_name(example):
     assert formats.python_module_name(example) is False
 
 
+@pytest.mark.parametrize(
+    "example",
+    [
+        "pip-run",
+        "abc-d-λ",
+        "abc-d-λ.xyz-e",
+        "abc-d.λ-xyz-e",
+    ],
+)
+def test_valid_module_name_relaxed(example):
+    assert formats.python_module_name_relaxed(example) is True
+
+
+@pytest.mark.parametrize(
+    "example",
+    [
+        "pip run",
+        "-pip-run",
+        "pip-run-",
+        "pip-run-stubs",
+    ],
+)
+def test_invalid_module_name_relaxed(example):
+    assert formats.python_module_name_relaxed(example) is False
+
+
 class TestClassifiers:
     """The ``_TroveClassifier`` class and ``_download_classifiers`` are part of the
     private API and therefore need to be tested.
