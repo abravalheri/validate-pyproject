@@ -6,11 +6,11 @@ Changelog
    Development Version
    ====================
 
-Version 0.16
+Version 0.18
 ============
 - Allow overwriting schemas referring to the same ``tool``, #175.
 
-Version 0.16
+Version 0.17
 ============
 - Update version regex according to latest packaging version, #153
 - Remove duplicate ``# ruff: noqa``, #158
