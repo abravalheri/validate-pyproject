@@ -88,3 +88,6 @@ disallow_subclassing_any = false
 [[tool.mypy.overrides]]
 module = ["fastjsonschema"]
 ignore_missing_imports = true
+
+[tool.repo-review]
+ignore = ["PP302", "PP304", "PP305", "PP306", "PP308", "PP309", "PC111", "PC140", "PC170", "PC180", "PC901"]

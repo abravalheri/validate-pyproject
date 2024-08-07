@@ -62,3 +62,9 @@ repos:
       files: \.schema\.json$
     - id: check-readthedocs
     - id: check-github-workflows
+
+- repo: https://github.com/scientific-python/cookie
+  rev: 2024.04.23
+  hooks:
+    - id: sp-repo-review
+      name: Validate Python repository
