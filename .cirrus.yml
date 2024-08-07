@@ -126,13 +126,12 @@ macos_task:
   <<: *test-template
 
 freebsd_task:
-  name: test (freebsd - 3.9)
+  name: test (freebsd - 3.11)
   freebsd_instance: {image_family: freebsd-14-0}
   install_script:
     - pkg remove -y python lang/python
-    - pkg install -y git python39 py39-pip py39-gdbm py39-sqlite3 py39-tox py39-tomli
-    - ln -s /usr/local/bin/python3.9 /usr/local/bin/python
-    - python -m pip install pipx
+    - pkg install -y git python311 py311-pip py311-gdbm py311-sqlite3 py311-tox py311-tomli py311-pipx
+    - ln -s /usr/local/bin/python3.11 /usr/local/bin/python
   <<: *test-template
 
 windows_task:
