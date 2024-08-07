@@ -1,11 +1,84 @@
 [build-system]
-# AVOID CHANGING REQUIRES: IT WILL BE UPDATED BY PYSCAFFOLD!
-requires = ["setuptools>=46.1.0", "setuptools_scm[toml]>=7.1"]
+requires = ["setuptools>=61.2", "setuptools_scm[toml]>=7.1"]
 build-backend = "setuptools.build_meta"
 
+[project]
+name = "validate-pyproject"
+description = "Validation library and CLI tool for checking on 'pyproject.toml' files using JSON Schema"
+authors = [{name = "Anderson Bravalheri", email = "andersonbravalheri@gmail.com"}]
+readme ="README.rst"
+license = {text = "MPL-2.0 and MIT and BSD-3-Clause"}
+requires-python = ">=3.8"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Topic :: Software Development :: Quality Assurance",
+    "Typing :: Typed",
+]
+dependencies = ["fastjsonschema>=2.16.2,<=3"]
+dynamic = ["version"]
+
+[project.urls]
+Homepage = "https://github.com/abravalheri/validate-pyproject/"
+Documentation = "https://validate-pyproject.readthedocs.io/"
+Source = "https://github.com/abravalheri/validate-pyproject"
+Tracker = "https://github.com/abravalheri/validate-pyproject/issues"
+Changelog = "https://validate-pyproject.readthedocs.io/en/latest/changelog.html"
+Download = "https://pypi.org/project/validate-pyproject/#files"
+
+[project.optional-dependencies]
+all = [
+    "packaging>=20.4",
+    "tomli>=1.2.1; python_version<'3.11'",
+    "trove-classifiers>=2021.10.20",
+]
+store = ["validate-pyproject-schema-store"]
+testing = [
+    "setuptools",
+    "pytest",
+    "pytest-cov",
+    "pytest-xdist",
+    "pytest-randomly",
+    "repo-review; python_version>='3.10'",
+    "tomli>=1.2.1; python_version<'3.11'",
+]
+typecheck = [
+    "mypy",
+    "importlib-resources",
+]
+
+[project.scripts]
+validate-pyproject = "validate_pyproject.cli:main"
+
+[project.entry-points."validate_pyproject.tool_schema"]
+setuptools = "validate_pyproject.api:load_builtin_plugin"
+distutils = "validate_pyproject.api:load_builtin_plugin"
+
+[project.entry-points."repo_review.checks"]
+validate_pyproject = "validate_pyproject.repo_review:repo_review_checks"
+
+[project.entry-points."repo_review.families"]
+validate_pyproject = "validate_pyproject.repo_review:repo_review_families"
+
 [tool.setuptools_scm]
-# See configuration details in https://github.com/pypa/setuptools_scm
 version_scheme = "no-guess-dev"
+
+[tool.pytest.ini_options]
+addopts = """
+    --cov validate_pyproject
+    --cov-report term-missing
+    --doctest-modules
+    --verbose
+    --strict-markers
+"""
+norecursedirs = [
+    "dist",
+    "build",
+    ".tox",
+]
+testpaths = ["src", "tests"]
 
 [tool.mypy]
 show_traceback = true
@@ -17,8 +90,3 @@ disallow_subclassing_any = false
 [[tool.mypy.overrides]]
 module = ["fastjsonschema"]
 ignore_missing_imports = true
-
-[tool.pytest.ini_options]
-addopts = ["--cov", "validate_pyproject", "--cov-report", "term-missing", "--verbose", "--strict-markers"]
-norecursedirs = ["dist", "build", ".tox"]
-testpaths = ["tests"]
