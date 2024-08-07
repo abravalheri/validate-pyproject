@@ -83,7 +83,9 @@ try:
         from packaging import requirements as _req
     except ImportError:  # pragma: no cover
         # let's try setuptools vendored version
-        from setuptools._vendor.packaging import requirements as _req  # type: ignore
+        from setuptools._vendor.packaging import (  # type: ignore[no-redef]
+            requirements as _req,
+        )
 
     def pep508(value: str) -> bool:
         """See :ref:`PyPA's dependency specifiers <pypa:dependency-specifiers>`
