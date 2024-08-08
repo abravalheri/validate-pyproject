@@ -73,11 +73,7 @@ addopts = """
     --verbose
     --strict-markers
 """
-norecursedirs = [
-    "dist",
-    "build",
-    ".tox",
-]
+norecursedirs = ["dist", "build", ".tox"]
 testpaths = ["src", "tests"]
 
 [tool.mypy]
