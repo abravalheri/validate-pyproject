@@ -38,6 +38,13 @@ repos:
   - id: blacken-docs
     additional_dependencies: [black==23.*]
 
+- repo: https://github.com/pre-commit/pygrep-hooks
+  rev: "v1.10.0"
+  hooks:
+    - id: rst-backticks
+    - id: rst-directive-colons
+    - id: rst-inline-touching-normal
+
 - repo: local  # self-test for `validate-pyproject` hook
   hooks:
   - id: validate-pyproject
