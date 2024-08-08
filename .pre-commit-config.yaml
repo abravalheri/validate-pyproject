@@ -32,11 +32,18 @@ repos:
     args: [--fix, --show-fixes]
   - id: ruff-format
 
-- repo: https://github.com/asottile/blacken-docs
+- repo: https://github.com/adamchainz/blacken-docs
   rev: 1.18.0
   hooks:
   - id: blacken-docs
     additional_dependencies: [black==23.*]
+
+- repo: https://github.com/pre-commit/pygrep-hooks
+  rev: "v1.10.0"
+  hooks:
+    - id: rst-backticks
+    - id: rst-directive-colons
+    - id: rst-inline-touching-normal
 
 - repo: local  # self-test for `validate-pyproject` hook
   hooks:
@@ -62,3 +69,9 @@ repos:
       files: \.schema\.json$
     - id: check-readthedocs
     - id: check-github-workflows
+
+- repo: https://github.com/scientific-python/cookie
+  rev: 2024.04.23
+  hooks:
+    - id: sp-repo-review
+      name: Validate Python repository
