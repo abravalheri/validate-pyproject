@@ -6,9 +6,14 @@ Changelog
    Development Version
    ====================
 
+Version 0.19
+============
+- Relax requirements about module names to also allow dash characters, #164
+- Migrate metadata to ``pyproject.toml`` , #192
+
 Version 0.18
 ============
-- Allow overwriting schemas referring to the same ``tool``, #175.
+- Allow overwriting schemas referring to the same ``tool``, #175
 
 Version 0.17
 ============
