@@ -6,6 +6,11 @@ Changelog
    Development Version
    ====================
 
+Development Version
+====================
+
+- Fix misplaced comments on ``formats.py``, #184
+
 Version 0.19
 ============
 - Relax requirements about module names to also allow dash characters, #164
