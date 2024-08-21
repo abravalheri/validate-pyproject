@@ -165,8 +165,8 @@ pre-commit
         rev: <insert current version here>
         hooks:
           - id: validate-pyproject
-          # Optional extra validations from SchemaStore:
-          additional_dependencies: ["validate-pyproject-schema-store[all]"]
+            # Optional extra validations from SchemaStore:
+            additional_dependencies: ["validate-pyproject-schema-store[all]"]
 
 By default, this ``pre-commit`` hook will only validate the ``pyproject.toml``
 file at the root of the project repository.
