@@ -80,21 +80,11 @@ build_task:
   <<: *task-template
   install_script: pip install tox
   build_script:
-    - tox -e clean,build
+    - tox -e clean,lint,typecheck,build
     - tar czf dist.tar.gz dist
   upload_artifacts:
     path: dist.tar.gz
 
-check_task:
-  name: check (Linux - 3.10)
-  alias: check
-  depends_on: [build]
-  container: {image: "python:3.10-bookworm"}  # 3.11+ don't understand some code paths
-  dist_cache: {folder: dist, fingerprint_script: echo $CIRRUS_BUILD_ID}  # download
-  <<: *task-template
-  install_script: pip install tox
-  download_artifact_script: *download-artifact
-  check_script: tox --installpkg dist/*.whl -e lint,typecheck
 
 linux_task:
   matrix:
@@ -187,7 +177,7 @@ linkcheck_task:
 # publish_task:
 #   name: publish (Linux - 3.10)
 #   container: {image: "python:3.10-bullseye"}
-#   depends_on: [check, build, base-test, test]
+#   depends_on: [build, base-test, test]
 #   only_if: $CIRRUS_TAG =~ 'v\d.*' && $CIRRUS_USER_PERMISSION == "admin"
 #   <<: *task-template
 #   env:
