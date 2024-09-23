@@ -6,6 +6,7 @@ env:
   LANG: C.UTF-8
   PIP_CACHE_DIR: ${CIRRUS_WORKING_DIR}/.cache/pip
   PRE_COMMIT_HOME: ${CIRRUS_WORKING_DIR}/.cache/pre-commit
+  CIRRUS_ARTIFACT_URL: https://api.cirrus-ci.com/v1/artifact/build/${CIRRUS_BUILD_ID}
   # Coveralls configuration
   CI_NAME: cirrus-ci
   CI_BRANCH: ${CIRRUS_BRANCH}
@@ -41,12 +42,15 @@ env:
   alias: test
   depends_on: [build]
   <<: *task-template
-  dist_cache: {folder: dist, fingerprint_script: echo $CIRRUS_BUILD_ID}  # download
   test_files_cache:
     folder: ${VALIDATE_PYPROJECT_CACHE_REMOTE}
     fingerprint_script: echo $CIRRUS_BUILD_ID
     populate_script: python tools/cache_urls_for_tests.py
     reupload_on_changes: true
+  download_artifact_script: &download-artifact
+    - curl -L -O ${CIRRUS_ARTIFACT_URL}/build/upload/dist.tar.gz
+    - tar xzf dist.tar.gz
+    - rm dist.tar.gz
   test_script: >
     tox --installpkg dist/*.whl --
     -n 5 --randomly-seed=42 -rfEx --durations 10 --color yes
@@ -69,17 +73,17 @@ env:
 # ---- CI Pipeline ----
 
 build_task:
-  name: build (Linux - 3.10)
+  name: build and check (Linux - 3.11)
   alias: build
-  container: {image: "python:3.10-bullseye"}
+  container: {image: "python:3.11-bullseye"}
   clone_script: *clone
-  dist_cache:  # build once and upload to be used by other tasks
-    folder: dist
-    fingerprint_script: echo $CIRRUS_BUILD_ID
-    reupload_on_changes: true
   <<: *task-template
   install_script: pip install tox
-  build_script: tox -e clean,build
+  build_script:
+    - tox -e clean,build
+    - tar czf dist.tar.gz dist
+  upload_artifacts:
+    path: dist.tar.gz
 
 check_task:
   name: check (Linux - 3.10)
@@ -89,18 +93,19 @@ check_task:
   dist_cache: {folder: dist, fingerprint_script: echo $CIRRUS_BUILD_ID}  # download
   <<: *task-template
   install_script: pip install tox
+  download_artifact_script: *download-artifact
   check_script: tox --installpkg dist/*.whl -e lint,typecheck
 
 linux_task:
   matrix:
     - name: test (Linux - 3.8)
       container: {image: "python:3.8-bookworm"}
-    - name: test (Linux - 3.9)
-      container: {image: "python:3.9-bookworm"}
     - name: test (Linux - 3.10)
       container: {image: "python:3.10-bookworm"}
+      skip: $BRANCH !=~ "^(main|master)$"
     - name: test (Linux - 3.11)
       container: {image: "python:3.11-bookworm"}
+      skip: $BRANCH !=~ "^(main|master)$"
     - name: test (Linux - 3.12)
       container: {image: "python:3.12-bookworm"}
     - name: test (Linux - 3.13)
@@ -109,23 +114,26 @@ linux_task:
   install_script:
     - python -m pip install --upgrade pip tox pipx
   <<: *test-template
+  alias: base-test
 
 mamba_task:
   name: test (Linux - mambaforge)
   container: {image: "condaforge/mambaforge"}
   install_script:  # Overwrite template
-    - mamba install -y pip tox pipx
+    - mamba install -y pip pipx tox curl
   <<: *test-template
+  depends_on: [base-test]
 
 macos_task:
   name: test (macOS - brew)
   macos_instance:
     image: ghcr.io/cirruslabs/macos-runner:sonoma
-  brew_cache: {folder: "$HOME/Library/Caches/Homebrew"}
-  install_script: brew install python tox pipx
   env:
     PATH: "/opt/homebrew/opt/python/libexec/bin:${PATH}"
+  brew_cache: {folder: "$HOME/Library/Caches/Homebrew"}
+  install_script: brew install python tox pipx
   <<: *test-template
+  depends_on: [build, base-test]
 
 freebsd_task:
   name: test (freebsd - 3.11)
@@ -135,22 +143,25 @@ freebsd_task:
     - pkg install -y git python311 py311-pip py311-gdbm py311-sqlite3 py311-tox py311-tomli py311-pipx
     - ln -s /usr/local/bin/python3.11 /usr/local/bin/python
   <<: *test-template
+  depends_on: [build, base-test]
 
 windows_task:
-  name: test (Windows - 3.9.13)
+  name: test (Windows - 3.12.5)
   windows_container:
     image: "cirrusci/windowsservercore:2019"
     os_version: 2019
   env:
     CIRRUS_SHELL: bash
-    PATH: /c/Python39:/c/Python39/Scripts:/c/tools:${PATH}
+    PATH: /c/Python312:/c/Python312/Scripts:/c/tools:${PATH}
   install_script:
     # Activate long file paths to avoid some errors
     - ps: New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" -Name "LongPathsEnabled" -Value 1 -PropertyType DWORD -Force
-    - choco install -y --no-progress python3 --version=3.9.13 --params "/NoLockdown"
+    - choco install -y --no-progress python3 --version=3.12.5 --params "/NoLockdown"
+    - choco install -y --no-progress curl
     - pip install --upgrade certifi
     - python -m pip install -U pip tox pipx
   <<: *test-template
+  depends_on: [build, base-test]
 
 finalize_task:
   container: {image: "python:3.10-bullseye"}
@@ -162,12 +173,13 @@ finalize_task:
 
 linkcheck_task:
   name: linkcheck (Linux - 3.10)
+  only_if: $BRANCH =~ "^(main|master)$"
   container: {image: "python:3.10-bullseye"}
   depends_on: [finalize]
   allow_failures: true
-  dist_cache: {folder: dist, fingerprint_script: echo $CIRRUS_BUILD_ID}  # download
   <<: *task-template
   install_script: pip install tox
+  download_artifact_script: *download-artifact
   linkcheck_script: tox --installpkg dist/*.whl -e linkcheck -- -q
 
 # # The following task is already covered by a GitHub Action,
@@ -175,16 +187,16 @@ linkcheck_task:
 # publish_task:
 #   name: publish (Linux - 3.10)
 #   container: {image: "python:3.10-bullseye"}
-#   depends_on: [check, build, test]
+#   depends_on: [check, build, base-test, test]
 #   only_if: $CIRRUS_TAG =~ 'v\d.*' && $CIRRUS_USER_PERMISSION == "admin"
 #   <<: *task-template
-#   dist_cache: {folder: dist, fingerprint_script: echo $CIRRUS_BUILD_ID}  # download
 #   env:
 #     TWINE_REPOSITORY: pypi
 #     TWINE_USERNAME: __token__
 #     TWINE_PASSWORD: $PYPI_TOKEN
 #     # See: https://cirrus-ci.org/guide/writing-tasks/#encrypted-variables
 #   install_script: pip install tox
+#   download_artifact_script: *download-artifact
 #   publish_script:
 #     - ls dist/*
 #     - tox -e publish
