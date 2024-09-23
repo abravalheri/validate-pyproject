@@ -37,7 +37,7 @@ all = [
 store = ["validate-pyproject-schema-store"]
 testing = [
     "setuptools",
-    "pytest",
+    "pytest>=8.3.3",
     "pytest-cov",
     "pytest-xdist",
     "pytest-randomly",
@@ -67,13 +67,14 @@ version_scheme = "no-guess-dev"
 
 [tool.pytest.ini_options]
 addopts = """
+    --import-mode importlib
     --cov validate_pyproject
     --cov-report term-missing
     --doctest-modules
-    --verbose
     --strict-markers
+    --verbose
 """
-norecursedirs = ["dist", "build", ".tox"]
+norecursedirs = ["dist", "build", ".*"]
 testpaths = ["src", "tests"]
 
 [tool.mypy]
