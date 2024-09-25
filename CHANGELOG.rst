@@ -6,10 +6,17 @@ Changelog
    Development Version
    ====================
 
-Development Version
-====================
+Version 0.20
+============
 
+- ``setuptools`` plugin:
+   * Update ``setuptools.schema.json``, #206
+
+Maintenance and Minor Changes
+-----------------------------
 - Fix misplaced comments on ``formats.py``, #184
+- Adopt ``--import-mode=importlib`` for pytest to prevent errors with ``importlib.metadata``, #203
+- Update CI configs, #195 #202, #204, #205
 
 Version 0.19
 ============
