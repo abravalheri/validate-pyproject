@@ -1,0 +1,2 @@
+[[tool.setuptools.ext-modules]]
+sources = ["hello.c", "world.c"]
