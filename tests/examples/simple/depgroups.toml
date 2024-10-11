@@ -1,0 +1,3 @@
+[dependency-groups]
+test = ["one", "two"]
+other = ["one", {include-group = "test"}]

@@ -1,0 +1,2 @@
+[dependency-groups]
+mydep = ["one", {other = "two"}]

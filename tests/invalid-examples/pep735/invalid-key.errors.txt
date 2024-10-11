@@ -1,0 +1,1 @@
+`dependency-groups.mydep[1]` must be valid exactly by one definition
