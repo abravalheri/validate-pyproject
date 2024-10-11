@@ -1,0 +1,5 @@
+[project]
+name = "x"
+version = "1.2.3"
+license.text = "Something"
+license-files = ["value"]
