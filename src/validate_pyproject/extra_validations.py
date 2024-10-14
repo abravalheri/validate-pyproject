@@ -75,7 +75,7 @@ def validate_include_depenency(pyproject: T) -> T:
                         "description": cleandoc(IncludedDependencyGroupMustExist._DESC),
                         "see": IncludedDependencyGroupMustExist._URL,
                     },
-                    rule="PEP 621",
+                    rule="PEP 735",
                 )
     # TODO: check for `include-group` cycles (can be conditional to graphlib)
     return pyproject
