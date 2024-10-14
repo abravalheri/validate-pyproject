@@ -380,4 +380,5 @@ def int(value: builtins.int) -> bool:
 
 def SPDX(value: str) -> bool:
     """Should validate eventually"""
+    # TODO: validate conditional to the presence of (the right version) of packaging
     return True
