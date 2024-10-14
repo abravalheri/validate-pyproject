@@ -77,6 +77,7 @@ def validate_include_depenency(pyproject: T) -> T:
                     },
                     rule="PEP 621",
                 )
+    # TODO: check for `include-group` cycles (can be conditional to graphlib)
     return pyproject
 
 
