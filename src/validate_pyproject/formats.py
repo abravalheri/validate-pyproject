@@ -376,3 +376,9 @@ def uint(value: builtins.int) -> bool:
 def int(value: builtins.int) -> bool:
     r"""Signed 64-bit integer (:math:`-2^{63} \leq x < 2^{63}`)"""
     return -(2**63) <= value < 2**63
+
+
+def SPDX(value: str) -> bool:
+    """Should validate eventually"""
+    # TODO: validate conditional to the presence of (the right version) of packaging
+    return True
