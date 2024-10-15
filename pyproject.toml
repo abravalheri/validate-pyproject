@@ -35,7 +35,7 @@ all = [
     "trove-classifiers>=2021.10.20",
 ]
 store = ["validate-pyproject-schema-store"]
-testing = [
+test = [
     "setuptools",
     "pytest>=8.3.3",
     "pytest-cov",
