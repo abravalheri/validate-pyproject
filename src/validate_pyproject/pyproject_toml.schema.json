@@ -1,6 +1,5 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-
   "$id": "https://packaging.python.org/en/latest/specifications/declaring-build-dependencies/",
   "title": "Data structure for ``pyproject.toml`` files",
   "$$description": [
@@ -60,6 +59,36 @@
 
     "tool": {
       "type": "object"
+    },
+    "dependency-groups": {
+      "type": "object",
+      "description": "Dependency groups following PEP 735",
+      "additionalProperties": false,
+      "patternProperties": {
+        "^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9._-]*[a-zA-Z0-9])$": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "string",
+                "description": "Python package specifiers following PEP 508",
+                "format": "pep508"
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "include-group": {
+                    "description": "Another dependency group to include in this one",
+                    "type": "string",
+                    "pattern": "^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9._-]*[a-zA-Z0-9])$"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
     }
   }
 }

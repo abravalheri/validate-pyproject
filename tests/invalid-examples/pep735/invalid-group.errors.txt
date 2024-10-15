@@ -1,0 +1,1 @@
+dependency-groups` must not contain {'a b'} properties
