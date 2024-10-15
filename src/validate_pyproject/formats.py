@@ -356,7 +356,7 @@ def python_entrypoint_reference(value: str) -> bool:
         obj = rest
 
     module_parts = module.split(".")
-    identifiers: Iterable[str] = (
+    identifiers: "Iterable[str]" = (
         _chain(module_parts, obj.split(".")) if rest else module_parts
     )
     return all(python_identifier(i.strip()) for i in identifiers)
