@@ -10,7 +10,7 @@ Version 0.21
 ============
 * Added support PEP 735, #208
 * Added support PEP 639, #210
-* Renamed `testing` extra to `test`, #212
+* Renamed ``testing`` extra to ``test``, #212
 * General updates in CI setup
 
 Version 0.20
