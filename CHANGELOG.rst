@@ -6,9 +6,15 @@ Changelog
    Development Version
    ====================
 
+Version 0.21
+============
+* Added support PEP 735, #208
+* Added support PEP 639, #210
+* Renamed `testing` extra to `test`, #212
+* General updates in CI setup
+
 Version 0.20
 ============
-
 - ``setuptools`` plugin:
    * Update ``setuptools.schema.json``, #206
 
