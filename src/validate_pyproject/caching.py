@@ -7,7 +7,7 @@ import os
 from pathlib import Path
 from typing import Callable, Optional, Union
 
-PathLike = Union[str, os.PathLike]
+PathLike = Union[str, "os.PathLike[str]"]
 _logger = logging.getLogger(__name__)
 
 
