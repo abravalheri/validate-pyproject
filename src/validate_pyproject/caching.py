@@ -7,7 +7,7 @@ import os
 from pathlib import Path
 from typing import Callable, Optional, Union
 
-PathLike = Union[str, os.PathLike]
+PathLike = Union[str, "os.PathLike[str]"]
 _logger = logging.getLogger(__name__)
 
 
@@ -44,5 +44,5 @@ def path_for(arbitrary_id: str, cache: Optional[PathLike] = None) -> Optional[Pa
     escaped = "".join(c if c.isalnum() else "-" for c in arbitrary_id)
     sha1 = hashlib.sha1(arbitrary_id.encode())  # noqa: S324
     # ^-- Non-crypto context and appending `escaped` should minimise collisions
-    return Path(os.path.expanduser(cache_dir), f"{sha1.hexdigest()}-{escaped}")
+    return Path(os.path.expanduser(cache_dir)) / f"{sha1.hexdigest()}-{escaped}"
     # ^-- Intentionally uses `os.path` instead of `pathlib` to avoid exception

@@ -89,7 +89,7 @@ def iterate_entry_points(group: str = ENTRYPOINT_GROUP) -> Iterable[EntryPoint]:
     else:  # pragma: no cover
         # TODO: Once Python 3.10 becomes the oldest version supported, this fallback and
         #       conditional statement can be removed.
-        entries_ = (plugin for plugin in entries.get(group, []))
+        entries_ = (plugin for plugin in entries.get(group, []))  # type: ignore[attr-defined]
     deduplicated = {
         e.name: e for e in sorted(entries_, key=lambda e: (e.name, e.value))
     }

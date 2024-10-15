@@ -16,6 +16,8 @@ import typing
 from itertools import chain as _chain
 
 if typing.TYPE_CHECKING:
+    from collections.abc import Iterable
+
     from typing_extensions import Literal
 
 _logger = logging.getLogger(__name__)
@@ -354,7 +356,9 @@ def python_entrypoint_reference(value: str) -> bool:
         obj = rest
 
     module_parts = module.split(".")
-    identifiers = _chain(module_parts, obj.split(".")) if rest else module_parts
+    identifiers: Iterable[str] = (
+        _chain(module_parts, obj.split(".")) if rest else module_parts
+    )
     return all(python_identifier(i.strip()) for i in identifiers)
 
 

@@ -87,7 +87,7 @@ disallow_any_generics = false
 disallow_subclassing_any = false
 
 [[tool.mypy.overrides]]
-module = ["fastjsonschema"]
+module = ["fastjsonschema", "setuptools._vendor.packaging"]
 ignore_missing_imports = true
 
 [tool.repo-review]
