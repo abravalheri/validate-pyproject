@@ -67,9 +67,7 @@ def validate_include_depenency(pyproject: T) -> T:
             ):
                 raise IncludedDependencyGroupMustExist(
                     message=f"The included dependency group {include_group} doesn't exist",
-                    value={
-                        "field": include_group,
-                    },
+                    value=each,
                     name=f"data.dependency_groups.{key}",
                     definition={
                         "description": cleandoc(IncludedDependencyGroupMustExist._DESC),
