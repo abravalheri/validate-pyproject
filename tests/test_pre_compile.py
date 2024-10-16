@@ -15,7 +15,7 @@ from validate_pyproject.pre_compile import cli, pre_compile
 
 from .helpers import error_file, get_tools, get_tools_as_args
 
-MAIN_FILE = "hello_world.py"  # Let's use something different that `__init__.py`
+MAIN_FILE = "hello_world.py"  # Let's use something different than `__init__.py`
 
 
 def _pre_compile_checks(path: Path):
