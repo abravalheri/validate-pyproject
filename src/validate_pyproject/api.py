@@ -246,7 +246,9 @@ class Validator:
     def generated_code(self) -> str:
         if self._code_cache is None:
             fmts = dict(self.formats)
-            self._code_cache = FJS.compile_to_code(self.schema, self.handlers, fmts)
+            self._code_cache = FJS.compile_to_code(
+                self.schema, self.handlers, fmts, use_default=False
+            )
 
         return self._code_cache
 
@@ -259,7 +261,9 @@ class Validator:
         and raises an exception when it is not a valid.
         """
         if self._cache is None:
-            compiled = FJS.compile(self.schema, self.handlers, dict(self.formats))
+            compiled = FJS.compile(
+                self.schema, self.handlers, dict(self.formats), use_default=False
+            )
             fn = partial(compiled, custom_formats=self._format_validators)
             self._cache = typing.cast(ValidationFn, fn)
 

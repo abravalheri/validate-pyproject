@@ -1,3 +1,4 @@
+import copy
 import logging
 from pathlib import Path
 
@@ -14,8 +15,10 @@ def test_examples_api(example: Path) -> None:
     load_tools = get_tools(example)
 
     toml_equivalent = tomllib.loads(example.read_text())
+    copy_toml = copy.deepcopy(toml_equivalent)
     validator = api.Validator(extra_plugins=load_tools)
     assert validator(toml_equivalent) is not None
+    assert toml_equivalent == copy_toml
 
 
 def test_examples_cli(example: Path) -> None:
