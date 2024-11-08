@@ -379,13 +379,7 @@ def int(value: builtins.int) -> bool:
 
 
 try:
-    try:
-        from packaging import licenses as _licenses
-    except ImportError:  # pragma: no cover
-        # let's try setuptools vendored version
-        from setuptools._vendor.packaging import (  # type: ignore[no-redef]
-            licenses as _licenses,
-        )
+    from packaging import licenses as _licenses
 
     def SPDX(value: str) -> bool:
         """See :ref:`PyPA's license specifiers <pypa:#license>`
