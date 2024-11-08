@@ -393,9 +393,9 @@ try:
 
 except ImportError:  # pragma: no cover
     _logger.warning(
-        "Could not find an installation of `packaging`. License expressions "
-        "might not be validated. "
-        "To enforce validation, please install `packaging`."
+        "Could not find an up-to-date installation of `packaging`. "
+        "License expressions might not be validated. "
+        "To enforce validation, please install `packaging>=24.2`."
     )
 
     def SPDX(value: str) -> bool:
