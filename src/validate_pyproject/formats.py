@@ -382,8 +382,8 @@ try:
     from packaging import licenses as _licenses
 
     def SPDX(value: str) -> bool:
-        """See ``license`` in the :ref:`PyPA's pyproject project metadata specification
-        <pypa:pyproject-project-table>` (amended in :pep:`639`).
+        """See :ref:`PyPA's License-Expression specification
+        <pypa:core-metadata-license-expression>` (added in :pep:`639`).
         """
         try:
             _licenses.canonicalize_license_expression(value)
