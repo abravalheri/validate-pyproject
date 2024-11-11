@@ -30,7 +30,7 @@ Download = "https://pypi.org/project/validate-pyproject/#files"
 
 [project.optional-dependencies]
 all = [
-    "packaging>=20.4",
+    "packaging>=24.2",
     "tomli>=1.2.1; python_version<'3.11'",
     "trove-classifiers>=2021.10.20",
 ]

@@ -378,7 +378,25 @@ def int(value: builtins.int) -> bool:
     return -(2**63) <= value < 2**63
 
 
-def SPDX(value: str) -> bool:
-    """Should validate eventually"""
-    # TODO: validate conditional to the presence of (the right version) of packaging
-    return True
+try:
+    from packaging import licenses as _licenses
+
+    def SPDX(value: str) -> bool:
+        """See :ref:`PyPA's License-Expression specification
+        <pypa:core-metadata-license-expression>` (added in :pep:`639`).
+        """
+        try:
+            _licenses.canonicalize_license_expression(value)
+            return True
+        except _licenses.InvalidLicenseExpression:
+            return False
+
+except ImportError:  # pragma: no cover
+    _logger.warning(
+        "Could not find an up-to-date installation of `packaging`. "
+        "License expressions might not be validated. "
+        "To enforce validation, please install `packaging>=24.2`."
+    )
+
+    def SPDX(value: str) -> bool:
+        return True

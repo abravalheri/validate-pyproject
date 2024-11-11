@@ -293,6 +293,54 @@ def test_invalid_module_name_relaxed(example):
     assert formats.python_module_name_relaxed(example) is False
 
 
+@pytest.mark.parametrize(
+    "example",
+    [
+        "MIT",
+        "Bsd-3-clause",
+        "mit and (apache-2.0 or bsd-2-clause)",
+        "MIT OR GPL-2.0-or-later OR (FSFUL AND BSD-2-Clause)",
+        "GPL-3.0-only WITH Classpath-exception-2.0 OR BSD-3-Clause",
+        "LicenseRef-Special-License OR CC0-1.0 OR Unlicense",
+        "LicenseRef-Public-Domain",
+        "licenseref-proprietary",
+        "LicenseRef-Beerware-4.2",
+        "(LicenseRef-Special-License OR LicenseRef-OtherLicense) OR Unlicense",
+    ],
+)
+def test_valid_pep639_license_expression(example):
+    assert formats.SPDX(example) is True
+
+
+@pytest.mark.parametrize(
+    "example",
+    [
+        "",
+        "Use-it-after-midnight",
+        "LicenseRef-License with spaces",
+        "LicenseRef-License_with_underscores",
+        "or",
+        "and",
+        "with",
+        "mit or",
+        "mit and",
+        "mit with",
+        "or mit",
+        "and mit",
+        "with mit",
+        "(mit",
+        "mit)",
+        "mit or or apache-2.0",
+        # Missing an operator before `(`.
+        "mit or apache-2.0 (bsd-3-clause and MPL-2.0)",
+        # "2-BSD-Clause is not a valid license.
+        "Apache-2.0 OR 2-BSD-Clause",
+    ],
+)
+def test_invalid_pep639_license_expression(example):
+    assert formats.SPDX(example) is False
+
+
 class TestClassifiers:
     """The ``_TroveClassifier`` class and ``_download_classifiers`` are part of the
     private API and therefore need to be tested.
