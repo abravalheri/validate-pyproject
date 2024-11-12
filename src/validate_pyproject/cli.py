@@ -161,7 +161,7 @@ def parse_args(
 
     parser.add_argument('--normalized-pep440', default=False, action='store_true',
                         dest='normalized_pep440',
-                        help='require all optional deps and check everything is normalized, for example, pep440 version')
+                        help='require all pep440 to be normalized')
 
     parser.set_defaults(loglevel=logging.WARNING)
     params = vars(parser.parse_args(args))
