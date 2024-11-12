@@ -69,7 +69,7 @@ def normalized_pep440(version: str) -> bool:
     if _version is None:
         raise ValueError("--normalized-pep440 flags require packaging installed")
     if str(_version.parse(version)) != version:
-        raise ValueError(f'{version} is not normalized pep440 version')
+        raise ValueError(f"{version} is not normalized pep440 version")
     return True
 
 
@@ -166,8 +166,7 @@ def _download_classifiers() -> str:
     with urlopen(url, context=context) as response:  # noqa: S310 (audit URLs)
         headers = Message()
         headers["content_type"] = response.getheader("content-type", "text/plain")
-        return response.read().decode(
-            headers.get_param("charset", "utf-8"))  # type: ignore[no-any-return]
+        return response.read().decode(headers.get_param("charset", "utf-8"))  # type: ignore[no-any-return]
 
 
 class _TroveClassifier:
@@ -353,19 +352,19 @@ def python_entrypoint_reference(value: str) -> bool:
 
 def uint8(value: builtins.int) -> bool:
     r"""Unsigned 8-bit integer (:math:`0 \leq x < 2^8`)"""
-    return 0 <= value < 2 ** 8
+    return 0 <= value < 2**8
 
 
 def uint16(value: builtins.int) -> bool:
     r"""Unsigned 16-bit integer (:math:`0 \leq x < 2^{16}`)"""
-    return 0 <= value < 2 ** 16
+    return 0 <= value < 2**16
 
 
 def uint(value: builtins.int) -> bool:
     r"""Unsigned 64-bit integer (:math:`0 \leq x < 2^{64}`)"""
-    return 0 <= value < 2 ** 64
+    return 0 <= value < 2**64
 
 
 def int(value: builtins.int) -> bool:
     r"""Signed 64-bit integer (:math:`-2^{63} \leq x < 2^{63}`)"""
-    return -(2 ** 63) <= value < 2 ** 63
+    return -(2**63) <= value < 2**63

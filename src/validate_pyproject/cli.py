@@ -29,7 +29,7 @@ from typing import (
 
 from . import __version__, formats
 from . import _tomllib as tomllib
-from .api import Validator, FORMAT_FUNCTIONS
+from .api import FORMAT_FUNCTIONS, Validator
 from .errors import ValidationError
 from .plugins import PluginWrapper
 from .plugins import list_from_entry_points as list_plugins_from_entry_points
@@ -111,7 +111,7 @@ META: Dict[str, dict] = {
     "store": dict(
         flags=("--store",),
         help="Load a pyproject.json file and read all the $ref's into tools "
-             "(see https://json.schemastore.org/pyproject.json)",
+        "(see https://json.schemastore.org/pyproject.json)",
     ),
 }
 
@@ -159,9 +159,13 @@ def parse_args(
     for cli_opts in get_parser_spec(plugins).values():
         parser.add_argument(*cli_opts.pop("flags", ()), **cli_opts)
 
-    parser.add_argument('--normalized-pep440', default=False, action='store_true',
-                        dest='normalized_pep440',
-                        help='require all pep440 to be normalized')
+    parser.add_argument(
+        "--normalized-pep440",
+        default=False,
+        action="store_true",
+        dest="normalized_pep440",
+        help="require all pep440 to be normalized",
+    )
 
     parser.set_defaults(loglevel=logging.WARNING)
     params = vars(parser.parse_args(args))
@@ -170,7 +174,7 @@ def parse_args(
     params["tool"] = params["tool"] or []
     params["store"] = params["store"] or ""
     params["plugins"] = select_plugins(plugins, enabled, disabled)
-    params['normalized_pep440'] = params.pop('normalized_pep440', False)
+    params["normalized_pep440"] = params.pop("normalized_pep440", False)
     return params_class(**params)  # type: ignore[call-overload, no-any-return]
 
 
@@ -235,10 +239,12 @@ def run(args: Sequence[str] = ()) -> int:
     format_validators = FORMAT_FUNCTIONS
     if params.normalized_pep440:
         format_validators = MappingProxyType(
-            FORMAT_FUNCTIONS | {'pep440': formats.normalized_pep440})
+            FORMAT_FUNCTIONS | {"pep440": formats.normalized_pep440}
+        )
 
-    validator = Validator(params.plugins, extra_plugins=tool_plugins,
-                          format_validators=format_validators)
+    validator = Validator(
+        params.plugins, extra_plugins=tool_plugins, format_validators=format_validators
+    )
 
     exceptions = _ExceptionGroup()
     for file in params.input_file:
