@@ -7,8 +7,10 @@ try:  # pragma: no cover
         from tomli import TOMLDecodeError, loads
 except ImportError:  # pragma: no cover
     try:
-        from toml import TomlDecodeError as TOMLDecodeError  # type: ignore
-        from toml import loads  # type: ignore
+        from toml import (  # type: ignore[no-redef,import-untyped]
+            TomlDecodeError as TOMLDecodeError,
+        )
+        from toml import loads  # type: ignore[no-redef]
     except ImportError as ex:
         raise ImportError("Please install `tomli` (TOML parser)") from ex
 

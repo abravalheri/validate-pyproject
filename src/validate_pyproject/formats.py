@@ -99,7 +99,9 @@ try:
         from packaging import requirements as _req
     except ImportError:  # pragma: no cover
         # let's try setuptools vendored version
-        from setuptools._vendor.packaging import requirements as _req  # type: ignore
+        from setuptools._vendor.packaging import (  # type: ignore[no-redef]
+            requirements as _req,
+        )
 
     def pep508(value: str) -> bool:
         """See :ref:`PyPA's dependency specifiers <pypa:dependency-specifiers>`
@@ -178,12 +180,15 @@ class _TroveClassifier:
     """
 
     downloaded: typing.Union[None, "Literal[False]", typing.Set[str]]
+    """
+    None => not cached yet
+    False => unavailable
+    set => cached values
+    """
 
     def __init__(self) -> None:
         self.downloaded = None
         self._skip_download = False
-        # None => not cached yet
-        # False => cache not available
         self.__name__ = "trove_classifier"  # Emulate a public function
 
     def _disable_download(self) -> None:
@@ -305,6 +310,25 @@ def python_module_name(value: str) -> bool:
     return python_qualified_identifier(value)
 
 
+def python_module_name_relaxed(value: str) -> bool:
+    """Similar to :obj:`python_module_name`, but relaxed to also accept
+    dash characters (``-``) and cover special cases like ``pip-run``.
+
+    It is recommended, however, that beginners avoid dash characters,
+    as they require advanced knowledge about Python internals.
+
+    The following are disallowed:
+
+    * names starting/ending in dashes,
+    * names ending in ``-stubs`` (potentially collide with :obj:`pep561_stub_name`).
+    """
+    if value.startswith("-") or value.endswith("-"):
+        return False
+    if value.endswith("-stubs"):
+        return False  # Avoid collision with PEP 561
+    return python_module_name(value.replace("-", "_"))
+
+
 def python_entrypoint_group(value: str) -> bool:
     """See ``Data model > group`` in the :ref:`PyPA's entry-points specification
     <pypa:entry-points>`.
@@ -346,7 +370,7 @@ def python_entrypoint_reference(value: str) -> bool:
         obj = rest
 
     module_parts = module.split(".")
-    identifiers = _chain(module_parts, obj.split(".")) if rest else module_parts
+    identifiers = _chain(module_parts, obj.split(".")) if rest else iter(module_parts)
     return all(python_identifier(i.strip()) for i in identifiers)
 
 
@@ -368,3 +392,27 @@ def uint(value: builtins.int) -> bool:
 def int(value: builtins.int) -> bool:
     r"""Signed 64-bit integer (:math:`-2^{63} \leq x < 2^{63}`)"""
     return -(2**63) <= value < 2**63
+
+
+try:
+    from packaging import licenses as _licenses
+
+    def SPDX(value: str) -> bool:
+        """See :ref:`PyPA's License-Expression specification
+        <pypa:core-metadata-license-expression>` (added in :pep:`639`).
+        """
+        try:
+            _licenses.canonicalize_license_expression(value)
+            return True
+        except _licenses.InvalidLicenseExpression:
+            return False
+
+except ImportError:  # pragma: no cover
+    _logger.warning(
+        "Could not find an up-to-date installation of `packaging`. "
+        "License expressions might not be validated. "
+        "To enforce validation, please install `packaging>=24.2`."
+    )
+
+    def SPDX(value: str) -> bool:
+        return True

@@ -38,7 +38,7 @@ def download(url):
 
 def download_all(cache: str):
     with ThreadPoolExecutor(max_workers=5) as executor:
-        executor.map(download, set(iter_test_urls()))
+        return list(executor.map(download, set(iter_test_urls())))  # Consume iterator
 
 
 if __name__ == "__main__":
@@ -47,4 +47,7 @@ if __name__ == "__main__":
         raise SystemExit("Please define VALIDATE_PYPROJECT_CACHE_REMOTE")
 
     Path(cache).mkdir(parents=True, exist_ok=True)
-    download_all(cache)
+    downloads = download_all(cache)
+    assert len(downloads) > 0, f"empty {downloads=!r}"  # noqa
+    files = list(map(print, Path(cache).iterdir()))
+    assert len(files) > 0, f"empty {files=!r}"  # noqa

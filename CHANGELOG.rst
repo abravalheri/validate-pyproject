@@ -6,11 +6,34 @@ Changelog
    Development Version
    ====================
 
-Version 0.16
+Version 0.21
 ============
-- Allow overwriting schemas referring to the same ``tool``, #175.
+* Added support PEP 735, #208
+* Added support PEP 639, #210
+* Renamed ``testing`` extra to ``test``, #212
+* General updates in CI setup
 
-Version 0.16
+Version 0.20
+============
+- ``setuptools`` plugin:
+   * Update ``setuptools.schema.json``, #206
+
+Maintenance and Minor Changes
+-----------------------------
+- Fix misplaced comments on ``formats.py``, #184
+- Adopt ``--import-mode=importlib`` for pytest to prevent errors with ``importlib.metadata``, #203
+- Update CI configs, #195 #202, #204, #205
+
+Version 0.19
+============
+- Relax requirements about module names to also allow dash characters, #164
+- Migrate metadata to ``pyproject.toml`` , #192
+
+Version 0.18
+============
+- Allow overwriting schemas referring to the same ``tool``, #175
+
+Version 0.17
 ============
 - Update version regex according to latest packaging version, #153
 - Remove duplicate ``# ruff: noqa``, #158

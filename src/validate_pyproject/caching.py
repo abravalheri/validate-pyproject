@@ -7,7 +7,7 @@ import os
 from pathlib import Path
 from typing import Callable, Optional, Union
 
-PathLike = Union[str, os.PathLike]
+PathLike = Union[str, "os.PathLike[str]"]
 _logger = logging.getLogger(__name__)
 
 
@@ -33,7 +33,7 @@ def as_file(
             cache_path.write_text(f.getvalue(), encoding="utf-8")
             _logger.debug(f"Caching {arg} into {cache_path}")
 
-    return open(cache_path, "rb")  # noqa: SIM115 -- not relevant
+    return open(cache_path, "rb")
 
 
 def path_for(arbitrary_id: str, cache: Optional[PathLike] = None) -> Optional[Path]:

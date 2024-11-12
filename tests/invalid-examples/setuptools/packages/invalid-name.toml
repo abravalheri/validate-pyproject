@@ -9,4 +9,4 @@ version = "0.0.0"
 
 [tool.setuptools]
 platforms = ["any"]
-packages = ["not-an-identifier"]
+packages = ["-not-a-valid-name"]
