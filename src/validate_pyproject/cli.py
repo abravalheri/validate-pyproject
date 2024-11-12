@@ -13,6 +13,7 @@ import sys
 from contextlib import contextmanager
 from itertools import chain
 from textwrap import dedent, wrap
+from types import MappingProxyType
 from typing import (
     Callable,
     Dict,
@@ -26,9 +27,9 @@ from typing import (
     TypeVar,
 )
 
-from . import __version__
+from . import __version__, formats
 from . import _tomllib as tomllib
-from .api import Validator
+from .api import Validator, FORMAT_FUNCTIONS
 from .errors import ValidationError
 from .plugins import PluginWrapper
 from .plugins import list_from_entry_points as list_plugins_from_entry_points
@@ -110,7 +111,7 @@ META: Dict[str, dict] = {
     "store": dict(
         flags=("--store",),
         help="Load a pyproject.json file and read all the $ref's into tools "
-        "(see https://json.schemastore.org/pyproject.json)",
+             "(see https://json.schemastore.org/pyproject.json)",
     ),
 }
 
@@ -122,6 +123,7 @@ class CliParams(NamedTuple):
     store: str
     loglevel: int = logging.WARNING
     dump_json: bool = False
+    normalized_pep440: bool = False
 
 
 def __meta__(plugins: Sequence[PluginWrapper]) -> Dict[str, dict]:
@@ -157,6 +159,10 @@ def parse_args(
     for cli_opts in get_parser_spec(plugins).values():
         parser.add_argument(*cli_opts.pop("flags", ()), **cli_opts)
 
+    parser.add_argument('--normalized-pep440', default=False, action='store_true',
+                        dest='normalized_pep440',
+                        help='require all optional deps and check everything is normalized, for example, pep440 version')
+
     parser.set_defaults(loglevel=logging.WARNING)
     params = vars(parser.parse_args(args))
     enabled = params.pop("enable", ())
@@ -164,6 +170,7 @@ def parse_args(
     params["tool"] = params["tool"] or []
     params["store"] = params["store"] or ""
     params["plugins"] = select_plugins(plugins, enabled, disabled)
+    params['normalized_pep440'] = params.pop('normalized_pep440', False)
     return params_class(**params)  # type: ignore[call-overload, no-any-return]
 
 
@@ -225,7 +232,13 @@ def run(args: Sequence[str] = ()) -> int:
     tool_plugins = [RemotePlugin.from_str(t) for t in params.tool]
     if params.store:
         tool_plugins.extend(load_store(params.store))
-    validator = Validator(params.plugins, extra_plugins=tool_plugins)
+    format_validators = FORMAT_FUNCTIONS
+    if params.normalized_pep440:
+        format_validators = MappingProxyType(
+            FORMAT_FUNCTIONS | {'pep440': formats.normalized_pep440})
+
+    validator = Validator(params.plugins, extra_plugins=tool_plugins,
+                          format_validators=format_validators)
 
     exceptions = _ExceptionGroup()
     for file in params.input_file:

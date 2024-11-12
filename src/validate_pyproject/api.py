@@ -32,7 +32,6 @@ _logger = logging.getLogger(__name__)
 if typing.TYPE_CHECKING:  # pragma: no cover
     from .plugins import PluginProtocol
 
-
 try:  # pragma: no cover
     from importlib.resources import files
 
@@ -42,7 +41,6 @@ try:  # pragma: no cover
 
 except ImportError:  # pragma: no cover
     from importlib.resources import read_text
-
 
 T = TypeVar("T", bound=Mapping)
 AllPlugins = Enum("AllPlugins", "ALL_PLUGINS")  #: :meta private:
