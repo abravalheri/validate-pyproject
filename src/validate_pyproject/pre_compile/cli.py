@@ -83,6 +83,7 @@ class CliParams(NamedTuple):
     loglevel: int = logging.WARNING
     tool: Sequence[str] = ()
     store: str = ""
+    normalized_pep440: bool = False
 
 
 def parser_spec(plugins: Sequence[PluginWrapper]) -> Dict[str, dict]:
