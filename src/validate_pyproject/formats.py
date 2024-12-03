@@ -18,7 +18,7 @@ from itertools import chain as _chain
 try:
     from packaging import version as _version
 except ImportError:  # pragma: no cover
-    _version = None
+    _version = None  # type: ignore
 
 if typing.TYPE_CHECKING:
     from typing_extensions import Literal
