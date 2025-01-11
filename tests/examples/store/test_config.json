@@ -1,3 +1,6 @@
 {
-    "store": "https://json.schemastore.org/pyproject.json"
+    "store": "https://json.schemastore.org/pyproject.json",
+    "tools": {
+        "pdm-dockerize": "https://json.schemastore.org/partial-pdm-dockerize.json"
+    }
 }
