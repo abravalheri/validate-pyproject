@@ -76,8 +76,10 @@ addopts = """
 """
 norecursedirs = ["dist", "build", ".*"]
 testpaths = ["src", "tests"]
+log_cli_level = "info"
 
 [tool.mypy]
+python_version = "3.8"
 enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
 show_traceback = true
 warn_unreachable = true
