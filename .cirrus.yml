@@ -78,7 +78,7 @@ build_task:
   container: {image: "python:3.11-bullseye"}
   clone_script: *clone
   <<: *task-template
-  install_script: pip install tox
+  install_script: pip install tox tox-uv
   build_script:
     - tox -e clean,lint,typecheck,build
     - tar czf dist.tar.gz dist
@@ -102,7 +102,7 @@ linux_task:
       container: {image: "python:3.13-rc-bookworm"}
       allow_failures: true  # RC
   install_script:
-    - python -m pip install --upgrade pip tox pipx
+    - python -m pip install --upgrade pip tox tox-uv pipx
   <<: *test-template
   alias: base-test
 
@@ -149,7 +149,7 @@ windows_task:
     - choco install -y --no-progress python3 --version=3.12.5 --params "/NoLockdown"
     - choco install -y --no-progress curl
     - pip install --upgrade certifi
-    - python -m pip install -U pip tox pipx
+    - python -m pip install -U pip tox tox-uv pipx
   <<: *test-template
   depends_on: [build, base-test]
 
@@ -168,7 +168,7 @@ linkcheck_task:
   depends_on: [finalize]
   allow_failures: true
   <<: *task-template
-  install_script: pip install tox
+  install_script: pip install tox tox-uv
   download_artifact_script: *download-artifact
   linkcheck_script: tox --installpkg dist/*.whl -e linkcheck -- -q
 
