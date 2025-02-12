@@ -2,4 +2,3 @@
 name = "example"
 version = "1.2.3"
 sbom-files = ["sboms/bom.cdx.json", "sboms/*"]
-
