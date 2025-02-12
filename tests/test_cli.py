@@ -201,7 +201,7 @@ def test_bad_url(tmp_path, capsys):
 def test_bad_extra_url(tmp_path, capsys):
     example = write_example(tmp_path, name="valid-pyproject.toml")
     with pytest.raises(ValueError, match="URL must start with 'http:' or 'https:'"):
-        cli.run(["--extra", "file://json.schemastore.org/poetry.toml", str(example)])
+        cli.run(["--tool", "=file://json.schemastore.org/poetry.toml", str(example)])
 
 
 @pytest.mark.skipif(sys.version_info[:2] < (3, 11), reason="requires 3.11+")

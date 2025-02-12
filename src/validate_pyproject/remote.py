@@ -2,7 +2,7 @@ import json
 import logging
 import typing
 import urllib.parse
-from typing import Generator, Optional, Tuple, Union
+from typing import Generator, Optional, Tuple
 
 from . import caching, errors, http
 from .types import Schema
@@ -58,23 +58,7 @@ class RemotePlugin:
         return cls.from_url(tool, url)
 
 
-class ExtraRemotePlugin:
-    def __init__(self, *, schema: Schema, fragment: str = ""):
-        self.tool = None
-        self.schema = schema
-        self.fragment = fragment
-        self.id = self.schema["$id"]
-        self.help_text = f"extra: <external> ({self.id})"
-
-    @classmethod
-    def from_url(cls, url: str) -> "Self":
-        fragment, schema = load_from_uri(url)
-        return cls(schema=schema, fragment=fragment)
-
-
-def load_store(
-    pyproject_url: str,
-) -> Generator[Union[RemotePlugin, ExtraRemotePlugin], None, None]:
+def load_store(pyproject_url: str) -> Generator[RemotePlugin, None, None]:
     """
     Takes a URL / Path and loads the tool table, assuming it is a set of ref's.
     Currently ignores "inline" sections. This is the format that SchemaStore
@@ -97,7 +81,7 @@ def load_store(
             for values in rp.schema["properties"].values():
                 url = values.get("$ref", "")
                 if url.startswith(("https://", "https://")):
-                    yield ExtraRemotePlugin.from_url(url)
+                    yield RemotePlugin.from_url("", url)
         else:
             _logger.warning(f"{tool!r} does not contain $ref")  # pragma: no cover
 
@@ -105,5 +89,4 @@ def load_store(
 if typing.TYPE_CHECKING:
     from .plugins import PluginProtocol
 
-    _1: PluginProtocol = typing.cast(RemotePlugin, None)
-    _2: PluginProtocol = typing.cast(ExtraRemotePlugin, None)
+    _: PluginProtocol = typing.cast(RemotePlugin, None)

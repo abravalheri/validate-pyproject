@@ -113,7 +113,7 @@ class SchemaRegistry(Mapping[str, Schema]):
 
         # Add tools using Plugins
         for plugin in plugins:
-            if plugin.tool is not None:
+            if plugin.tool:
                 allow_overwrite: Optional[str] = None
                 if plugin.tool in tool_properties:
                     _logger.warning(
@@ -150,7 +150,7 @@ class SchemaRegistry(Mapping[str, Schema]):
 
     def _ensure_compatibility(
         self,
-        reference: Optional[str],
+        reference: str,
         schema: Schema,
         allow_overwrite: Optional[str] = None,
     ) -> Schema:

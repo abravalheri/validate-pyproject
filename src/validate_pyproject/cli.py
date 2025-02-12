@@ -30,9 +30,9 @@ from . import __version__
 from . import _tomllib as tomllib
 from .api import Validator
 from .errors import ValidationError
-from .plugins import PluginProtocol, PluginWrapper
+from .plugins import PluginWrapper
 from .plugins import list_from_entry_points as list_plugins_from_entry_points
-from .remote import ExtraRemotePlugin, RemotePlugin, load_store
+from .remote import RemotePlugin, load_store
 
 _logger = logging.getLogger(__package__)
 T = TypeVar("T", bound=NamedTuple)
@@ -105,12 +105,7 @@ META: Dict[str, dict] = {
         flags=("-t", "--tool"),
         action="append",
         dest="tool",
-        help="External tools file/url(s) to load, of the form name=URL#path",
-    ),
-    "extra": dict(
-        flags=("--extra",),
-        action="append",
-        help="Extra schema files to load",
+        help="External tools file/url(s) to load, of the form name=URL#path, name can be empty",
     ),
     "store": dict(
         flags=("--store",),
@@ -124,7 +119,6 @@ class CliParams(NamedTuple):
     input_file: List[io.TextIOBase]
     plugins: List[PluginWrapper]
     tool: List[str]
-    extra: List[str]
     store: str
     loglevel: int = logging.WARNING
     dump_json: bool = False
@@ -168,7 +162,6 @@ def parse_args(
     enabled = params.pop("enable", ())
     disabled = params.pop("disable", ())
     params["tool"] = params["tool"] or []
-    params["extra"] = params["extra"] or []
     params["store"] = params["store"] or ""
     params["plugins"] = select_plugins(plugins, enabled, disabled)
     return params_class(**params)  # type: ignore[call-overload, no-any-return]
@@ -229,8 +222,7 @@ def run(args: Sequence[str] = ()) -> int:
     plugins: List[PluginWrapper] = list_plugins_from_entry_points()
     params: CliParams = parse_args(args, plugins)
     setup_logging(params.loglevel)
-    tool_plugins: List[PluginProtocol] = [RemotePlugin.from_str(t) for t in params.tool]
-    tool_plugins.extend(ExtraRemotePlugin.from_url(e) for e in params.extra)
+    tool_plugins = [RemotePlugin.from_str(t) for t in params.tool]
     if params.store:
         tool_plugins.extend(load_store(params.store))
     validator = Validator(params.plugins, extra_plugins=tool_plugins)

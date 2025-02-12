@@ -12,7 +12,7 @@ from typing import Any, Dict, List, Mapping, NamedTuple, Sequence
 from .. import cli
 from ..plugins import PluginProtocol, PluginWrapper
 from ..plugins import list_from_entry_points as list_plugins_from_entry_points
-from ..remote import ExtraRemotePlugin, RemotePlugin, load_store
+from ..remote import RemotePlugin, load_store
 from . import pre_compile
 
 if sys.platform == "win32":  # pragma: no cover
@@ -58,13 +58,7 @@ META: Dict[str, dict] = {
         flags=("-t", "--tool"),
         action="append",
         dest="tool",
-        help="External tools file/url(s) to load, of the form name=URL#path",
-    ),
-    "extra": dict(
-        flags=("--extra",),
-        action="append",
-        dest="extra",
-        help="External schema file/url(s) to load, of the form URL#path",
+        help="External tools file/url(s) to load, of the form name=URL#path, name can be empty",
     ),
     "store": dict(
         flags=("--store",),
@@ -88,7 +82,6 @@ class CliParams(NamedTuple):
     replacements: Mapping[str, str] = MappingProxyType({})
     loglevel: int = logging.WARNING
     tool: Sequence[str] = ()
-    extra: Sequence[str] = ()
     store: str = ""
 
 
@@ -109,7 +102,6 @@ def run(args: Sequence[str] = ()) -> int:
     cli.setup_logging(prms.loglevel)
 
     tool_plugins: List[PluginProtocol] = [RemotePlugin.from_str(t) for t in prms.tool]
-    tool_plugins.extend(ExtraRemotePlugin.from_url(e) for e in prms.extra)
     if prms.store:
         tool_plugins.extend(load_store(prms.store))
 
