@@ -144,6 +144,13 @@
         "type": "string"
       }
     },
+    "sbom-files": {
+      "description": "Paths or globs to paths of Software Bill-of-Materials files",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
     "authors": {
       "type": "array",
       "items": {"$ref": "#/definitions/author"},
@@ -247,6 +254,7 @@
           "requires-python",
           "license",
           "license-files",
+          "sbom-files",
           "authors",
           "maintainers",
           "keywords",
