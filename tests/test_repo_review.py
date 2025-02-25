@@ -45,9 +45,9 @@ def test_valid_example(repo_review_processor, name: str) -> None:
 @pytest.mark.parametrize("name", ["pdm/invalid-version", "pdm/redefining-as-dynamic"])
 def test_invalid_example(repo_review_processor, name: str) -> None:
     processed = repo_review_processor.process(INVALID_EXAMPLES / name)
-    assert any(
-        not r.result and r.result is not None for r in processed.results
-    ), f"{processed.results}"
+    assert any(not r.result and r.result is not None for r in processed.results), (
+        f"{processed.results}"
+    )
 
 
 def test_no_distutils(repo_review_processor) -> None:
