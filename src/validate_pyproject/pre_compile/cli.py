@@ -58,7 +58,7 @@ META: Dict[str, dict] = {
         flags=("-t", "--tool"),
         action="append",
         dest="tool",
-        help="External tools file/url(s) to load, of the form name=URL#path, name can be empty",
+        help="External tools file/url(s) to load, of the form name=URL#path",
     ),
     "store": dict(
         flags=("--store",),
