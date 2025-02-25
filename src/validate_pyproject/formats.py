@@ -15,6 +15,11 @@ import string
 import typing
 from itertools import chain as _chain
 
+try:
+    from packaging import version as _version
+except ImportError:  # pragma: no cover
+    _version = None  # type: ignore[assignment]
+
 if typing.TYPE_CHECKING:
     from typing_extensions import Literal
 
@@ -55,6 +60,17 @@ VERSION_PATTERN = r"""
 """
 
 VERSION_REGEX = re.compile(r"^\s*" + VERSION_PATTERN + r"\s*$", re.X | re.I)
+
+
+def normalized_pep440(version: str) -> bool:
+    """See :ref:`PyPA's version specification <pypa:version-specifiers>`
+    (initially introduced in :pep:`440`).
+    """
+    if _version is None:
+        raise ValueError("--normalized-pep440 flags require packaging installed")
+    if str(_version.parse(version)) != version:
+        raise ValueError(f"{version} is not normalized pep440 version")
+    return True
 
 
 def pep440(version: str) -> bool:
