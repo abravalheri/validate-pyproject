@@ -127,7 +127,7 @@ macos_task:
 
 freebsd_task:
   name: test (freebsd - 3.11)
-  freebsd_instance: {image_family: freebsd-14-0}
+  freebsd_instance: {image_family: freebsd-14-2}
   install_script:
     - pkg remove -y python lang/python
     - pkg install -y git python311 py311-pip py311-gdbm py311-sqlite3 py311-tox py311-tomli py311-pipx

@@ -67,16 +67,23 @@ def load_store(pyproject_url: str) -> Generator[RemotePlugin, None, None]:
 
     fragment, contents = load_from_uri(pyproject_url)
     if fragment:
-        _logger.error(f"Must not be called with a fragment, got {fragment!r}")
+        _logger.error(
+            f"Must not be called with a fragment, got {fragment!r}"
+        )  # pragma: no cover
     table = contents["properties"]["tool"]["properties"]
     for tool, info in table.items():
         if tool in {"setuptools", "distutils"}:
             pass  # built-in
         elif "$ref" in info:
             _logger.info(f"Loading {tool} from store: {pyproject_url}")
-            yield RemotePlugin.from_url(tool, info["$ref"])
+            rp = RemotePlugin.from_url(tool, info["$ref"])
+            yield rp
+            for values in rp.schema["properties"].values():
+                url = values.get("$ref", "")
+                if url.startswith(("https://", "https://")):
+                    yield RemotePlugin.from_url("", url)
         else:
-            _logger.warning(f"{tool!r} does not contain $ref")
+            _logger.warning(f"{tool!r} does not contain $ref")  # pragma: no cover
 
 
 if typing.TYPE_CHECKING:

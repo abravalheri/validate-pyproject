@@ -4,6 +4,7 @@ Retrieve JSON schemas for validating dicts representing a ``pyproject.toml`` fil
 
 import json
 import logging
+import sys
 import typing
 from enum import Enum
 from functools import partial, reduce
@@ -33,15 +34,18 @@ if typing.TYPE_CHECKING:  # pragma: no cover
     from .plugins import PluginProtocol
 
 
-try:  # pragma: no cover
+if sys.version_info >= (3, 9):  # pragma: no cover
     from importlib.resources import files
 
     def read_text(package: Union[str, ModuleType], resource: str) -> str:
         """:meta private:"""
         return files(package).joinpath(resource).read_text(encoding="utf-8")
 
-except ImportError:  # pragma: no cover
-    from importlib.resources import read_text
+else:  # pragma: no cover
+    from importlib.resources import read_text as read_text  # noqa: PLC0414
+
+
+__all__ = ["Validator"]
 
 
 T = TypeVar("T", bound=Mapping)
@@ -109,19 +113,25 @@ class SchemaRegistry(Mapping[str, Schema]):
 
         # Add tools using Plugins
         for plugin in plugins:
-            allow_overwrite: Optional[str] = None
-            if plugin.tool in tool_properties:
-                _logger.warning(f"{plugin.id} overwrites `tool.{plugin.tool}` schema")
-                allow_overwrite = plugin.schema.get("$id")
+            if plugin.tool:
+                allow_overwrite: Optional[str] = None
+                if plugin.tool in tool_properties:
+                    _logger.warning(
+                        f"{plugin.id} overwrites `tool.{plugin.tool}` schema"
+                    )
+                    allow_overwrite = plugin.schema.get("$id")
+                else:
+                    _logger.info(f"{plugin.id} defines `tool.{plugin.tool}` schema")
+                compatible = self._ensure_compatibility(
+                    plugin.tool, plugin.schema, allow_overwrite
+                )
+                sid = compatible["$id"]
+                sref = f"{sid}#{plugin.fragment}" if plugin.fragment else sid
+                tool_properties[plugin.tool] = {"$ref": sref}
+                self._schemas[sid] = (f"tool.{plugin.tool}", plugin.id, plugin.schema)
             else:
-                _logger.info(f"{plugin.id} defines `tool.{plugin.tool}` schema")
-            compatible = self._ensure_compatibility(
-                plugin.tool, plugin.schema, allow_overwrite
-            )
-            sid = compatible["$id"]
-            sref = f"{sid}#{plugin.fragment}" if plugin.fragment else sid
-            tool_properties[plugin.tool] = {"$ref": sref}
-            self._schemas[sid] = (f"tool.{plugin.tool}", plugin.id, plugin.schema)
+                _logger.info(f"Extra schema: {plugin.id}")
+                self._schemas[plugin.id] = (plugin.id, plugin.id, plugin.schema)
 
         self._main_id: str = top_level["$id"]
         main_schema = Schema(top_level)
@@ -139,17 +149,22 @@ class SchemaRegistry(Mapping[str, Schema]):
         return self._main_id
 
     def _ensure_compatibility(
-        self, reference: str, schema: Schema, allow_overwrite: Optional[str] = None
+        self,
+        reference: str,
+        schema: Schema,
+        allow_overwrite: Optional[str] = None,
     ) -> Schema:
         if "$id" not in schema or not schema["$id"]:
-            raise errors.SchemaMissingId(reference)
+            raise errors.SchemaMissingId(reference or "<extra>")
         sid = schema["$id"]
         if sid in self._schemas and sid != allow_overwrite:
             raise errors.SchemaWithDuplicatedId(sid)
         version = schema.get("$schema")
         # Support schemas with missing trailing # (incorrect, but required before 0.15)
         if version and version.rstrip("#") != self.spec_version.rstrip("#"):
-            raise errors.InvalidSchemaVersion(reference, version, self.spec_version)
+            raise errors.InvalidSchemaVersion(
+                reference or sid, version, self.spec_version
+            )
         return schema
 
     def __getitem__(self, key: str) -> Schema:
