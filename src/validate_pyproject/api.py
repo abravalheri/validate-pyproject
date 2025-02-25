@@ -42,10 +42,10 @@ if sys.version_info >= (3, 9):  # pragma: no cover
         return files(package).joinpath(resource).read_text(encoding="utf-8")
 
 else:  # pragma: no cover
-    from importlib.resources import read_text
+    from importlib.resources import read_text as read_text  # noqa: PLC0414
 
 
-__all__ = ["read_text", "SchemaRegistry"]
+__all__ = ["Validator"]
 
 
 T = TypeVar("T", bound=Mapping)
