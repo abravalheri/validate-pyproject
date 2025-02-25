@@ -6,6 +6,18 @@ Changelog
    Development Version
    ====================
 
+Version 0.24
+============
+* Fix integration with SchemaStore by loading extra/side schemas by @henryiii, #226, #229
+
+Version 0.23
+============
+* Validate SPDX license expressions by @cdce8p in #217
+
+Version 0.22
+============
+* Prevent injecting defaults and modifying input in-place, by @henryiii in #213
+
 Version 0.21
 ============
 * Added support PEP 735, #208
