@@ -28,9 +28,9 @@ def repo_review_checks() -> Dict[str, VPP001]:
 
 def repo_review_families(pyproject: Dict[str, Any]) -> Dict[str, Dict[str, str]]:
     has_distutils = "distutils" in pyproject.get("tool", {})
-    plugin_names = (ep.name for ep in plugins.iterate_entry_points())
-    plugin_list = (
-        f"`[tool.{n}]`" for n in plugin_names if n != "distutils" or has_distutils
+    plugin_names = plugins.list_from_entry_points(
+        lambda e: e.name != "distutils" or has_distutils
     )
+    plugin_list = (f"`[tool.{n}]`" for n in plugin_names)
     descr = f"Checks `[build-system]`, `[project]`, {', '.join(plugin_list)}"
     return {"validate-pyproject": {"name": "Validate-PyProject", "description": descr}}

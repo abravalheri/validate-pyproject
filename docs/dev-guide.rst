@@ -89,7 +89,6 @@ can pass ``plugins=[]`` to the constructor; or, for example in the snippet
 above, we could have used ``plugins=...`` instead of ``extra_plugins=...``
 to ensure only the explicitly given plugins are loaded.
 
-
 Distributing Plugins
 --------------------
 
@@ -121,6 +120,39 @@ argument as same name as given to the entrypoint (e.g. :samp:`your_plugin({"your
 Also notice plugins are activated in a specific order, using Python's built-in
 ``sorted`` function.
 
+
+Providing multiple schemas
+--------------------------
+
+A second system is provided for providing multiple schemas in a single plugin.
+This is useful when a single plugin is responsible for multiple subtables
+under the ``tool`` table, or if you need to provide multiple schemas for a
+a single subtable.
+
+To use this system, the plugin function, which does not take any arguments,
+should return a dictionary with two keys: ``tools``, which is a dictionary of
+tool names to schemas, and optionally ``schemas``, which is a list of schemas
+that are not associated with any specific tool, but are loaded via ref's from
+the other tools.
+
+When using a :pep:`621`-compliant backend, the following can be add to your
+``pyproject.toml`` file:
+
+.. code-block:: toml
+
+    # in pyproject.toml
+    [project.entry-points."validate_pyproject.validate_pyproject.multi_schema"]
+    arbitrary = "your_package.your_module:your_plugin"
+
+An example of the plugin structure needed for this system is shown below:
+
+.. code-block:: python
+
+    def your_plugin(tool_name: str) -> dict:
+        return {
+            "tools": {"my-tool": my_schema},
+            "schemas": [my_extra_schema],
+        }
 
 .. _entry-point: https://setuptools.pypa.io/en/stable/userguide/entry_point.html#entry-points
 .. _JSON Schema: https://json-schema.org/

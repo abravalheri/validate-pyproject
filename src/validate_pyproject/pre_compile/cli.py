@@ -7,10 +7,10 @@ import sys
 from functools import partial, wraps
 from pathlib import Path
 from types import MappingProxyType
-from typing import Any, Dict, List, Mapping, NamedTuple, Sequence
+from typing import Any, Dict, List, Mapping, NamedTuple, Sequence, Union
 
 from .. import cli
-from ..plugins import PluginProtocol, PluginWrapper
+from ..plugins import PluginProtocol, PluginWrapper, StoredPlugin
 from ..plugins import list_from_entry_points as list_plugins_from_entry_points
 from ..remote import RemotePlugin, load_store
 from . import pre_compile
@@ -85,7 +85,9 @@ class CliParams(NamedTuple):
     store: str = ""
 
 
-def parser_spec(plugins: Sequence[PluginWrapper]) -> Dict[str, dict]:
+def parser_spec(
+    plugins: Sequence[Union[PluginWrapper, StoredPlugin]],
+) -> Dict[str, dict]:
     common = ("version", "enable", "disable", "verbose", "very_verbose")
     cli_spec = cli.__meta__(plugins)
     meta = {k: v.copy() for k, v in META.items()}
