@@ -30,7 +30,7 @@ from . import __version__
 from . import _tomllib as tomllib
 from .api import Validator
 from .errors import ValidationError
-from .plugins import PluginWrapper
+from .plugins import PluginProtocol, PluginWrapper
 from .plugins import list_from_entry_points as list_plugins_from_entry_points
 from .remote import RemotePlugin, load_store
 
@@ -124,7 +124,7 @@ class CliParams(NamedTuple):
     dump_json: bool = False
 
 
-def __meta__(plugins: Sequence[PluginWrapper]) -> Dict[str, dict]:
+def __meta__(plugins: Sequence[PluginProtocol]) -> Dict[str, dict]:
     """'Hyper parameters' to instruct :mod:`argparse` how to create the CLI"""
     meta = {k: v.copy() for k, v in META.items()}
     meta["enable"]["choices"] = {p.tool for p in plugins}
@@ -135,9 +135,9 @@ def __meta__(plugins: Sequence[PluginWrapper]) -> Dict[str, dict]:
 @critical_logging()
 def parse_args(
     args: Sequence[str],
-    plugins: Sequence[PluginWrapper],
+    plugins: Sequence[PluginProtocol],
     description: str = "Validate a given TOML file",
-    get_parser_spec: Callable[[Sequence[PluginWrapper]], Dict[str, dict]] = __meta__,
+    get_parser_spec: Callable[[Sequence[PluginProtocol]], Dict[str, dict]] = __meta__,
     params_class: Type[T] = CliParams,  # type: ignore[assignment]
 ) -> T:
     """Parse command line parameters
@@ -167,11 +167,14 @@ def parse_args(
     return params_class(**params)  # type: ignore[call-overload, no-any-return]
 
 
+Plugins = TypeVar("Plugins", bound=PluginProtocol)
+
+
 def select_plugins(
-    plugins: Sequence[PluginWrapper],
+    plugins: Sequence[Plugins],
     enabled: Sequence[str] = (),
     disabled: Sequence[str] = (),
-) -> List[PluginWrapper]:
+) -> List[Plugins]:
     available = list(plugins)
     if enabled:
         available = [p for p in available if p.tool in enabled]
@@ -219,7 +222,7 @@ def run(args: Sequence[str] = ()) -> int:
           (for example  ``["--verbose", "setup.cfg"]``).
     """
     args = args or sys.argv[1:]
-    plugins: List[PluginWrapper] = list_plugins_from_entry_points()
+    plugins = list_plugins_from_entry_points()
     params: CliParams = parse_args(args, plugins)
     setup_logging(params.loglevel)
     tool_plugins = [RemotePlugin.from_str(t) for t in params.tool]
@@ -263,7 +266,7 @@ class Formatter(argparse.RawTextHelpFormatter):
         return list(chain.from_iterable(wrap(x, width) for x in text.splitlines()))
 
 
-def plugins_help(plugins: Sequence[PluginWrapper]) -> str:
+def plugins_help(plugins: Sequence[PluginProtocol]) -> str:
     return "\n".join(_format_plugin_help(p) for p in plugins)
 
 
@@ -273,7 +276,7 @@ def _flatten_str(text: str) -> str:
     return (text[0].lower() + text[1:]).strip()
 
 
-def _format_plugin_help(plugin: PluginWrapper) -> str:
+def _format_plugin_help(plugin: PluginProtocol) -> str:
     help_text = plugin.help_text
     help_text = f": {_flatten_str(help_text)}" if help_text else ""
     return f"* {plugin.tool!r}{help_text}"

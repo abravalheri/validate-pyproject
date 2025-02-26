@@ -9,12 +9,10 @@ import typing
 from importlib.metadata import EntryPoint, entry_points
 from string import Template
 from textwrap import dedent
-from typing import Any, Callable, Iterable, List, Optional, Protocol
+from typing import Any, Callable, Generator, Iterable, List, Optional, Protocol, Union
 
 from .. import __version__
 from ..types import Plugin, Schema
-
-ENTRYPOINT_GROUP = "validate_pyproject.tool_schema"
 
 
 class PluginProtocol(Protocol):
@@ -66,16 +64,49 @@ class PluginWrapper:
         return f"{self.__class__.__name__}({self.tool!r}, {self.id})"
 
 
+class StoredPlugin:
+    def __init__(self, tool: str, schema: Schema):
+        self._tool, _, self._fragment = tool.partition("#")
+        self._schema = schema
+
+    @property
+    def id(self) -> str:
+        return self.schema.get("id", "MISSING ID")
+
+    @property
+    def tool(self) -> str:
+        return self._tool
+
+    @property
+    def schema(self) -> Schema:
+        return self._schema
+
+    @property
+    def fragment(self) -> str:
+        return self._fragment
+
+    @property
+    def help_text(self) -> str:
+        return self.schema.get("description", "")
+
+    def __repr__(self) -> str:
+        args = [repr(self.tool), self.id]
+        if self.fragment:
+            args.append(f"fragment={self.fragment!r}")
+        return f"{self.__class__.__name__}({', '.join(args)}, <schema: {self.id}>)"
+
+
 if typing.TYPE_CHECKING:
     _: PluginProtocol = typing.cast(PluginWrapper, None)
 
 
-def iterate_entry_points(group: str = ENTRYPOINT_GROUP) -> Iterable[EntryPoint]:
+def iterate_entry_points(group: str) -> Iterable[EntryPoint]:
     """Produces a generator yielding an EntryPoint object for each plugin registered
     via ``setuptools`` `entry point`_ mechanism.
 
     This method can be used in conjunction with :obj:`load_from_entry_point` to filter
-    the plugins before actually loading them.
+    the plugins before actually loading them. The entry points are not
+    deduplicated, but they are sorted.
     """
     entries = entry_points()
     if hasattr(entries, "select"):  # pragma: no cover
@@ -90,10 +121,7 @@ def iterate_entry_points(group: str = ENTRYPOINT_GROUP) -> Iterable[EntryPoint]:
         # TODO: Once Python 3.10 becomes the oldest version supported, this fallback and
         #       conditional statement can be removed.
         entries_ = (plugin for plugin in entries.get(group, []))
-    deduplicated = {
-        e.name: e for e in sorted(entries_, key=lambda e: (e.name, e.value))
-    }
-    return list(deduplicated.values())
+    return sorted(entries_, key=lambda e: e.name)
 
 
 def load_from_entry_point(entry_point: EntryPoint) -> PluginWrapper:
@@ -105,23 +133,42 @@ def load_from_entry_point(entry_point: EntryPoint) -> PluginWrapper:
         raise ErrorLoadingPlugin(entry_point=entry_point) from ex
 
 
+def load_from_multi_entry_point(
+    entry_point: EntryPoint,
+) -> Generator[StoredPlugin, None, None]:
+    """Carefully load the plugin, raising a meaningful message in case of errors"""
+    try:
+        fn = entry_point.load()
+        output = fn()
+    except Exception as ex:
+        raise ErrorLoadingPlugin(entry_point=entry_point) from ex
+
+    for tool, schema in output.get("tools", {}).items():
+        yield StoredPlugin(tool, schema)
+    for schema in output.get("schemas", []):
+        yield StoredPlugin("", schema)
+
+
 def list_from_entry_points(
-    group: str = ENTRYPOINT_GROUP,
     filtering: Callable[[EntryPoint], bool] = lambda _: True,
-) -> List[PluginWrapper]:
+) -> List[Union[PluginWrapper, StoredPlugin]]:
     """Produces a list of plugin objects for each plugin registered
     via ``setuptools`` `entry point`_ mechanism.
 
     Args:
-        group: name of the setuptools' entry point group where plugins is being
-            registered
         filtering: function returning a boolean deciding if the entry point should be
             loaded and included (or not) in the final list. A ``True`` return means the
             plugin should be included.
     """
-    return [
-        load_from_entry_point(e) for e in iterate_entry_points(group) if filtering(e)
+    eps: List[Union[PluginWrapper, StoredPlugin]] = [
+        load_from_entry_point(e)
+        for e in iterate_entry_points("validate_pyproject.tool_schema")
+        if filtering(e)
     ]
+    for e in iterate_entry_points("validate_pyproject.multi_schema"):
+        eps.extend(load_from_multi_entry_point(e))
+    dedup = {(e.tool if e.tool else e.id): e for e in sorted(eps, key=lambda e: e.tool)}
+    return list(dedup.values())
 
 
 class ErrorLoadingPlugin(RuntimeError):
