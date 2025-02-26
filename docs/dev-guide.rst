@@ -89,6 +89,7 @@ can pass ``plugins=[]`` to the constructor; or, for example in the snippet
 above, we could have used ``plugins=...`` instead of ``extra_plugins=...``
 to ensure only the explicitly given plugins are loaded.
 
+
 Distributing Plugins
 --------------------
 
