@@ -66,7 +66,7 @@ class PluginWrapper:
 
 class StoredPlugin:
     def __init__(self, tool: str, schema: Schema):
-        self._tool = tool
+        self._tool, _, self._fragment = tool.partition("#")
         self._schema = schema
 
     @property
@@ -83,14 +83,17 @@ class StoredPlugin:
 
     @property
     def fragment(self) -> str:
-        return ""
+        return self._fragment
 
     @property
     def help_text(self) -> str:
         return self.schema.get("description", "")
 
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}({self.tool!r}, <schema: {self.id}>)"
+        args = [repr(self.tool), self.id]
+        if self.fragment:
+            args.append(f"fragment={self.fragment!r}")
+        return f"{self.__class__.__name__}({', '.join(args)}, <schema: {self.id}>)"
 
 
 if typing.TYPE_CHECKING:

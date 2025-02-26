@@ -154,6 +154,9 @@ An example of the plugin structure needed for this system is shown below:
             "schemas": [my_extra_schema],
         }
 
+Fragments for schemas are also supported with this system; use ``#`` to split
+the tool name and fragment path in the dictionary key.
+
 .. _entry-point: https://setuptools.pypa.io/en/stable/userguide/entry_point.html#entry-points
 .. _JSON Schema: https://json-schema.org/
 .. _Python package: https://packaging.python.org/

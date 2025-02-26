@@ -91,7 +91,7 @@ def test_multi_plugins(monkeypatch):
     s3 = {"id": "example3"}
     sys.modules["test_module"] = ModuleType("test_module")
     sys.modules["test_module"].f = lambda: {
-        "tools": {"example": s1},
+        "tools": {"example#frag": s1},
         "schemas": [s2, s3],
     }  # type: ignore[attr-defined]
     monkeypatch.setattr(
@@ -101,3 +101,8 @@ def test_multi_plugins(monkeypatch):
     lst = plugins.list_from_entry_points()
     assert len(lst) == 3
     assert all(e.id.startswith("example") for e in lst)
+
+    (fragmented,) = (e for e in lst if e.tool)
+    assert fragmented.tool == "example"
+    assert fragmented.fragment == "frag"
+    assert fragmented.schema == s1
