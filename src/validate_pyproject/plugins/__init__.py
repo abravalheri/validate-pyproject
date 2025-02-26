@@ -70,12 +70,13 @@ if typing.TYPE_CHECKING:
     _: PluginProtocol = typing.cast(PluginWrapper, None)
 
 
-def iterate_entry_points(group: str = ENTRYPOINT_GROUP) -> Iterable[EntryPoint]:
+def iterate_entry_points(group: str) -> Iterable[EntryPoint]:
     """Produces a generator yielding an EntryPoint object for each plugin registered
     via ``setuptools`` `entry point`_ mechanism.
 
     This method can be used in conjunction with :obj:`load_from_entry_point` to filter
-    the plugins before actually loading them.
+    the plugins before actually loading them. The entry points are not
+    deduplicated, but they are sorted.
     """
     entries = entry_points()
     if hasattr(entries, "select"):  # pragma: no cover
@@ -90,10 +91,7 @@ def iterate_entry_points(group: str = ENTRYPOINT_GROUP) -> Iterable[EntryPoint]:
         # TODO: Once Python 3.10 becomes the oldest version supported, this fallback and
         #       conditional statement can be removed.
         entries_ = (plugin for plugin in entries.get(group, []))
-    deduplicated = {
-        e.name: e for e in sorted(entries_, key=lambda e: (e.name, e.value))
-    }
-    return list(deduplicated.values())
+    return sorted(entries_, key=lambda e: e.name)
 
 
 def load_from_entry_point(entry_point: EntryPoint) -> PluginWrapper:
@@ -106,22 +104,23 @@ def load_from_entry_point(entry_point: EntryPoint) -> PluginWrapper:
 
 
 def list_from_entry_points(
-    group: str = ENTRYPOINT_GROUP,
     filtering: Callable[[EntryPoint], bool] = lambda _: True,
 ) -> List[PluginWrapper]:
     """Produces a list of plugin objects for each plugin registered
     via ``setuptools`` `entry point`_ mechanism.
 
     Args:
-        group: name of the setuptools' entry point group where plugins is being
-            registered
         filtering: function returning a boolean deciding if the entry point should be
             loaded and included (or not) in the final list. A ``True`` return means the
             plugin should be included.
     """
-    return [
-        load_from_entry_point(e) for e in iterate_entry_points(group) if filtering(e)
+    eps = [
+        load_from_entry_point(e)
+        for e in iterate_entry_points(ENTRYPOINT_GROUP)
+        if filtering(e)
     ]
+    dedup = {e.tool: e for e in sorted(eps, key=lambda e: e.tool)}
+    return list(dedup.values())
 
 
 class ErrorLoadingPlugin(RuntimeError):
