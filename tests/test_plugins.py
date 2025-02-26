@@ -75,6 +75,22 @@ class TestPluginWrapper:
         assert pw.help_text == "Help for `name`"
 
 
+class TestStoredPlugin:
+    def test_empty_help_text(self):
+        def _fn1(_):
+            return {}
+
+        pw = plugins.StoredPlugin("name", {})
+        assert pw.help_text == ""
+
+        def _fn2(_):
+            """Help for `${tool}`"""
+            return {}
+
+        pw = plugins.StoredPlugin("name", {"description": "Help for me"})
+        assert pw.help_text == "Help for me"
+
+
 def fake_multi_iterate_entry_points(name: str) -> List[importlib.metadata.EntryPoint]:
     if name == "validate_pyproject.multi_schema":
         return [
@@ -106,3 +122,16 @@ def test_multi_plugins(monkeypatch):
     assert fragmented.tool == "example"
     assert fragmented.fragment == "frag"
     assert fragmented.schema == s1
+
+
+def test_broken_multi_plugin(monkeypatch):
+    def broken_ep():
+        raise RuntimeError("Broken")
+
+    sys.modules["test_module"] = ModuleType("test_module")
+    sys.modules["test_module"].f = broken_ep
+    monkeypatch.setattr(
+        plugins, "iterate_entry_points", fake_multi_iterate_entry_points
+    )
+    with pytest.raises(ErrorLoadingPlugin):
+        plugins.list_from_entry_points()
