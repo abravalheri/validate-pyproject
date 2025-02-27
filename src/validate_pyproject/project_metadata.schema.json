@@ -326,7 +326,11 @@
           "format": "idn-email",
           "description": "MUST be a valid email address"
         }
-      }
+      },
+      "anyOf": [
+        { "required": ["name"] },
+        { "required": ["email"] }
+      ]
     },
     "entry-point-group": {
       "$id": "#/definitions/entry-point-group",
