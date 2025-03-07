@@ -65,8 +65,9 @@ jobs:
     strategy:
       matrix:
         python:
-        - "3.8"  # oldest Python supported by validate-pyproject
-        - "3.x"  # newest Python that is stable
+        - "3.8"   # oldest Python supported by validate-pyproject
+        - "3.12"  # This must remain because Py3.12 is hardcoded to block all other tests
+        - "3.x"   # newest Python that is stable
         platform:
         - ubuntu-latest
         - macos-13
