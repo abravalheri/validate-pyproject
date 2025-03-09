@@ -85,7 +85,9 @@ class CliParams(NamedTuple):
     store: str = ""
 
 
-def parser_spec(plugins: Sequence[PluginWrapper]) -> Dict[str, dict]:
+def parser_spec(
+    plugins: Sequence[PluginProtocol],
+) -> Dict[str, dict]:
     common = ("version", "enable", "disable", "verbose", "very_verbose")
     cli_spec = cli.__meta__(plugins)
     meta = {k: v.copy() for k, v in META.items()}
