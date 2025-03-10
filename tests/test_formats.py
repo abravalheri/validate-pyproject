@@ -139,7 +139,7 @@ def test_entrypoint_references_with_extras():
     assert formats.python_entrypoint_reference(example) is False
 
 
-@pytest.mark.parametrize("example", ["module" "invalid-module"])
+@pytest.mark.parametrize("example", ["moduleinvalid-module"])
 def test_invalid_entrypoint_references(example):
     assert formats.python_entrypoint_reference(example) is False
 
