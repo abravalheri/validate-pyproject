@@ -70,7 +70,12 @@ def load_store(pyproject_url: str) -> Generator[RemotePlugin, None, None]:
         _logger.error(
             f"Must not be called with a fragment, got {fragment!r}"
         )  # pragma: no cover
-    table = contents["properties"]["tool"]["properties"]
+    tools = contents["properties"]["tool"]
+    try:
+        table = tools["properties"]
+    except KeyError:
+        _, table_contents = load_from_uri(tools["$ref"])
+        table = table_contents["properties"]
     for tool, info in table.items():
         if tool in {"setuptools", "distutils"}:
             pass  # built-in

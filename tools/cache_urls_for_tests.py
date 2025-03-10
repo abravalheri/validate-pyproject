@@ -19,9 +19,18 @@ SCHEMA_STORE = "https://json.schemastore.org/pyproject.json"
 def iter_test_urls():
     with caching.as_file(http.open_url, SCHEMA_STORE) as f:
         store = json.load(f)
-        for _, tool in store["properties"]["tool"]["properties"].items():
-            if "$ref" in tool and tool["$ref"].startswith(("http://", "https://")):
-                yield tool["$ref"]
+
+    tools = store["properties"]["tool"]
+
+    try:
+        tools_dict = tools["properties"]
+    except KeyError:
+        with caching.as_file(http.open_url, tools["$ref"]) as ff:
+            tools_dict = json.load(ff)
+
+    for _, tool in tools_dict["properties"].items():
+        if "$ref" in tool and tool["$ref"].startswith(("http://", "https://")):
+            yield tool["$ref"]
 
     files = PROJECT.glob("**/test_config.json")
     for file in files:
