@@ -7,9 +7,10 @@
 
 import typing
 from importlib.metadata import EntryPoint, entry_points
+from itertools import chain
 from string import Template
 from textwrap import dedent
-from typing import Any, Callable, Generator, Iterable, List, Optional, Protocol, Union
+from typing import Callable, Generator, Iterable, List, Optional, Protocol, Union
 
 from .. import __version__
 from ..types import Plugin, Schema
@@ -101,27 +102,26 @@ if typing.TYPE_CHECKING:
 
 
 def iterate_entry_points(group: str) -> Iterable[EntryPoint]:
-    """Produces a generator yielding an EntryPoint object for each plugin registered
+    """Produces an iterable yielding an EntryPoint object for each plugin registered
     via ``setuptools`` `entry point`_ mechanism.
 
     This method can be used in conjunction with :obj:`load_from_entry_point` to filter
     the plugins before actually loading them. The entry points are not
-    deduplicated, but they are sorted.
+    deduplicated or sorted.
     """
     entries = entry_points()
     if hasattr(entries, "select"):  # pragma: no cover
         # The select method was introduced in importlib_metadata 3.9 (and Python 3.10)
         # and the previous dict interface was declared deprecated
         select = typing.cast(
-            Any,
+            Callable[..., Iterable[EntryPoint]],
             getattr(entries, "select"),  # noqa: B009
         )  # typecheck gymnastics
-        entries_: Iterable[EntryPoint] = select(group=group)
-    else:  # pragma: no cover
-        # TODO: Once Python 3.10 becomes the oldest version supported, this fallback and
-        #       conditional statement can be removed.
-        entries_ = (plugin for plugin in entries.get(group, []))
-    return sorted(entries_, key=lambda e: e.name)
+        return select(group=group)
+    # pragma: no cover
+    # TODO: Once Python 3.10 becomes the oldest version supported, this fallback and
+    #       conditional statement can be removed.
+    return (plugin for plugin in entries.get(group, []))
 
 
 def load_from_entry_point(entry_point: EntryPoint) -> PluginWrapper:
@@ -149,6 +149,10 @@ def load_from_multi_entry_point(
         yield StoredPlugin("", schema)
 
 
+def _tool_or_id(e: Union[StoredPlugin, PluginWrapper]) -> str:
+    return e.tool or e.id
+
+
 def list_from_entry_points(
     filtering: Callable[[EntryPoint], bool] = lambda _: True,
 ) -> List[Union[PluginWrapper, StoredPlugin]]:
@@ -160,14 +164,20 @@ def list_from_entry_points(
             loaded and included (or not) in the final list. A ``True`` return means the
             plugin should be included.
     """
-    eps: List[Union[PluginWrapper, StoredPlugin]] = [
+    tool_eps = (
         load_from_entry_point(e)
         for e in iterate_entry_points("validate_pyproject.tool_schema")
         if filtering(e)
-    ]
-    for e in iterate_entry_points("validate_pyproject.multi_schema"):
-        eps.extend(load_from_multi_entry_point(e))
-    dedup = {(e.tool if e.tool else e.id): e for e in sorted(eps, key=lambda e: e.tool)}
+    )
+    multi_eps = (
+        load_from_multi_entry_point(e)
+        for e in iterate_entry_points("validate_pyproject.multi_schema")
+        if filtering(e)
+    )
+    eps: Iterable[Union[StoredPlugin, PluginWrapper]] = chain(
+        tool_eps, chain.from_iterable(multi_eps)
+    )
+    dedup = {_tool_or_id(e): e for e in sorted(eps, key=_tool_or_id)}
     return list(dedup.values())
 
 
