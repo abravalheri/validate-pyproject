@@ -143,7 +143,7 @@ def load_from_multi_entry_point(
     except Exception as ex:
         raise ErrorLoadingPlugin(entry_point=entry_point) from ex
 
-    for tool, schema in output.get("tools", {}).items():
+    for tool, schema in output["tools"].items():
         yield StoredPlugin(tool, schema)
     for schema in output.get("schemas", []):
         yield StoredPlugin("", schema)
