@@ -10,7 +10,17 @@ from importlib.metadata import EntryPoint, entry_points
 from itertools import chain
 from string import Template
 from textwrap import dedent
-from typing import Callable, Generator, Iterable, List, Optional, Protocol, Union
+from typing import (
+    Any,
+    Callable,
+    Generator,
+    Iterable,
+    List,
+    NamedTuple,
+    Optional,
+    Protocol,
+    Union,
+)
 
 from .. import __version__
 from ..types import Plugin, Schema
@@ -149,8 +159,17 @@ def load_from_multi_entry_point(
         yield StoredPlugin("", schema)
 
 
-def _tool_or_id(e: Union[StoredPlugin, PluginWrapper]) -> str:
-    return e.tool or e.id
+class _SortablePlugin(NamedTuple):
+    priority: int
+    name: str
+    plugin: Union[PluginWrapper, StoredPlugin]
+
+    def __lt__(self, other: Any) -> bool:
+        return (self.plugin.tool or self.plugin.id, self.name, self.priority) < (
+            other.plugin.tool or other.plugin.id,
+            other.name,
+            other.priority,
+        )
 
 
 def list_from_entry_points(
@@ -165,24 +184,23 @@ def list_from_entry_points(
             plugin should be included.
     """
     tool_eps = (
-        load_from_entry_point(e)
+        _SortablePlugin(0, e.name, load_from_entry_point(e))
         for e in iterate_entry_points("validate_pyproject.tool_schema")
         if filtering(e)
     )
     multi_eps = (
-        load_from_multi_entry_point(e)
+        _SortablePlugin(1, e.name, p)
         for e in sorted(
             iterate_entry_points("validate_pyproject.multi_schema"),
             key=lambda e: e.name,
             reverse=True,
         )
+        for p in load_from_multi_entry_point(e)
         if filtering(e)
     )
-    eps: Iterable[Union[StoredPlugin, PluginWrapper]] = chain(
-        tool_eps, chain.from_iterable(multi_eps)
-    )
-    dedup = {_tool_or_id(e): e for e in sorted(eps, key=_tool_or_id)}
-    return list(dedup.values())
+    eps = chain(tool_eps, multi_eps)
+    dedup = {e.plugin.tool or e.plugin.id: e.plugin for e in sorted(eps, reverse=True)}
+    return list(dedup.values())[::-1]
 
 
 class ErrorLoadingPlugin(RuntimeError):
