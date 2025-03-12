@@ -107,7 +107,7 @@ def iterate_entry_points(group: str) -> Iterable[EntryPoint]:
 
     This method can be used in conjunction with :obj:`load_from_entry_point` to filter
     the plugins before actually loading them. The entry points are not
-    deduplicated or sorted.
+    deduplicated.
     """
     entries = entry_points()
     if hasattr(entries, "select"):  # pragma: no cover
@@ -171,7 +171,11 @@ def list_from_entry_points(
     )
     multi_eps = (
         load_from_multi_entry_point(e)
-        for e in iterate_entry_points("validate_pyproject.multi_schema")
+        for e in sorted(
+            iterate_entry_points("validate_pyproject.multi_schema"),
+            key=lambda e: e.name,
+            reverse=True,
+        )
         if filtering(e)
     )
     eps: Iterable[Union[StoredPlugin, PluginWrapper]] = chain(
