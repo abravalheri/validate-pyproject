@@ -103,9 +103,9 @@ def fake_multi_iterate_entry_points(name: str) -> List[importlib.metadata.EntryP
 
 
 def test_multi_plugins(monkeypatch):
-    s1 = {"id": "example1"}
-    s2 = {"id": "example2"}
-    s3 = {"id": "example3"}
+    s1 = {"$id": "example1"}
+    s2 = {"$id": "example2"}
+    s3 = {"$id": "example3"}
     sys.modules["test_module"] = ModuleType("test_module")
     sys.modules["test_module"].f = lambda: {
         "tools": {"example#frag": s1},
@@ -149,14 +149,14 @@ def fake_both_iterate_entry_points(name: str) -> List[importlib.metadata.EntryPo
 
 
 def test_combined_plugins(monkeypatch):
-    s1 = {"id": "example1"}
-    s2 = {"id": "example2"}
+    s1 = {"$id": "example1"}
+    s2 = {"$id": "example2"}
     sys.modules["test_module"] = ModuleType("test_module")
     sys.modules["test_module"].f = lambda: {
         "tools": {"example1": s1, "example2": s2},
     }  # type: ignore[attr-defined]
-    sys.modules["test_module"].f1 = lambda _: {"id": "tool1"}  # type: ignore[attr-defined]
-    sys.modules["test_module"].f3 = lambda _: {"id": "tool3"}  # type: ignore[attr-defined]
+    sys.modules["test_module"].f1 = lambda _: {"$id": "tool1"}  # type: ignore[attr-defined]
+    sys.modules["test_module"].f3 = lambda _: {"$id": "tool3"}  # type: ignore[attr-defined]
     monkeypatch.setattr(plugins, "iterate_entry_points", fake_both_iterate_entry_points)
 
     lst = plugins.list_from_entry_points()
@@ -194,9 +194,9 @@ def fake_several_entry_points(
 
 @pytest.mark.parametrize("reverse", [True, False])
 def test_several_multi_plugins(monkeypatch, reverse):
-    s1 = {"id": "example1"}
-    s2 = {"id": "example2"}
-    s3 = {"id": "example3"}
+    s1 = {"$id": "example1"}
+    s2 = {"$id": "example2"}
+    s3 = {"$id": "example3"}
     sys.modules["test_module"] = ModuleType("test_module")
     sys.modules["test_module"].f1 = lambda: {
         "tools": {"example": s1},
