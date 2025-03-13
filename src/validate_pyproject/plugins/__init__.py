@@ -74,16 +74,19 @@ class PluginWrapper:
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}({self.tool!r}, {self.id})"
 
+    def __str__(self) -> str:
+        return self.id
+
 
 class StoredPlugin:
-    def __init__(self, tool: str, schema: Schema, id: str):
+    def __init__(self, tool: str, schema: Schema, source: str):
         self._tool, _, self._fragment = tool.partition("#")
         self._schema = schema
-        self._id = id
+        self._source = source
 
     @property
     def id(self) -> str:
-        return self._id
+        return self._schema["$id"]  # type: ignore[no-any-return]
 
     @property
     def tool(self) -> str:
@@ -100,6 +103,9 @@ class StoredPlugin:
     @property
     def help_text(self) -> str:
         return self.schema.get("description", "")
+
+    def __str__(self) -> str:
+        return self._source
 
     def __repr__(self) -> str:
         args = [repr(self.tool), self.id]
