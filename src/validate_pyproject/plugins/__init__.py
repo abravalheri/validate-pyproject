@@ -165,10 +165,10 @@ class _SortablePlugin(NamedTuple):
     plugin: Union[PluginWrapper, StoredPlugin]
 
     def __lt__(self, other: Any) -> bool:
-        return (self.plugin.tool or self.plugin.id, self.name, self.priority) < (
+        return (self.plugin.tool or self.plugin.id, self.priority, self.name) < (
             other.plugin.tool or other.plugin.id,
-            other.name,
             other.priority,
+            other.name,
         )
 
 
@@ -184,12 +184,12 @@ def list_from_entry_points(
             plugin should be included.
     """
     tool_eps = (
-        _SortablePlugin(0, e.name, load_from_entry_point(e))
+        _SortablePlugin(1, e.name, load_from_entry_point(e))
         for e in iterate_entry_points("validate_pyproject.tool_schema")
         if filtering(e)
     )
     multi_eps = (
-        _SortablePlugin(1, e.name, p)
+        _SortablePlugin(0, e.name, p)
         for e in sorted(
             iterate_entry_points("validate_pyproject.multi_schema"),
             key=lambda e: e.name,

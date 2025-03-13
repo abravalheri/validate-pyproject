@@ -125,11 +125,15 @@ def test_multi_plugins(monkeypatch):
     assert fragmented.schema == s1
 
 
-def fake_both_iterate_entry_points(name: str) -> List[importlib.metadata.EntryPoint]:
+def fake_both_iterate_entry_points(
+    name: str, epname: str
+) -> List[importlib.metadata.EntryPoint]:
     if name == "validate_pyproject.multi_schema":
         return [
             importlib.metadata.EntryPoint(
-                name="_", value="test_module:f", group="validate_pyproject.multi_schema"
+                name=epname,
+                value="test_module:f",
+                group="validate_pyproject.multi_schema",
             )
         ]
     if name == "validate_pyproject.tool_schema":
@@ -144,23 +148,35 @@ def fake_both_iterate_entry_points(name: str) -> List[importlib.metadata.EntryPo
                 value="test_module:f3",
                 group="validate_pyproject.tool_schema",
             ),
+            importlib.metadata.EntryPoint(
+                name="example4",
+                value="test_module:f4",
+                group="validate_pyproject.tool_schema",
+            ),
         ]
     return []
 
 
-def test_combined_plugins(monkeypatch):
+@pytest.mark.parametrize("epname", ["aaa", "zzz"])
+def test_combined_plugins(monkeypatch, epname):
     s1 = {"$id": "example1"}
     s2 = {"$id": "example2"}
+    s3 = {"$id": "example3"}
     sys.modules["test_module"] = ModuleType("test_module")
     sys.modules["test_module"].f = lambda: {
-        "tools": {"example1": s1, "example2": s2},
+        "tools": {"example1": s1, "example2": s2, "example3": s3},
     }  # type: ignore[attr-defined]
-    sys.modules["test_module"].f1 = lambda _: {"$id": "tool1"}  # type: ignore[attr-defined]
-    sys.modules["test_module"].f3 = lambda _: {"$id": "tool3"}  # type: ignore[attr-defined]
-    monkeypatch.setattr(plugins, "iterate_entry_points", fake_both_iterate_entry_points)
+    sys.modules["test_module"].f1 = lambda _: {"$id": "ztool1"}  # type: ignore[attr-defined]
+    sys.modules["test_module"].f3 = lambda _: {"$id": "atool3"}  # type: ignore[attr-defined]
+    sys.modules["test_module"].f4 = lambda _: {"$id": "tool4"}  # type: ignore[attr-defined]
+    monkeypatch.setattr(
+        plugins,
+        "iterate_entry_points",
+        functools.partial(fake_both_iterate_entry_points, epname=epname),
+    )
 
     lst = plugins.list_from_entry_points()
-    assert len(lst) == 3
+    assert len(lst) == 4
 
     assert lst[0].tool == "example1"
     assert isinstance(lst[0], StoredPlugin)
@@ -169,7 +185,10 @@ def test_combined_plugins(monkeypatch):
     assert isinstance(lst[1], StoredPlugin)
 
     assert lst[2].tool == "example3"
-    assert isinstance(lst[2], PluginWrapper)
+    assert isinstance(lst[2], StoredPlugin)
+
+    assert lst[3].tool == "example4"
+    assert isinstance(lst[3], PluginWrapper)
 
 
 def fake_several_entry_points(
