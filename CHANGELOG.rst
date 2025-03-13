@@ -6,6 +6,11 @@ Changelog
    Development Version
    ====================
 
+
+Version 0.24.1
+==============
+* Fixed: multi plugin id was read from the wrong place by @henryiii, #240.
+
 Version 0.24
 ============
 * Fix integration with ``SchemaStore`` by loading extra/side schemas, #226, #229.
@@ -20,7 +25,6 @@ Version 0.24
   package on PyPI if you need to convert to a classic requirements list.
 
 Contributions by @henryiii.
-
 
 Version 0.23
 ============
