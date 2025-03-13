@@ -76,13 +76,14 @@ class PluginWrapper:
 
 
 class StoredPlugin:
-    def __init__(self, tool: str, schema: Schema):
+    def __init__(self, tool: str, schema: Schema, id: str):
         self._tool, _, self._fragment = tool.partition("#")
         self._schema = schema
+        self._id = id
 
     @property
     def id(self) -> str:
-        return self.schema.get("$id", "MISSING ID")
+        return self._id
 
     @property
     def tool(self) -> str:
@@ -150,13 +151,14 @@ def load_from_multi_entry_point(
     try:
         fn = entry_point.load()
         output = fn()
+        id_ = f"{fn.__module__}.{fn.__name__}"
     except Exception as ex:
         raise ErrorLoadingPlugin(entry_point=entry_point) from ex
 
     for tool, schema in output["tools"].items():
-        yield StoredPlugin(tool, schema)
-    for schema in output.get("schemas", []):
-        yield StoredPlugin("", schema)
+        yield StoredPlugin(tool, schema, f"{id_}:{tool}")
+    for i, schema in enumerate(output.get("schemas", [])):
+        yield StoredPlugin("", schema, f"{id_}:{i}")
 
 
 class _SortablePlugin(NamedTuple):

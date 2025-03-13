@@ -81,14 +81,14 @@ class TestStoredPlugin:
         def _fn1(_):
             return {}
 
-        pw = plugins.StoredPlugin("name", {})
+        pw = plugins.StoredPlugin("name", {}, "id1")
         assert pw.help_text == ""
 
         def _fn2(_):
             """Help for `${tool}`"""
             return {}
 
-        pw = plugins.StoredPlugin("name", {"description": "Help for me"})
+        pw = plugins.StoredPlugin("name", {"description": "Help for me"}, "id2")
         assert pw.help_text == "Help for me"
 
 
@@ -117,7 +117,6 @@ def test_multi_plugins(monkeypatch):
 
     lst = plugins.list_from_entry_points()
     assert len(lst) == 3
-    assert all(e.id.startswith("example") for e in lst)
 
     (fragmented,) = (e for e in lst if e.tool)
     assert fragmented.tool == "example"
@@ -211,8 +210,8 @@ def test_several_multi_plugins(monkeypatch, reverse):
     )
 
     (plugin1, plugin2) = plugins.list_from_entry_points()
-    assert plugin1.id == "example1"
-    assert plugin2.id == "example3"
+    assert plugin1.schema["$id"] == "example1"
+    assert plugin2.schema["$id"] == "example3"
 
 
 def test_broken_multi_plugin(monkeypatch):
