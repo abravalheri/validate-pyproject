@@ -172,11 +172,14 @@ class _SortablePlugin(NamedTuple):
     name: str
     plugin: Union[PluginWrapper, StoredPlugin]
 
+    def key(self) -> str:
+        return self.plugin.tool or self.plugin.id
+
     def __lt__(self, other: Any) -> bool:
-        return (self.plugin.tool or self.plugin.id, self.priority, self.name) < (
-            other.plugin.tool or other.plugin.id,
+        return (self.priority, self.name, self.key()) < (
             other.priority,
             other.name,
+            other.key(),
         )
 
 
@@ -191,24 +194,29 @@ def list_from_entry_points(
             loaded and included (or not) in the final list. A ``True`` return means the
             plugin should be included.
     """
+    # **Major concern**:
+    # Consistency and reproducibility on which entry-points have priority
+    # for a given environment.
+    # The plugin with higher priority overwrites the schema definition.
+    # The exact order itself is not important for now.
+    # **Implementation detail**:
+    # Tool plugins are loaded first, so they are listed first than other schemas,
+    # but multi plugins always have priority, overwriting the tool schemas.
+    # The "higher alphabetically" an entry-point name, the more priority.
     tool_eps = (
-        _SortablePlugin(1, e.name, load_from_entry_point(e))
+        _SortablePlugin(0, e.name, load_from_entry_point(e))
         for e in iterate_entry_points("validate_pyproject.tool_schema")
         if filtering(e)
     )
     multi_eps = (
-        _SortablePlugin(0, e.name, p)
-        for e in sorted(
-            iterate_entry_points("validate_pyproject.multi_schema"),
-            key=lambda e: e.name,
-            reverse=True,
-        )
+        _SortablePlugin(1, e.name, p)
+        for e in iterate_entry_points("validate_pyproject.multi_schema")
         for p in load_from_multi_entry_point(e)
         if filtering(e)
     )
     eps = chain(tool_eps, multi_eps)
-    dedup = {e.plugin.tool or e.plugin.id: e.plugin for e in sorted(eps, reverse=True)}
-    return list(dedup.values())[::-1]
+    dedup = {e.key(): e.plugin for e in sorted(eps)}
+    return list(dedup.values())
 
 
 class ErrorLoadingPlugin(RuntimeError):

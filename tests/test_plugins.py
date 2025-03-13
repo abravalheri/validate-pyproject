@@ -143,13 +143,13 @@ def fake_both_iterate_entry_points(
                 group="validate_pyproject.tool_schema",
             ),
             importlib.metadata.EntryPoint(
-                name="example3",
-                value="test_module:f3",
+                name="example2",
+                value="test_module:f2",
                 group="validate_pyproject.tool_schema",
             ),
             importlib.metadata.EntryPoint(
-                name="example4",
-                value="test_module:f4",
+                name="example3",
+                value="test_module:f3",
                 group="validate_pyproject.tool_schema",
             ),
         ]
@@ -160,14 +160,14 @@ def fake_both_iterate_entry_points(
 def test_combined_plugins(monkeypatch, epname):
     s1 = {"$id": "example1"}
     s2 = {"$id": "example2"}
-    s3 = {"$id": "example3"}
+    s4 = {"$id": "example3"}
     sys.modules["test_module"] = ModuleType("test_module")
     sys.modules["test_module"].f = lambda: {
-        "tools": {"example1": s1, "example2": s2, "example3": s3},
+        "tools": {"example1": s1, "example2": s2, "example4": s4},
     }  # type: ignore[attr-defined]
     sys.modules["test_module"].f1 = lambda _: {"$id": "ztool1"}  # type: ignore[attr-defined]
-    sys.modules["test_module"].f3 = lambda _: {"$id": "atool3"}  # type: ignore[attr-defined]
-    sys.modules["test_module"].f4 = lambda _: {"$id": "tool4"}  # type: ignore[attr-defined]
+    sys.modules["test_module"].f2 = lambda _: {"$id": "atool2"}  # type: ignore[attr-defined]
+    sys.modules["test_module"].f3 = lambda _: {"$id": "tool3"}  # type: ignore[attr-defined]
     monkeypatch.setattr(
         plugins,
         "iterate_entry_points",
@@ -184,10 +184,10 @@ def test_combined_plugins(monkeypatch, epname):
     assert isinstance(lst[1], StoredPlugin)
 
     assert lst[2].tool == "example3"
-    assert isinstance(lst[2], StoredPlugin)
+    assert isinstance(lst[2], PluginWrapper)
 
     assert lst[3].tool == "example4"
-    assert isinstance(lst[3], PluginWrapper)
+    assert isinstance(lst[3], StoredPlugin)
 
 
 def fake_several_entry_points(
@@ -196,12 +196,12 @@ def fake_several_entry_points(
     if name == "validate_pyproject.multi_schema":
         items = [
             importlib.metadata.EntryPoint(
-                name="a",
+                name="zzz",
                 value="test_module:f1",
                 group="validate_pyproject.multi_schema",
             ),
             importlib.metadata.EntryPoint(
-                name="b",
+                name="aaa",
                 value="test_module:f2",
                 group="validate_pyproject.multi_schema",
             ),
@@ -228,6 +228,7 @@ def test_several_multi_plugins(monkeypatch, reverse):
         functools.partial(fake_several_entry_points, reverse=reverse),
     )
 
+    # "alphabetically higher" entry-point names have priority
     (plugin1, plugin2) = plugins.list_from_entry_points()
     assert plugin1.schema["$id"] == "example1"
     assert plugin2.schema["$id"] == "example3"
