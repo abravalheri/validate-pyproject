@@ -82,7 +82,7 @@ class StoredPlugin:
 
     @property
     def id(self) -> str:
-        return self.schema.get("id", "MISSING ID")
+        return self.schema.get("$id", "MISSING ID")
 
     @property
     def tool(self) -> str:
