@@ -142,7 +142,7 @@ When using a :pep:`621`-compliant backend, the following can be add to your
 .. code-block:: toml
 
     # in pyproject.toml
-    [project.entry-points."validate_pyproject.validate_pyproject.multi_schema"]
+    [project.entry-points."validate_pyproject.multi_schema"]
     arbitrary = "your_package.your_module:your_plugin"
 
 An example of the plugin structure needed for this system is shown below:
