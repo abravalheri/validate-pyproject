@@ -35,7 +35,6 @@ jobs:
       - uses: actions/setup-python@v5
         with: {python-version: "3.10"}
       - uses: astral-sh/setup-uv@v5
-        with: {enable-cache: true}
       - name: Run static analysis and format checkers
         run: >-
           uvx --with tox-uv
@@ -84,7 +83,6 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
       - uses: astral-sh/setup-uv@v5
-        with: {enable-cache: true}
       - name: Retrieve pre-built distribution files
         uses: actions/download-artifact@v4
         with: {name: python-distribution-files, path: dist/}
@@ -128,7 +126,6 @@ jobs:
       - uses: actions/setup-python@v5
         with: {python-version: "3.10"}
       - uses: astral-sh/setup-uv@v5
-        with: {enable-cache: true}
       - name: Retrieve pre-built distribution files
         uses: actions/download-artifact@v4
         with: {name: python-distribution-files, path: dist/}
