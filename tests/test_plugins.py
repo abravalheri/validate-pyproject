@@ -1,12 +1,16 @@
 # The code in this module is mostly borrowed/adapted from PyScaffold and was originally
 # published under the MIT license
 # The original PyScaffold license can be found in 'NOTICE.txt'
-from importlib.metadata import EntryPoint  # pragma: no cover
+import functools
+import importlib.metadata
+import sys
+from types import ModuleType
+from typing import List
 
 import pytest
 
 from validate_pyproject import plugins
-from validate_pyproject.plugins import ENTRYPOINT_GROUP, ErrorLoadingPlugin
+from validate_pyproject.plugins import ErrorLoadingPlugin, PluginWrapper, StoredPlugin
 
 EXISTING = (
     "setuptools",
@@ -18,7 +22,9 @@ def test_load_from_entry_point__error():
     # This module does not exist, so Python will have some trouble loading it
     # EntryPoint(name, value, group)
     entry = "mypkg.SOOOOO___fake___:activate"
-    fake = EntryPoint("fake", entry, ENTRYPOINT_GROUP)
+    fake = importlib.metadata.EntryPoint(
+        "fake", entry, "validate_pyproject.tool_schema"
+    )
     with pytest.raises(ErrorLoadingPlugin):
         plugins.load_from_entry_point(fake)
 
@@ -28,7 +34,7 @@ def is_entry_point(ep):
 
 
 def test_iterate_entry_points():
-    plugin_iter = plugins.iterate_entry_points()
+    plugin_iter = plugins.iterate_entry_points("validate_pyproject.tool_schema")
     assert hasattr(plugin_iter, "__iter__")
     pluging_list = list(plugin_iter)
     assert all(is_entry_point(e) for e in pluging_list)
@@ -68,3 +74,155 @@ class TestPluginWrapper:
 
         pw = plugins.PluginWrapper("name", _fn2)
         assert pw.help_text == "Help for `name`"
+
+
+class TestStoredPlugin:
+    def test_empty_help_text(self):
+        def _fn1(_):
+            return {}
+
+        pw = plugins.StoredPlugin("name", {})
+        assert pw.help_text == ""
+
+        def _fn2(_):
+            """Help for `${tool}`"""
+            return {}
+
+        pw = plugins.StoredPlugin("name", {"description": "Help for me"})
+        assert pw.help_text == "Help for me"
+
+
+def fake_multi_iterate_entry_points(name: str) -> List[importlib.metadata.EntryPoint]:
+    if name == "validate_pyproject.multi_schema":
+        return [
+            importlib.metadata.EntryPoint(
+                name="_", value="test_module:f", group="validate_pyproject.multi_schema"
+            )
+        ]
+    return []
+
+
+def test_multi_plugins(monkeypatch):
+    s1 = {"id": "example1"}
+    s2 = {"id": "example2"}
+    s3 = {"id": "example3"}
+    sys.modules["test_module"] = ModuleType("test_module")
+    sys.modules["test_module"].f = lambda: {
+        "tools": {"example#frag": s1},
+        "schemas": [s2, s3],
+    }  # type: ignore[attr-defined]
+    monkeypatch.setattr(
+        plugins, "iterate_entry_points", fake_multi_iterate_entry_points
+    )
+
+    lst = plugins.list_from_entry_points()
+    assert len(lst) == 3
+    assert all(e.id.startswith("example") for e in lst)
+
+    (fragmented,) = (e for e in lst if e.tool)
+    assert fragmented.tool == "example"
+    assert fragmented.fragment == "frag"
+    assert fragmented.schema == s1
+
+
+def fake_both_iterate_entry_points(name: str) -> List[importlib.metadata.EntryPoint]:
+    if name == "validate_pyproject.multi_schema":
+        return [
+            importlib.metadata.EntryPoint(
+                name="_", value="test_module:f", group="validate_pyproject.multi_schema"
+            )
+        ]
+    if name == "validate_pyproject.tool_schema":
+        return [
+            importlib.metadata.EntryPoint(
+                name="example1",
+                value="test_module:f1",
+                group="validate_pyproject.tool_schema",
+            ),
+            importlib.metadata.EntryPoint(
+                name="example3",
+                value="test_module:f3",
+                group="validate_pyproject.tool_schema",
+            ),
+        ]
+    return []
+
+
+def test_combined_plugins(monkeypatch):
+    s1 = {"id": "example1"}
+    s2 = {"id": "example2"}
+    sys.modules["test_module"] = ModuleType("test_module")
+    sys.modules["test_module"].f = lambda: {
+        "tools": {"example1": s1, "example2": s2},
+    }  # type: ignore[attr-defined]
+    sys.modules["test_module"].f1 = lambda _: {"id": "tool1"}  # type: ignore[attr-defined]
+    sys.modules["test_module"].f3 = lambda _: {"id": "tool3"}  # type: ignore[attr-defined]
+    monkeypatch.setattr(plugins, "iterate_entry_points", fake_both_iterate_entry_points)
+
+    lst = plugins.list_from_entry_points()
+    assert len(lst) == 3
+
+    assert lst[0].tool == "example1"
+    assert isinstance(lst[0], StoredPlugin)
+
+    assert lst[1].tool == "example2"
+    assert isinstance(lst[1], StoredPlugin)
+
+    assert lst[2].tool == "example3"
+    assert isinstance(lst[2], PluginWrapper)
+
+
+def fake_several_entry_points(
+    name: str, *, reverse: bool
+) -> List[importlib.metadata.EntryPoint]:
+    if name == "validate_pyproject.multi_schema":
+        items = [
+            importlib.metadata.EntryPoint(
+                name="a",
+                value="test_module:f1",
+                group="validate_pyproject.multi_schema",
+            ),
+            importlib.metadata.EntryPoint(
+                name="b",
+                value="test_module:f2",
+                group="validate_pyproject.multi_schema",
+            ),
+        ]
+        return items[::-1] if reverse else items
+    return []
+
+
+@pytest.mark.parametrize("reverse", [True, False])
+def test_several_multi_plugins(monkeypatch, reverse):
+    s1 = {"id": "example1"}
+    s2 = {"id": "example2"}
+    s3 = {"id": "example3"}
+    sys.modules["test_module"] = ModuleType("test_module")
+    sys.modules["test_module"].f1 = lambda: {
+        "tools": {"example": s1},
+    }  # type: ignore[attr-defined]
+    sys.modules["test_module"].f2 = lambda: {
+        "tools": {"example": s2, "other": s3},
+    }  # type: ignore[attr-defined]
+    monkeypatch.setattr(
+        plugins,
+        "iterate_entry_points",
+        functools.partial(fake_several_entry_points, reverse=reverse),
+    )
+
+    (plugin1, plugin2) = plugins.list_from_entry_points()
+    assert plugin1.id == "example1"
+    assert plugin2.id == "example3"
+
+
+def test_broken_multi_plugin(monkeypatch):
+    def broken_ep():
+        raise RuntimeError("Broken")
+
+    sys.modules["test_module"] = ModuleType("test_module")
+    sys.modules["test_module"].f = broken_ep
+    monkeypatch.setattr(
+        plugins, "iterate_entry_points", fake_multi_iterate_entry_points
+    )
+    with pytest.raises(ErrorLoadingPlugin):
+        plugins.list_from_entry_points()
