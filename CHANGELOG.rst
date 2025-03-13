@@ -8,7 +8,19 @@ Changelog
 
 Version 0.24
 ============
-* Fix integration with SchemaStore by loading extra/side schemas by @henryiii, #226, #229
+* Fix integration with ``SchemaStore`` by loading extra/side schemas, #226, #229.
+* Add support for loading extra schemas, #226.
+* Fixed verify author dict is not empty, #232.
+* Added support for ``validate_pyproject.multi_schema`` plugins with extra schemas, #231.
+* ``validate-pyproject`` no longer communicates test dependencies via the ``tests``
+  extra and documentation dependencies dependencies via the ``docs/requirements.txt`` file.
+  Instead :doc:`pypa:dependency-groups` have been adopted to support CI environments, #227.
+
+  As a result, ``uv``'s high level interface also works for developers. You can use the :pypi:`dependency-groups`
+  package on PyPI if you need to convert to a classic requirements list.
+
+Contributions by @henryiii.
+
 
 Version 0.23
 ============
