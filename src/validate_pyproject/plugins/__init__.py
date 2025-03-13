@@ -74,15 +74,19 @@ class PluginWrapper:
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}({self.tool!r}, {self.id})"
 
+    def __str__(self) -> str:
+        return self.id
+
 
 class StoredPlugin:
-    def __init__(self, tool: str, schema: Schema):
+    def __init__(self, tool: str, schema: Schema, source: str):
         self._tool, _, self._fragment = tool.partition("#")
         self._schema = schema
+        self._source = source
 
     @property
     def id(self) -> str:
-        return self.schema.get("$id", "MISSING ID")
+        return self._schema["$id"]  # type: ignore[no-any-return]
 
     @property
     def tool(self) -> str:
@@ -99,6 +103,9 @@ class StoredPlugin:
     @property
     def help_text(self) -> str:
         return self.schema.get("description", "")
+
+    def __str__(self) -> str:
+        return self._source
 
     def __repr__(self) -> str:
         args = [repr(self.tool), self.id]
@@ -150,13 +157,14 @@ def load_from_multi_entry_point(
     try:
         fn = entry_point.load()
         output = fn()
+        id_ = f"{fn.__module__}.{fn.__name__}"
     except Exception as ex:
         raise ErrorLoadingPlugin(entry_point=entry_point) from ex
 
     for tool, schema in output["tools"].items():
-        yield StoredPlugin(tool, schema)
-    for schema in output.get("schemas", []):
-        yield StoredPlugin("", schema)
+        yield StoredPlugin(tool, schema, f"{id_}:{tool}")
+    for i, schema in enumerate(output.get("schemas", [])):
+        yield StoredPlugin("", schema, f"{id_}:{i}")
 
 
 class _SortablePlugin(NamedTuple):

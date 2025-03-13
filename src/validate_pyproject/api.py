@@ -116,12 +116,10 @@ class SchemaRegistry(Mapping[str, Schema]):
             if plugin.tool:
                 allow_overwrite: Optional[str] = None
                 if plugin.tool in tool_properties:
-                    _logger.warning(
-                        f"{plugin.id} overwrites `tool.{plugin.tool}` schema"
-                    )
+                    _logger.warning(f"{plugin} overwrites `tool.{plugin.tool}` schema")
                     allow_overwrite = plugin.schema.get("$id")
                 else:
-                    _logger.info(f"{plugin.id} defines `tool.{plugin.tool}` schema")
+                    _logger.info(f"{plugin} defines `tool.{plugin.tool}` schema")
                 compatible = self._ensure_compatibility(
                     plugin.tool, plugin.schema, allow_overwrite
                 )
@@ -130,7 +128,7 @@ class SchemaRegistry(Mapping[str, Schema]):
                 tool_properties[plugin.tool] = {"$ref": sref}
                 self._schemas[sid] = (f"tool.{plugin.tool}", plugin.id, plugin.schema)
             else:
-                _logger.info(f"Extra schema: {plugin.id}")
+                _logger.info(f"{plugin} defines extra schema {plugin.id}")
                 self._schemas[plugin.id] = (plugin.id, plugin.id, plugin.schema)
 
         self._main_id: str = top_level["$id"]
