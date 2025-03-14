@@ -198,7 +198,7 @@ def test_several_multi_plugins(monkeypatch):
     )
     for eps in (fake_eps, fake_eps.reverse()):
         monkeypatch.setattr(plugins, "iterate_entry_points", eps.get)
-        # "alphabetically higher" entry-point names have priority
+        # entry-point names closer to "zzzzzzzz..." have priority
         (plugin1, plugin2) = plugins.list_from_entry_points()
         assert plugin1.schema["$id"] == "example1"
         assert plugin2.schema["$id"] == "example3"
