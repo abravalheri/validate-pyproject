@@ -83,14 +83,14 @@ class TestStoredPlugin:
         def _fn1(_):
             return {}
 
-        pw = plugins.StoredPlugin("name", {}, "id1")
+        pw = plugins.StoredPlugin("name", {}, "id1", 0)
         assert pw.help_text == ""
 
         def _fn2(_):
             """Help for `${tool}`"""
             return {}
 
-        pw = plugins.StoredPlugin("name", {"description": "Help for me"}, "id2")
+        pw = plugins.StoredPlugin("name", {"description": "Help for me"}, "id2", 0)
         assert pw.help_text == "Help for me"
 
 
@@ -158,30 +158,31 @@ def test_combined_plugins(monkeypatch, epname):
             "tools": {
                 "example1": {"$id": "example1"},
                 "example2": {"$id": "example2"},
-                "example4": {"$id": "example4"},
+                "example3": {"$id": "example3"},
             }
         }
     )
     tool_eps(name="example1", value="test_module:f1")(lambda _: {"$id": "ztool1"})
     tool_eps(name="example2", value="test_module:f2")(lambda _: {"$id": "atool2"})
-    tool_eps(name="example3", value="test_module:f2")(lambda _: {"$id": "tool3"})
+    tool_eps(name="example4", value="test_module:f2")(lambda _: {"$id": "tool4"})
 
     monkeypatch.setattr(plugins, "iterate_entry_points", fake_eps.get)
 
     lst = plugins.list_from_entry_points()
+    print(lst)
     assert len(lst) == 4
 
     assert lst[0].tool == "example1"
-    assert isinstance(lst[0], StoredPlugin)
+    assert isinstance(lst[0], PluginWrapper)
 
     assert lst[1].tool == "example2"
-    assert isinstance(lst[1], StoredPlugin)
+    assert isinstance(lst[1], PluginWrapper)
 
     assert lst[2].tool == "example3"
-    assert isinstance(lst[2], PluginWrapper)
+    assert isinstance(lst[2], StoredPlugin)
 
     assert lst[3].tool == "example4"
-    assert isinstance(lst[3], StoredPlugin)
+    assert isinstance(lst[3], PluginWrapper)
 
 
 def test_several_multi_plugins(monkeypatch):
@@ -200,8 +201,40 @@ def test_several_multi_plugins(monkeypatch):
         monkeypatch.setattr(plugins, "iterate_entry_points", eps.get)
         # entry-point names closer to "zzzzzzzz..." have priority
         (plugin1, plugin2) = plugins.list_from_entry_points()
+        print(plugin1, plugin2)
         assert plugin1.schema["$id"] == "example1"
         assert plugin2.schema["$id"] == "example3"
+
+
+def test_custom_priority(monkeypatch):
+    fake_eps = _FakeEntryPoints(monkeypatch)
+    tool_eps = fake_eps.group("validate_pyproject.tool_schema")
+    multi_eps = fake_eps.group("validate_pyproject.multi_schema")
+
+    multi_schema = {"tools": {"example": {"$id": "multi-eps"}}}
+    multi_eps(name="example", value="test_module:f")(lambda: multi_schema)
+
+    @tool_eps(name="example", value="test_module1:f1")
+    def tool_schema1(_name):
+        return {"$id": "tool-eps-1"}
+
+    @tool_eps(name="example", value="test_module2:f1")
+    def tool_schema2(_name):
+        return {"$id": "tool-eps-2"}
+
+    monkeypatch.setattr(plugins, "iterate_entry_points", fake_eps.get)
+    (winner,) = plugins.list_from_entry_points()  # default: tool with "higher" ep name
+    assert winner.schema["$id"] == "tool-eps-2"
+
+    tool_schema1.priority = 1.1
+    (winner,) = plugins.list_from_entry_points()  # default: tool has priority
+    assert winner.schema["$id"] == "tool-eps-1"
+
+    tool_schema1.priority = 0.1
+    tool_schema2.priority = 0.2
+    multi_schema["priority"] = 0.9
+    (winner,) = plugins.list_from_entry_points()  # custom higher priority wins
+    assert winner.schema["$id"] == "multi-eps"
 
 
 def test_broken_multi_plugin(monkeypatch):

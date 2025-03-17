@@ -25,6 +25,9 @@ from typing import (
 from .. import __version__
 from ..types import Plugin, Schema
 
+_DEFAULT_MULTI_PRIORITY = 0
+_DEFAULT_TOOL_PRIORITY = 1
+
 
 class PluginProtocol(Protocol):
     @property
@@ -41,6 +44,9 @@ class PluginProtocol(Protocol):
 
     @property
     def fragment(self) -> str: ...
+
+    @property
+    def priority(self) -> float: ...
 
 
 class PluginWrapper:
@@ -65,6 +71,10 @@ class PluginWrapper:
         return ""
 
     @property
+    def priority(self) -> float:
+        return getattr(self._load_fn, "priority", _DEFAULT_TOOL_PRIORITY)
+
+    @property
     def help_text(self) -> str:
         tpl = self._load_fn.__doc__
         if not tpl:
@@ -79,10 +89,11 @@ class PluginWrapper:
 
 
 class StoredPlugin:
-    def __init__(self, tool: str, schema: Schema, source: str):
+    def __init__(self, tool: str, schema: Schema, source: str, priority: float):
         self._tool, _, self._fragment = tool.partition("#")
         self._schema = schema
         self._source = source
+        self._priority = priority
 
     @property
     def id(self) -> str:
@@ -99,6 +110,10 @@ class StoredPlugin:
     @property
     def fragment(self) -> str:
         return self._fragment
+
+    @property
+    def priority(self) -> float:
+        return self._priority
 
     @property
     def help_text(self) -> str:
@@ -161,14 +176,14 @@ def load_from_multi_entry_point(
     except Exception as ex:
         raise ErrorLoadingPlugin(entry_point=entry_point) from ex
 
+    priority = output.get("priority", _DEFAULT_MULTI_PRIORITY)
     for tool, schema in output["tools"].items():
-        yield StoredPlugin(tool, schema, f"{id_}:{tool}")
+        yield StoredPlugin(tool, schema, f"{id_}:{tool}", priority)
     for i, schema in enumerate(output.get("schemas", [])):
-        yield StoredPlugin("", schema, f"{id_}:{i}")
+        yield StoredPlugin("", schema, f"{id_}:{i}", priority)
 
 
 class _SortablePlugin(NamedTuple):
-    priority: int
     name: str
     plugin: Union[PluginWrapper, StoredPlugin]
 
@@ -176,8 +191,19 @@ class _SortablePlugin(NamedTuple):
         return self.plugin.tool or self.plugin.id
 
     def __lt__(self, other: Any) -> bool:
-        return (self.priority, self.name, self.key()) < (
-            other.priority,
+        # **Major concern**:
+        # Consistency and reproducibility on which entry-points have priority
+        # for a given environment.
+        # The plugin with higher priority overwrites the schema definition.
+        # The exact order that they are listed itself is not important for now.
+        # **Implementation detail**:
+        # By default, "single tool plugins" have priority 1 and "multi plugins"
+        # have priority 0.
+        # The order that the plugins will be listed is inverse to the priority.
+        # If 2 plugins have the same numerical priority, the one whose
+        # entry-point name is "higher alphabetically" wins.
+        return (self.plugin.priority, self.name, self.key()) < (
+            other.plugin.priority,
             other.name,
             other.key(),
         )
@@ -194,22 +220,13 @@ def list_from_entry_points(
             loaded and included (or not) in the final list. A ``True`` return means the
             plugin should be included.
     """
-    # **Major concern**:
-    # Consistency and reproducibility on which entry-points have priority
-    # for a given environment.
-    # The plugin with higher priority overwrites the schema definition.
-    # The exact order itself is not important for now.
-    # **Implementation detail**:
-    # Tool plugins are loaded first, so they are listed first than other schemas,
-    # but multi plugins always have priority, overwriting the tool schemas.
-    # The "higher alphabetically" an entry-point name, the more priority.
     tool_eps = (
-        _SortablePlugin(0, e.name, load_from_entry_point(e))
+        _SortablePlugin(e.name, load_from_entry_point(e))
         for e in iterate_entry_points("validate_pyproject.tool_schema")
         if filtering(e)
     )
     multi_eps = (
-        _SortablePlugin(1, e.name, p)
+        _SortablePlugin(e.name, p)
         for e in iterate_entry_points("validate_pyproject.multi_schema")
         for p in load_from_multi_entry_point(e)
         if filtering(e)

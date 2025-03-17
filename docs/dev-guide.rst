@@ -118,14 +118,11 @@ When using a :pep:`621`-compliant backend, the following can be add to your
 The plugin function will be automatically called with the ``tool_name``
 argument as same name as given to the entrypoint (e.g. :samp:`your_plugin({"your-tool"})`).
 
-Also notice plugins are activated in a specific order, using Python's built-in
-``sorted`` function.
-
 
 Providing multiple schemas
 --------------------------
 
-A second system is provided for providing multiple schemas in a single plugin.
+A second system is defined for providing multiple schemas in a single plugin.
 This is useful when a single plugin is responsible for multiple subtables
 under the ``tool`` table, or if you need to provide multiple schemas for a
 a single subtable.
@@ -157,6 +154,27 @@ An example of the plugin structure needed for this system is shown below:
 
 Fragments for schemas are also supported with this system; use ``#`` to split
 the tool name and fragment path in the dictionary key.
+
+
+.. admonition:: Experimental: Conflict Resolution
+
+   Please notice that when two plugins define the same ``tool``
+   (or auxiliary schemas with the same ``$id``),
+   an internal conflict resolution heuristic is employed to decide
+   which schema will take effect.
+
+   To influence this heuristic you can:
+
+   - Define a numeric ``.priority`` property in the functions
+     pointed by the ``validate_pyproject.tool_schema`` entry-points.
+   - Add a ``"priority"`` key with a numeric value into the dictionary
+     returned by the ``validate_pyproject.multi_schema`` plugins.
+
+   Typical values for ``priority`` are ``0`` and ``1``.
+
+   The exact order in which the plugins are loaded is considered an
+   implementation detail.
+
 
 .. _entry-point: https://setuptools.pypa.io/en/stable/userguide/entry_point.html#entry-points
 .. _JSON Schema: https://json-schema.org/
