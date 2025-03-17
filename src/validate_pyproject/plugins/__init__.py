@@ -115,7 +115,7 @@ class StoredPlugin:
 
 
 if typing.TYPE_CHECKING:
-    _: PluginProtocol = typing.cast(PluginWrapper, None)
+    _: PluginProtocol = typing.cast("PluginWrapper", None)
 
 
 def iterate_entry_points(group: str) -> Iterable[EntryPoint]:
@@ -131,7 +131,7 @@ def iterate_entry_points(group: str) -> Iterable[EntryPoint]:
         # The select method was introduced in importlib_metadata 3.9 (and Python 3.10)
         # and the previous dict interface was declared deprecated
         select = typing.cast(
-            Callable[..., Iterable[EntryPoint]],
+            "Callable[..., Iterable[EntryPoint]]",
             getattr(entries, "select"),  # noqa: B009
         )  # typecheck gymnastics
         return select(group=group)
