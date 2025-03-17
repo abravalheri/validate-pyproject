@@ -1,0 +1,1 @@
+`project.sbom-files` must be array
