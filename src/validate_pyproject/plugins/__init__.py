@@ -45,9 +45,6 @@ class PluginProtocol(Protocol):
     @property
     def fragment(self) -> str: ...
 
-    @property
-    def priority(self) -> float: ...
-
 
 class PluginWrapper:
     def __init__(self, tool: str, load_fn: Plugin):
