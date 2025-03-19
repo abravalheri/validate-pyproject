@@ -89,4 +89,4 @@ def load_store(pyproject_url: str) -> Generator[RemotePlugin, None, None]:
 if typing.TYPE_CHECKING:
     from .plugins import PluginProtocol
 
-    _: PluginProtocol = typing.cast(RemotePlugin, None)
+    _: PluginProtocol = typing.cast("RemotePlugin", None)

@@ -98,7 +98,7 @@ class SchemaRegistry(Mapping[str, Schema]):
         self._schemas: Dict[str, Tuple[str, str, Schema]] = {}
         # (which part of the TOML, who defines, schema)
 
-        top_level = typing.cast(dict, load(TOP_LEVEL_SCHEMA))  # Make it mutable
+        top_level = typing.cast("dict", load(TOP_LEVEL_SCHEMA))  # Make it mutable
         self._spec_version: str = top_level["$schema"]
         top_properties = top_level["properties"]
         tool_properties = top_properties["tool"].setdefault("properties", {})
@@ -278,7 +278,7 @@ class Validator:
                 self.schema, self.handlers, dict(self.formats), use_default=False
             )
             fn = partial(compiled, custom_formats=self._format_validators)
-            self._cache = typing.cast(ValidationFn, fn)
+            self._cache = typing.cast("ValidationFn", fn)
 
         with detailed_errors():
             self._cache(pyproject)
