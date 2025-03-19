@@ -4,7 +4,7 @@ validate-pyproject
 
 **validate-pyproject** is a command line tool and Python library for validating
 ``pyproject.toml`` files based on JSON Schema, and includes checks for
-:pep:`517`, :pep:`518` and :pep:`621`.
+:pep:`517`, :pep:`518`, :pep:`621`, :pep:`639`, and :pep:`735`.
 
 
 Contents
