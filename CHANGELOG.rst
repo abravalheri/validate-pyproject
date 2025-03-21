@@ -9,7 +9,8 @@ Changelog
 
 Version 0.24.1
 ==============
-* Fixed: multi plugin id was read from the wrong place by @henryiii, #240.
+* Fixed multi plugin id was read from the wrong place by @henryiii, #240.
+* Implemented alternative plugin sorting, #243
 
 Version 0.24
 ============
