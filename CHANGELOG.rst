@@ -6,6 +6,8 @@ Changelog
    Development Version
    ====================
 
+* Added support for specifying package-data for stub packages, #248.
+
 
 Version 0.24.1
 ==============
