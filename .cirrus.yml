@@ -93,13 +93,13 @@ linux_task:
     - name: test (Linux - 3.10)
       container: {image: "python:3.10-bookworm"}
       skip: $BRANCH !=~ "^(main|master)$"
-    - name: test (Linux - 3.11)
-      container: {image: "python:3.11-bookworm"}
-      skip: $BRANCH !=~ "^(main|master)$"
     - name: test (Linux - 3.12)
       container: {image: "python:3.12-bookworm"}
+      skip: $BRANCH !=~ "^(main|master)$"
     - name: test (Linux - 3.13)
-      container: {image: "python:3.13-rc-bookworm"}
+      container: {image: "python:3.13-bookworm"}
+    - name: test (Linux - 3.14)
+      container: {image: "python:3.14-rc-bookworm"}
       allow_failures: true  # RC
   install_script:
     - python -m pip install --upgrade pip tox tox-uv pipx
@@ -185,7 +185,7 @@ linkcheck_task:
 #     TWINE_USERNAME: __token__
 #     TWINE_PASSWORD: $PYPI_TOKEN
 #     # See: https://cirrus-ci.org/guide/writing-tasks/#encrypted-variables
-#   install_script: pip install tox
+#   install_script: pip install tox tox-uv
 #   download_artifact_script: *download-artifact
 #   publish_script:
 #     - ls dist/*
