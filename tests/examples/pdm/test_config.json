@@ -1,0 +1,6 @@
+{
+    "tools": {
+        "partial-pdm": "https://json.schemastore.org/partial-pdm.json",
+        "partial-pdm-dockerize": "https://json.schemastore.org/partial-pdm-dockerize.json"
+    }
+}
