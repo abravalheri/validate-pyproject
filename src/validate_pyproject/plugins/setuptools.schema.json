@@ -115,13 +115,7 @@
       ],
       "type": "object",
       "additionalProperties": false,
-      "propertyNames": {
-        "anyOf": [
-          {"type": "string", "format": "python-module-name"},
-          {"type": "string", "format": "pep561-stub-name"},
-          {"const": "*"}
-      ]
-      },
+      "propertyNames": {"type": "string", "format": "package-data-module-name-or-wildcard"},
       "patternProperties": {
         "^.*$": {"type": "array", "items": {"type": "string"}}
       }
@@ -143,13 +137,7 @@
       ],
       "type": "object",
       "additionalProperties": false,
-      "propertyNames": {
-        "anyOf": [
-          {"type": "string", "format": "python-module-name"},
-          {"type": "string", "format": "pep561-stub-name"},
-          {"const": "*"}
-        ]
-      },
+      "propertyNames": {"type": "string", "format": "package-data-module-name-or-wildcard"},
       "patternProperties": {
           "^.*$": {"type": "array", "items": {"type": "string"}}
       }
