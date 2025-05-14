@@ -6,6 +6,7 @@
 # Unnecessary `dict` call (rewrite as a literal)
 
 import argparse
+import functools
 import io
 import json
 import logging
@@ -151,8 +152,15 @@ def parse_args(
     if plugins:
         epilog = f"The following plugins are available:\n\n{plugins_help(plugins)}"
 
-    parser = argparse.ArgumentParser(
-        description=description, epilog=epilog, formatter_class=Formatter
+    make_parser = functools.partial(argparse.ArgumentParser)
+    formatter_class = functools.partial(Formatter)
+    if sys.version_info >= (3, 14):
+        make_parser = functools.partial(make_parser, color=True, suggest_on_error=True)
+        formatter_class = functools.partial(
+            formatter_class, color=True
+        )  # Should be fixed in 3.14.0b2
+    parser = make_parser(
+        description=description, epilog=epilog, formatter_class=formatter_class
     )
     for cli_opts in get_parser_spec(plugins).values():
         parser.add_argument(*cli_opts.pop("flags", ()), **cli_opts)
