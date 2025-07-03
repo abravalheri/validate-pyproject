@@ -1,4 +1,5 @@
-from typing import Callable, Mapping, NewType, TypeVar
+from collections.abc import Callable, Mapping
+from typing import NewType, TypeVar
 
 T = TypeVar("T", bound=Mapping)
 

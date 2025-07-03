@@ -3,8 +3,9 @@ difficult to express as a JSON Schema (or that are not supported by the current
 JSON Schema library).
 """
 
+from collections.abc import Mapping
 from inspect import cleandoc
-from typing import Mapping, TypeVar
+from typing import TypeVar
 
 from .error_reporting import ValidationError
 

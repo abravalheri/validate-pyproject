@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any
 
 import fastjsonschema
 
@@ -13,7 +13,7 @@ class VPP001:
     family = "validate-pyproject"
 
     @staticmethod
-    def check(pyproject: Dict[str, Any]) -> str:
+    def check(pyproject: dict[str, Any]) -> str:
         validator = api.Validator()
         try:
             validator(pyproject)
@@ -22,11 +22,11 @@ class VPP001:
             return f"Invalid pyproject.toml! Error: {e}"
 
 
-def repo_review_checks() -> Dict[str, VPP001]:
+def repo_review_checks() -> dict[str, VPP001]:
     return {"VPP001": VPP001()}
 
 
-def repo_review_families(pyproject: Dict[str, Any]) -> Dict[str, Dict[str, str]]:
+def repo_review_families(pyproject: dict[str, Any]) -> dict[str, dict[str, str]]:
     has_distutils = "distutils" in pyproject.get("tool", {})
     plugin_list = plugins.list_from_entry_points(
         lambda e: e.name != "distutils" or has_distutils

@@ -4,10 +4,11 @@
 import json
 import logging
 import sys
+from collections.abc import Mapping, Sequence
 from functools import partial, wraps
 from pathlib import Path
 from types import MappingProxyType
-from typing import Any, Dict, List, Mapping, NamedTuple, Sequence
+from typing import Any, NamedTuple
 
 from .. import cli
 from ..plugins import PluginProtocol, PluginWrapper
@@ -24,14 +25,14 @@ else:  # pragma: no cover
 _logger = logging.getLogger(__package__)
 
 
-def JSON_dict(name: str, value: str) -> Dict[str, Any]:
+def JSON_dict(name: str, value: str) -> dict[str, Any]:
     try:
         return ensure_dict(name, json.loads(value))
     except json.JSONDecodeError as ex:
         raise ValueError(f"Invalid JSON: {value}") from ex
 
 
-META: Dict[str, dict] = {
+META: dict[str, dict] = {
     "output_dir": dict(
         flags=("-O", "--output-dir"),
         default=".",
@@ -76,7 +77,7 @@ def ensure_dict(name: str, value: Any) -> dict:
 
 
 class CliParams(NamedTuple):
-    plugins: List[PluginWrapper]
+    plugins: list[PluginWrapper]
     output_dir: Path = Path(".")
     main_file: str = "__init__.py"
     replacements: Mapping[str, str] = MappingProxyType({})
@@ -87,7 +88,7 @@ class CliParams(NamedTuple):
 
 def parser_spec(
     plugins: Sequence[PluginProtocol],
-) -> Dict[str, dict]:
+) -> dict[str, dict]:
     common = ("version", "enable", "disable", "verbose", "very_verbose")
     cli_spec = cli.__meta__(plugins)
     meta = {k: v.copy() for k, v in META.items()}
@@ -103,7 +104,7 @@ def run(args: Sequence[str] = ()) -> int:
     prms = cli.parse_args(args, plugins, desc, parser_spec, CliParams)
     cli.setup_logging(prms.loglevel)
 
-    tool_plugins: List[PluginProtocol] = [RemotePlugin.from_str(t) for t in prms.tool]
+    tool_plugins: list[PluginProtocol] = [RemotePlugin.from_str(t) for t in prms.tool]
     if prms.store:
         tool_plugins.extend(load_store(prms.store))
 

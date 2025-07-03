@@ -6,15 +6,13 @@
 """
 
 import typing
+from collections.abc import Callable, Generator, Iterable
 from importlib.metadata import EntryPoint, entry_points
 from itertools import chain
 from string import Template
 from textwrap import dedent
 from typing import (
     Any,
-    Callable,
-    Generator,
-    Iterable,
     List,
     NamedTuple,
     Optional,
@@ -182,7 +180,7 @@ def load_from_multi_entry_point(
 
 class _SortablePlugin(NamedTuple):
     name: str
-    plugin: Union[PluginWrapper, StoredPlugin]
+    plugin: PluginWrapper | StoredPlugin
 
     def key(self) -> str:
         return self.plugin.tool or self.plugin.id
@@ -208,7 +206,7 @@ class _SortablePlugin(NamedTuple):
 
 def list_from_entry_points(
     filtering: Callable[[EntryPoint], bool] = lambda _: True,
-) -> List[Union[PluginWrapper, StoredPlugin]]:
+) -> list[PluginWrapper | StoredPlugin]:
     """Produces a list of plugin objects for each plugin registered
     via ``setuptools`` `entry point`_ mechanism.
 
@@ -240,7 +238,7 @@ class ErrorLoadingPlugin(RuntimeError):
     """
     __doc__ = _DESC
 
-    def __init__(self, plugin: str = "", entry_point: Optional[EntryPoint] = None):
+    def __init__(self, plugin: str = "", entry_point: EntryPoint | None = None):
         if entry_point and not plugin:
             plugin = getattr(entry_point, "module", entry_point.name)
 

@@ -2,7 +2,7 @@ import json
 import logging
 import typing
 import urllib.parse
-from typing import Generator, Optional, Tuple
+from collections.abc import Generator
 
 from . import caching, errors, http
 from .types import Schema
@@ -23,8 +23,8 @@ _logger = logging.getLogger(__name__)
 
 
 def load_from_uri(
-    tool_uri: str, cache_dir: Optional[caching.PathLike] = None
-) -> Tuple[str, Schema]:
+    tool_uri: str, cache_dir: caching.PathLike | None = None
+) -> tuple[str, Schema]:
     tool_info = urllib.parse.urlparse(tool_uri)
     if tool_info.netloc:
         url = f"{tool_info.scheme}://{tool_info.netloc}{tool_info.path}"

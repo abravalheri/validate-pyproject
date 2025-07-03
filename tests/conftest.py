@@ -7,7 +7,6 @@ Read more about conftest.py under:
 """
 
 from pathlib import Path
-from typing import List
 
 import pytest
 
@@ -18,7 +17,7 @@ def pytest_configure(config):
     config.addinivalue_line("markers", "uses_network: tests may try to download files")
 
 
-def collect(base: Path) -> List[str]:
+def collect(base: Path) -> list[str]:
     return [str(f.relative_to(base)) for f in base.glob("**/*.toml")]
 
 

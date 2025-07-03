@@ -1,90 +1,83 @@
 [build-system]
-requires = ["setuptools>=61.2", "setuptools_scm[toml]>=7.1"]
 build-backend = "setuptools.build_meta"
+
+requires = [ "setuptools>=61.2", "setuptools-scm[toml]>=7.1" ]
 
 [project]
 name = "validate-pyproject"
 description = "Validation library and CLI tool for checking on 'pyproject.toml' files using JSON Schema"
-authors = [{name = "Anderson Bravalheri", email = "andersonbravalheri@gmail.com"}]
-readme ="README.rst"
-license = {text = "MPL-2.0 and MIT and BSD-3-Clause"}
-requires-python = ">=3.8"
+readme = "README.rst"
+license = { text = "MPL-2.0 and MIT and BSD-3-Clause" }
+authors = [ { name = "Anderson Bravalheri", email = "andersonbravalheri@gmail.com" } ]
+requires-python = ">=3.10"
 classifiers = [
-    "Development Status :: 4 - Beta",
-    "Intended Audience :: Developers",
-    "Operating System :: OS Independent",
-    "Programming Language :: Python",
-    "Topic :: Software Development :: Quality Assurance",
-    "Typing :: Typed",
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Software Development :: Quality Assurance",
+  "Typing :: Typed",
 ]
-dependencies = ["fastjsonschema>=2.16.2,<=3"]
-dynamic = ["version"]
+dynamic = [ "version" ]
 
-[project.urls]
-Homepage = "https://github.com/abravalheri/validate-pyproject/"
-Documentation = "https://validate-pyproject.readthedocs.io/"
-Source = "https://github.com/abravalheri/validate-pyproject"
-Tracker = "https://github.com/abravalheri/validate-pyproject/issues"
-Changelog = "https://validate-pyproject.readthedocs.io/en/latest/changelog.html"
-Download = "https://pypi.org/project/validate-pyproject/#files"
-
-[project.optional-dependencies]
-all = [
-    "packaging>=24.2",
-    "tomli>=1.2.1; python_version<'3.11'",
-    "trove-classifiers>=2021.10.20",
+dependencies = [ "fastjsonschema>=2.16.2,<=3" ]
+optional-dependencies.all = [
+  "packaging>=24.2",
+  "tomli>=1.2.1; python_version<'3.11'",
+  "trove-classifiers>=2021.10.20",
 ]
-store = ["validate-pyproject-schema-store"]
-
-[project.scripts]
-validate-pyproject = "validate_pyproject.cli:main"
-
-[project.entry-points."validate_pyproject.tool_schema"]
-setuptools = "validate_pyproject.api:load_builtin_plugin"
-distutils = "validate_pyproject.api:load_builtin_plugin"
-
-[project.entry-points."repo_review.checks"]
-validate_pyproject = "validate_pyproject.repo_review:repo_review_checks"
-
-[project.entry-points."repo_review.families"]
-validate_pyproject = "validate_pyproject.repo_review:repo_review_families"
+optional-dependencies.store = [ "validate-pyproject-schema-store" ]
+urls.Changelog = "https://validate-pyproject.readthedocs.io/en/latest/changelog.html"
+urls.Documentation = "https://validate-pyproject.readthedocs.io/"
+urls.Download = "https://pypi.org/project/validate-pyproject/#files"
+urls.Homepage = "https://github.com/abravalheri/validate-pyproject/"
+urls.Source = "https://github.com/abravalheri/validate-pyproject"
+urls.Tracker = "https://github.com/abravalheri/validate-pyproject/issues"
+scripts.validate-pyproject = "validate_pyproject.cli:main"
+entry-points."repo_review.checks".validate_pyproject = "validate_pyproject.repo_review:repo_review_checks"
+entry-points."repo_review.families".validate_pyproject = "validate_pyproject.repo_review:repo_review_families"
+entry-points."validate_pyproject.tool_schema".distutils = "validate_pyproject.api:load_builtin_plugin"
+entry-points."validate_pyproject.tool_schema".setuptools = "validate_pyproject.api:load_builtin_plugin"
 
 [dependency-groups]
 dev = [
-    { include-group = "test" },
-]
-docs = [
-    "furo>=2023.08.17",
-    "sphinx>=7.2.2",
-    "sphinx-argparse>=0.3.1",
-    "sphinx-copybutton",
-    "sphinx-jsonschema>=1.16.11",
-    "sphinxemoji",
+  { include-group = "test" },
 ]
 test = [
-    "setuptools",
-    "pytest>=8.3.3",
-    "pytest-cov",
-    "pytest-xdist",
-    "pytest-randomly",
-    "repo-review; python_version>='3.10'",
-    "tomli>=1.2.1; python_version<'3.11'",
+  "pytest>=8.3.3",
+  "pytest-cov",
+  "pytest-randomly",
+  "pytest-xdist",
+  "repo-review; python_version>='3.10'",
+  "setuptools",
+  "tomli>=1.2.1; python_version<'3.11'",
+]
+docs = [
+  "furo>=2023.8.17",
+  "sphinx>=7.2.2",
+  "sphinx-argparse>=0.3.1",
+  "sphinx-copybutton",
+  "sphinx-jsonschema>=1.16.11",
+  "sphinxemoji",
 ]
 typecheck = [
-    "mypy",
-    "importlib-resources",
-]
-
-[tool.uv]
-environments = [
-  "python_version >= '3.9'",
-]
-dev-dependencies = [
-  "validate_pyproject[all]",
+  "importlib-resources",
+  "mypy",
 ]
 
 [tool.setuptools_scm]
 version_scheme = "no-guess-dev"
+
+[tool.ruff]
+lint.ignore = [ "PLC0415" ]
+
+[tool.repo-review]
+ignore = [ "PP302", "PP304", "PP305", "PP306", "PP308", "PP309", "PC140", "PC180", "PC901" ]
 
 [tool.pytest.ini_options]
 addopts = """
@@ -95,13 +88,13 @@ addopts = """
     --strict-markers
     --verbose
 """
-norecursedirs = ["dist", "build", ".*"]
-testpaths = ["src", "tests"]
+norecursedirs = [ "dist", "build", ".*" ]
+testpaths = [ "src", "tests" ]
 log_cli_level = "info"
 
 [tool.mypy]
-python_version = "3.8"
-enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
+python_version = "3.10"
+enable_error_code = [ "ignore-without-code", "redundant-expr", "truthy-bool" ]
 show_traceback = true
 warn_unreachable = true
 strict = true
@@ -110,8 +103,13 @@ disallow_any_generics = false
 disallow_subclassing_any = false
 
 [[tool.mypy.overrides]]
-module = ["fastjsonschema", "setuptools._vendor.packaging"]
+module = [ "fastjsonschema", "setuptools._vendor.packaging" ]
 ignore_missing_imports = true
 
-[tool.repo-review]
-ignore = ["PP302", "PP304", "PP305", "PP306", "PP308", "PP309", "PC140", "PC180", "PC901"]
+[tool.uv]
+environments = [
+  "python_version >= '3.10'",
+]
+dev-dependencies = [
+  "validate_pyproject[all]",
+]

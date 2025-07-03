@@ -6,19 +6,12 @@ import json
 import logging
 import sys
 import typing
+from collections.abc import Callable, Iterator, Mapping, Sequence
 from enum import Enum
 from functools import partial, reduce
 from types import MappingProxyType, ModuleType
 from typing import (
-    Callable,
-    Dict,
-    Iterator,
-    Mapping,
-    Optional,
-    Sequence,
-    Tuple,
     TypeVar,
-    Union,
 )
 
 import fastjsonschema as FJS
@@ -37,7 +30,7 @@ if typing.TYPE_CHECKING:  # pragma: no cover
 if sys.version_info >= (3, 9):  # pragma: no cover
     from importlib.resources import files
 
-    def read_text(package: Union[str, ModuleType], resource: str) -> str:
+    def read_text(package: str | ModuleType, resource: str) -> str:
         """:meta private:"""
         return files(package).joinpath(resource).read_text(encoding="utf-8")
 
@@ -95,7 +88,7 @@ class SchemaRegistry(Mapping[str, Schema]):
     """
 
     def __init__(self, plugins: Sequence["PluginProtocol"] = ()):
-        self._schemas: Dict[str, Tuple[str, str, Schema]] = {}
+        self._schemas: dict[str, tuple[str, str, Schema]] = {}
         # (which part of the TOML, who defines, schema)
 
         top_level = typing.cast("dict", load(TOP_LEVEL_SCHEMA))  # Make it mutable
@@ -114,7 +107,7 @@ class SchemaRegistry(Mapping[str, Schema]):
         # Add tools using Plugins
         for plugin in plugins:
             if plugin.tool:
-                allow_overwrite: Optional[str] = None
+                allow_overwrite: str | None = None
                 if plugin.tool in tool_properties:
                     _logger.warning(f"{plugin} overwrites `tool.{plugin.tool}` schema")
                     allow_overwrite = plugin.schema.get("$id")
@@ -150,7 +143,7 @@ class SchemaRegistry(Mapping[str, Schema]):
         self,
         reference: str,
         schema: Schema,
-        allow_overwrite: Optional[str] = None,
+        allow_overwrite: str | None = None,
     ) -> Schema:
         if "$id" not in schema or not schema["$id"]:
             raise errors.SchemaMissingId(reference or "<extra>")
@@ -212,15 +205,15 @@ class Validator:
 
     def __init__(
         self,
-        plugins: Union[Sequence["PluginProtocol"], AllPlugins] = ALL_PLUGINS,
+        plugins: Sequence["PluginProtocol"] | AllPlugins = ALL_PLUGINS,
         format_validators: Mapping[str, FormatValidationFn] = FORMAT_FUNCTIONS,
         extra_validations: Sequence[ValidationFn] = EXTRA_VALIDATIONS,
         *,
         extra_plugins: Sequence["PluginProtocol"] = (),
     ):
-        self._code_cache: Optional[str] = None
-        self._cache: Optional[ValidationFn] = None
-        self._schema: Optional[Schema] = None
+        self._code_cache: str | None = None
+        self._cache: ValidationFn | None = None
+        self._schema: Schema | None = None
 
         # Let's make the following options readonly
         self._format_validators = MappingProxyType(format_validators)

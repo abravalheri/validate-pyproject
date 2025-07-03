@@ -4,9 +4,10 @@ import logging
 import os
 import re
 import typing
+from collections.abc import Generator, Iterator, Sequence
 from contextlib import contextmanager
 from textwrap import indent, wrap
-from typing import Any, Dict, Generator, Iterator, List, Optional, Sequence, Union
+from typing import Any
 
 from fastjsonschema import JsonSchemaValueException
 
@@ -173,8 +174,8 @@ class _ErrorFormatting:
 class _SummaryWriter:
     _IGNORE = frozenset(("description", "default", "title", "examples"))
 
-    def __init__(self, jargon: Optional[Dict[str, str]] = None):
-        self.jargon: Dict[str, str] = jargon or {}
+    def __init__(self, jargon: dict[str, str] | None = None):
+        self.jargon: dict[str, str] = jargon or {}
         # Clarify confusing terms
         self._terms = {
             "anyOf": "at least one of the following",
@@ -207,14 +208,14 @@ class _SummaryWriter:
             "multipleOf",
         ]
 
-    def _jargon(self, term: Union[str, List[str]]) -> Union[str, List[str]]:
+    def _jargon(self, term: str | list[str]) -> str | list[str]:
         if isinstance(term, list):
             return [self.jargon.get(t, t) for t in term]
         return self.jargon.get(term, term)
 
     def __call__(
         self,
-        schema: Union[dict, List[dict]],
+        schema: dict | list[dict],
         prefix: str = "",
         *,
         _path: Sequence[str] = (),
@@ -261,15 +262,15 @@ class _SummaryWriter:
         return any(key.startswith(k) for k in "$_") or key in self._IGNORE
 
     def _filter_unecessary(
-        self, schema: Dict[str, Any], path: Sequence[str]
-    ) -> Dict[str, Any]:
+        self, schema: dict[str, Any], path: Sequence[str]
+    ) -> dict[str, Any]:
         return {
             key: value
             for key, value in schema.items()
             if not self._is_unecessary([*path, key])
         }
 
-    def _handle_simple_dict(self, value: dict, path: Sequence[str]) -> Optional[str]:
+    def _handle_simple_dict(self, value: dict, path: Sequence[str]) -> str | None:
         inline = any(p in value for p in self._guess_inline_defs)
         simple = not any(isinstance(v, (list, dict)) for v in value.values())
         if inline or simple:
@@ -328,7 +329,7 @@ class _SummaryWriter:
         return len(parent_prefix) * " " + child_prefix
 
 
-def _separate_terms(word: str) -> List[str]:
+def _separate_terms(word: str) -> list[str]:
     """
     >>> _separate_terms("FooBar-foo")
     ['foo', 'bar', 'foo']
