@@ -72,6 +72,8 @@ using |pipx|_:
 .. code-block:: bash
 
     $ pipx install 'validate-pyproject[all]'
+    # or to install and run in a single command
+    $ pipx run --spec='validate-pyproject[all]' validate-pyproject --help
 
 Now you can use ``validate-pyproject`` as a command line tool:
 
