@@ -73,7 +73,7 @@ using |pipx|_:
 
     $ pipx install 'validate-pyproject[all]'
     # or to install and run in a single command
-    $ pipx run --spec='validate-pyproject[all]' validate-pyproject --help
+    $ pipx run 'validate-pyproject[all]' --help
 
 Now you can use ``validate-pyproject`` as a command line tool:
 
