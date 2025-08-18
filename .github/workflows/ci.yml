@@ -30,7 +30,7 @@ jobs:
     outputs:
       wheel-distribution: ${{ steps.wheel-distribution.outputs.path }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with: {fetch-depth: 0}  # deep clone for setuptools-scm
       - uses: actions/setup-python@v5
         with: {python-version: "3.10"}
@@ -78,16 +78,16 @@ jobs:
         - windows-latest
     runs-on: ${{ matrix.platform }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
       - uses: astral-sh/setup-uv@v6
       - name: Retrieve pre-built distribution files
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with: {name: python-distribution-files, path: dist/}
       - name: Retrieve test download files
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: test-download-files
           path: ${{ env.VALIDATE_PYPROJECT_CACHE_REMOTE }}
@@ -122,12 +122,12 @@ jobs:
     if: ${{ github.event_name == 'push' && contains(github.ref, 'refs/tags/') }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: actions/setup-python@v5
         with: {python-version: "3.10"}
       - uses: astral-sh/setup-uv@v6
       - name: Retrieve pre-built distribution files
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with: {name: python-distribution-files, path: dist/}
       - name: Publish Package
         env:
