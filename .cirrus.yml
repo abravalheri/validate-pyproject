@@ -98,6 +98,8 @@ linux_task:
       skip: $BRANCH !=~ "^(main|master)$"
     - name: test (Linux - 3.13)
       container: {image: "python:3.13-bookworm"}
+    - name: test (Linux - 3.13)
+      container: {image: "python:3.13-trixie"}
     - name: test (Linux - 3.14)
       container: {image: "python:3.14-rc-bookworm"}
       allow_failures: true  # RC
