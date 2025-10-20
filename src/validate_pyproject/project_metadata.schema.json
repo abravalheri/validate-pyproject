@@ -233,6 +233,20 @@
         }
       }
     },
+    "import-names": {
+      "description": "Lists import names which a project, when installed, would exclusively provide.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "import-namespaces": {
+      "description": "Lists import names that, when installed, would be provided by the project, but not exclusively.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
     "dynamic": {
       "type": "array",
       "$$description": [
@@ -256,7 +270,9 @@
           "gui-scripts",
           "entry-points",
           "dependencies",
-          "optional-dependencies"
+          "optional-dependencies",
+          "import-names",
+          "import-namespaces"
         ]
       }
     }
