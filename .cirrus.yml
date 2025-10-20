@@ -22,9 +22,9 @@ env:
 
 .task_template: &task-template
   debug_information_script:
-    - echo "$(which python) -- $(python -VV)"
+    - echo "$(which python3) -- $(python3 -VV)"
     - echo "$(which pip) -- $(pip -VV)"
-    - python -c 'import os, sys; print(os.name, sys.platform, getattr(sys, "abiflags", None))'
+    - python3 -c 'import os, sys; print(os.name, sys.platform, getattr(sys, "abiflags", None))'
   prepare_script:  # avoid git failing with setuptools-scm
     - git config --global user.email "you@example.com"
     - git config --global user.name "Your Name"
@@ -45,7 +45,7 @@ env:
   test_files_cache:
     folder: ${VALIDATE_PYPROJECT_CACHE_REMOTE}
     fingerprint_script: echo $CIRRUS_BUILD_ID
-    populate_script: python tools/cache_urls_for_tests.py
+    populate_script: python3 tools/cache_urls_for_tests.py
     reupload_on_changes: true
   download_artifact_script: &download-artifact
     - curl -L -O ${CIRRUS_ARTIFACT_URL}/build/upload/dist.tar.gz
@@ -104,7 +104,7 @@ linux_task:
       container: {image: "python:3.14-rc-bookworm"}
       allow_failures: true  # RC
   install_script:
-    - python -m pip install --upgrade pip tox tox-uv pipx
+    - python3 -m pip install --upgrade pip tox tox-uv pipx
   <<: *test-template
   alias: base-test
 
@@ -134,6 +134,7 @@ freebsd_task:
     - pkg remove -y python lang/python
     - pkg install -y git python311 py311-pip py311-gdbm py311-sqlite3 py311-tox py311-tomli py311-pipx
     - ln -s /usr/local/bin/python3.11 /usr/local/bin/python
+    - ln -s /usr/local/bin/python3.11 /usr/local/bin/python3
   <<: *test-template
   depends_on: [build, base-test]
 
@@ -151,7 +152,7 @@ windows_task:
     - choco install -y --no-progress python3 --version=3.12.5 --params "/NoLockdown"
     - choco install -y --no-progress curl
     - pip install --upgrade certifi
-    - python -m pip install -U pip tox tox-uv pipx
+    - python3 -m pip install -U pip tox tox-uv pipx
   <<: *test-template
   depends_on: [build, base-test]
 
