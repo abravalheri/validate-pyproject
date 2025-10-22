@@ -123,7 +123,9 @@ macos_task:
   env:
     PATH: "/opt/homebrew/opt/python/libexec/bin:${PATH}"
   brew_cache: {folder: "$HOME/Library/Caches/Homebrew"}
-  install_script: brew install python tox pipx
+  install_script:
+    - brew reinstall python
+    - brew install tox pipx
   <<: *test-template
   depends_on: [build, base-test]
 
