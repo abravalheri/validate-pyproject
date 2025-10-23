@@ -98,6 +98,8 @@ linux_task:
       skip: $BRANCH !=~ "^(main|master)$"
     - name: test (Linux - 3.13)
       container: {image: "python:3.13-bookworm"}
+    - name: test (Linux - 3.13)
+      container: {image: "python:3.13-trixie"}
     - name: test (Linux - 3.14)
       container: {image: "python:3.14-rc-bookworm"}
       allow_failures: true  # RC
@@ -121,7 +123,9 @@ macos_task:
   env:
     PATH: "/opt/homebrew/opt/python/libexec/bin:${PATH}"
   brew_cache: {folder: "$HOME/Library/Caches/Homebrew"}
-  install_script: brew install python tox pipx
+  install_script:
+    - brew reinstall python
+    - brew install tox pipx
   <<: *test-template
   depends_on: [build, base-test]
 

@@ -30,10 +30,10 @@ jobs:
     outputs:
       wheel-distribution: ${{ steps.wheel-distribution.outputs.path }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with: {fetch-depth: 0}  # deep clone for setuptools-scm
-      - uses: actions/setup-python@v5
-        with: {python-version: "3.10"}
+      - uses: actions/setup-python@v6
+        with: {python-version: "3.x"}
       - uses: astral-sh/setup-uv@v6
       - name: Run static analysis and format checkers
         run: >-
@@ -55,7 +55,7 @@ jobs:
           path: dist/
           retention-days: 1
       - name: Download files used for testing
-        run: python3.10 tools/cache_urls_for_tests.py
+        run: python tools/cache_urls_for_tests.py
       - name: Store downloaded files
         uses: actions/upload-artifact@v4
         with:
@@ -72,22 +72,24 @@ jobs:
         python:
         - "3.8"   # oldest Python supported by validate-pyproject
         - "3.x"   # newest Python that is stable
+        - "3.14"
         platform:
         - ubuntu-latest
-        - macos-13
+        - macos-15-intel
         - windows-latest
     runs-on: ${{ matrix.platform }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python }}
+          allow-prereleases: true
       - uses: astral-sh/setup-uv@v6
       - name: Retrieve pre-built distribution files
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with: {name: python-distribution-files, path: dist/}
       - name: Retrieve test download files
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: test-download-files
           path: ${{ env.VALIDATE_PYPROJECT_CACHE_REMOTE }}
@@ -122,12 +124,12 @@ jobs:
     if: ${{ github.event_name == 'push' && contains(github.ref, 'refs/tags/') }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with: {python-version: "3.10"}
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with: {python-version: "3.x"}
       - uses: astral-sh/setup-uv@v6
       - name: Retrieve pre-built distribution files
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with: {name: python-distribution-files, path: dist/}
       - name: Publish Package
         env:
