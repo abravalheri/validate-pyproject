@@ -34,7 +34,7 @@ jobs:
         with: {fetch-depth: 0}  # deep clone for setuptools-scm
       - uses: actions/setup-python@v6
         with: {python-version: "3.x"}
-      - uses: astral-sh/setup-uv@v6
+      - uses: astral-sh/setup-uv@v7
       - name: Run static analysis and format checkers
         run: >-
           uvx --with tox-uv
@@ -49,7 +49,7 @@ jobs:
       - name: Store the distribution files for use in other stages
         # `tests` and `publish` will use the same pre-built distributions,
         # so we make sure to release the exact same package that was tested
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: python-distribution-files
           path: dist/
@@ -57,7 +57,7 @@ jobs:
       - name: Download files used for testing
         run: python tools/cache_urls_for_tests.py
       - name: Store downloaded files
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: test-download-files
           path: ${{ env.VALIDATE_PYPROJECT_CACHE_REMOTE }}
@@ -84,12 +84,12 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
           allow-prereleases: true
-      - uses: astral-sh/setup-uv@v6
+      - uses: astral-sh/setup-uv@v7
       - name: Retrieve pre-built distribution files
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with: {name: python-distribution-files, path: dist/}
       - name: Retrieve test download files
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           name: test-download-files
           path: ${{ env.VALIDATE_PYPROJECT_CACHE_REMOTE }}
@@ -127,9 +127,9 @@ jobs:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v6
         with: {python-version: "3.x"}
-      - uses: astral-sh/setup-uv@v6
+      - uses: astral-sh/setup-uv@v7
       - name: Retrieve pre-built distribution files
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with: {name: python-distribution-files, path: dist/}
       - name: Publish Package
         env:
