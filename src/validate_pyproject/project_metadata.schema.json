@@ -237,14 +237,16 @@
       "description": "Lists import names which a project, when installed, would exclusively provide.",
       "type": "array",
       "items": {
-        "type": "string"
+        "type": "string",
+        "format": "import-name"
       }
     },
     "import-namespaces": {
       "description": "Lists import names that, when installed, would be provided by the project, but not exclusively.",
       "type": "array",
       "items": {
-        "type": "string"
+        "type": "string",
+        "format": "import-name"
       }
     },
     "dynamic": {
