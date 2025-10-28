@@ -1,0 +1,1 @@
+Duplicated names are not allowed in import-names/import-namespaces
