@@ -52,6 +52,7 @@ validate_pyproject = "validate_pyproject.repo_review:repo_review_families"
 [dependency-groups]
 dev = [
     { include-group = "test" },
+    "validate_pyproject[all]",
 ]
 docs = [
     "furo>=2023.08.17",
@@ -78,9 +79,6 @@ typecheck = [
 [tool.uv]
 environments = [
   "python_version >= '3.9'",
-]
-dev-dependencies = [
-  "validate_pyproject[all]",
 ]
 
 [tool.setuptools_scm]
