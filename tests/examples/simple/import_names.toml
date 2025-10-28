@@ -1,0 +1,5 @@
+[project]
+name = "hi"
+version = "1.0.0"
+import-names = ["one", "one.two", "two; private"]
+import-namespaces = ["_other ; private"]

@@ -11,6 +11,8 @@ requires-python = ">=3.9"
 readme = "README.md"
 keywords = ["packaging", "PEP 517", "build"]
 dynamic = ["version"]
+import-names = ["pdm.backend"]
+import-namespaces = ["pdm"]
 
 classifiers = [
     "Development Status :: 5 - Production/Stable",

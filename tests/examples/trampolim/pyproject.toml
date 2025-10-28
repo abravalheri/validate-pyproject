@@ -23,7 +23,7 @@ classifiers = [
   'Development Status :: 4 - Beta',
   'Programming Language :: Python'
 ]
-
+import-namespaces = ["trampolim"]
 dependencies = [
   'tomli>=1.0.0',
   'packaging',
