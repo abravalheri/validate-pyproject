@@ -26,7 +26,7 @@ repos:
     args: ["--ignore-words-list=THIRDPARTY", --write-changes]
 
 - repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.14.2
+  rev: v0.14.3
   hooks:
   - id: ruff-check
     args: [--exclude=tools/to_schemastore.py, "--ignore=PLC0415,RUF200", --fix, --show-fixes, ]
