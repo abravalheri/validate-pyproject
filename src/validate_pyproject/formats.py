@@ -8,6 +8,7 @@ function with a ``-`` to obtain the format name and vice versa.
 """
 
 import builtins
+import keyword
 import logging
 import os
 import re
@@ -400,3 +401,27 @@ except ImportError:  # pragma: no cover
 
     def SPDX(value: str) -> bool:
         return True
+
+
+VALID_IMPORT_NAME = re.compile(
+    r"""
+    ^                                  # start of string
+        [A-Za-z_][A-Za-z_0-9]+         # a valid Python identifier
+        (?:\.[A-Za-z_][A-Za-z_0-9]*)*  # optionally followed by .identifier's
+    (?:\s*;\s*private)?                # optionally followed by ; private
+    $                                  # end of string
+    """,
+    re.VERBOSE,
+)
+
+
+def import_name(value: str) -> bool:
+    """This is a valid import name. It has to be series of python identifiers
+    (not keywords), separated by dots, optionally followed by a semicolon and
+    the keyword "private".
+    """
+    if VALID_IMPORT_NAME.match(value) is None:
+        return False
+
+    idents, _, _ = value.partition(";")
+    return all(not keyword.iskeyword(ident) for ident in idents.rstrip().split("."))

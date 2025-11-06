@@ -455,3 +455,16 @@ class TestClassifiers:
 def test_private_classifier():
     assert formats.trove_classifier("private :: Keep Off PyPI") is True
     assert formats.trove_classifier("private:: Keep Off PyPI") is False
+
+
+def test_import_name():
+    assert formats.import_name("simple")
+    assert formats.import_name("some1; private")
+    assert formats.import_name("other.thing ; private")
+    assert formats.import_name("_other._thing ; private")
+
+    assert not formats.import_name("one two")
+    assert not formats.import_name("one; two")
+    assert not formats.import_name("1thing")
+    assert not formats.import_name("for")
+    assert not formats.import_name("thing.is.keyword")

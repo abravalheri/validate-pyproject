@@ -1,0 +1,5 @@
+[project]
+name = "hi"
+version = "1.0.0"
+import-names = ["one"]
+import-namespaces = ["one; private"]
