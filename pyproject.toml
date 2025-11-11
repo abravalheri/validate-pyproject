@@ -97,7 +97,7 @@ addopts = """
 """
 norecursedirs = ["dist", "build", ".*"]
 testpaths = ["src", "tests"]
-log_cli_level = "info"
+log_level = "INFO"
 
 [tool.mypy]
 python_version = "3.8"
