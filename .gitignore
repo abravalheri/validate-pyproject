@@ -52,3 +52,7 @@ MANIFEST
 .venv*/
 .conda*/
 .python-version
+
+# Lock files
+uv.lock
+*pylock.toml
