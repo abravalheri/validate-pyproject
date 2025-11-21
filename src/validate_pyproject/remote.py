@@ -78,7 +78,8 @@ def load_store(pyproject_url: str) -> Generator[RemotePlugin, None, None]:
             _logger.info(f"Loading {tool} from store: {pyproject_url}")
             rp = RemotePlugin.from_url(tool, info["$ref"])
             yield rp
-            for values in rp.schema["properties"].values():
+            # Does not support anyOf and similar with properties inside them
+            for values in rp.schema.get("properties", {}).values():
                 url = values.get("$ref", "")
                 if url.startswith(("https://", "https://")):
                     yield RemotePlugin.from_url("", url)
