@@ -29,7 +29,7 @@ repos:
   rev: v0.14.4
   hooks:
   - id: ruff-check
-    args: [--exclude=tools/to_schemastore.py, "--ignore=PLC0415,RUF200", --fix, --show-fixes, ]
+    args: [--fix, --show-fixes]
   - id: ruff-format
 
 - repo: https://github.com/adamchainz/blacken-docs
