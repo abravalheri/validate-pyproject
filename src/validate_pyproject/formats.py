@@ -369,9 +369,39 @@ def uint16(value: builtins.int) -> bool:
     return 0 <= value < 2**16
 
 
-def uint(value: builtins.int) -> bool:
+def uint32(value: builtins.int) -> bool:
+    r"""Unsigned 32-bit integer (:math:`0 \leq x < 2^{32}`)"""
+    return 0 <= value < 2**32
+
+
+def uint64(value: builtins.int) -> bool:
     r"""Unsigned 64-bit integer (:math:`0 \leq x < 2^{64}`)"""
     return 0 <= value < 2**64
+
+
+def uint(value: builtins.int) -> bool:
+    r"""Signed 64-bit integer (:math:`0 \leq x < 2^{64}`)"""
+    return 0 <= value < 2**64
+
+
+def int8(value: builtins.int) -> bool:
+    r"""Signed 8-bit integer (:math:`-2^{7} \leq x < 2^{7}`)"""
+    return -(2**7) <= value < 2**7
+
+
+def int16(value: builtins.int) -> bool:
+    r"""Signed 16-bit integer (:math:`-2^{15} \leq x < 2^{15}`)"""
+    return -(2**15) <= value < 2**15
+
+
+def int32(value: builtins.int) -> bool:
+    r"""Signed 32-bit integer (:math:`-2^{31} \leq x < 2^{31}`)"""
+    return -(2**31) <= value < 2**31
+
+
+def int64(value: builtins.int) -> bool:
+    r"""Signed 64-bit integer (:math:`-2^{63} \leq x < 2^{63}`)"""
+    return -(2**63) <= value < 2**63
 
 
 def int(value: builtins.int) -> bool:
