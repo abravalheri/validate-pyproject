@@ -1,5 +1,6 @@
 # --- General config ---
 target-version = "py38"
+exclude = ["tools/to_schemastore.py", "tests/invalid-examples"]
 
 # --- Linting config ---
 [lint]
@@ -25,7 +26,7 @@ extend-select = [
   "YTT",         # flake8-2020
 ]
 ignore = [
-  "SIM105",  # contextlib.supress (3.7 feature)
+  "PLC0415",  # import at top of file
 ]
 
 [lint.per-file-ignores]
