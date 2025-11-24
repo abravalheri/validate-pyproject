@@ -214,7 +214,7 @@ class _TroveClassifier:
         return value in self.downloaded or value.lower().startswith("private ::")
 
 
-if os.getenv("VALIDATE_PYPROJECT_NO_TROVE_CLASSIFIERS"):
+if os.getenv("VALIDATE_PYPROJECT_NO_TROVE_CLASSIFIERS") and not typing.TYPE_CHECKING:
     trove_classifier = _TroveClassifier()
 else:
     try:
