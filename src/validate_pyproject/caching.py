@@ -1,11 +1,15 @@
 # This module is intentionally kept minimal,
 # so that it can be imported without triggering imports outside stdlib.
+from __future__ import annotations
+
 import hashlib
-import io
 import logging
 import os
 from pathlib import Path
-from typing import Callable, Optional, Union
+from typing import TYPE_CHECKING, Callable, Union
+
+if TYPE_CHECKING:
+    import io
 
 PathLike = Union[str, "os.PathLike[str]"]
 _logger = logging.getLogger(__name__)
@@ -14,8 +18,8 @@ _logger = logging.getLogger(__name__)
 def as_file(
     fn: Callable[[str], io.StringIO],
     arg: str,
-    cache_dir: Optional[PathLike] = None,
-) -> Union[io.StringIO, io.BufferedReader]:
+    cache_dir: PathLike | None = None,
+) -> io.StringIO | io.BufferedReader:
     """
     Cache the result of calling ``fn(arg)`` into a file inside ``cache_dir``.
     The file name is derived from ``arg``.
@@ -36,7 +40,7 @@ def as_file(
     return open(cache_path, "rb")
 
 
-def path_for(arbitrary_id: str, cache: Optional[PathLike] = None) -> Optional[Path]:
+def path_for(arbitrary_id: str, cache: PathLike | None = None) -> Path | None:
     cache_dir = cache or os.getenv("VALIDATE_PYPROJECT_CACHE_REMOTE")
     if not cache_dir:
         return None

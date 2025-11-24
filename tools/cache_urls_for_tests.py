@@ -19,14 +19,14 @@ SCHEMA_STORE = "https://json.schemastore.org/pyproject.json"
 def iter_test_urls():
     with caching.as_file(http.open_url, SCHEMA_STORE) as f:
         store = json.load(f)
-        for _, tool in store["properties"]["tool"]["properties"].items():
+        for tool in store["properties"]["tool"]["properties"].values():
             if "$ref" in tool and tool["$ref"].startswith(("http://", "https://")):
                 yield tool["$ref"]
 
     files = PROJECT.glob("**/test_config.json")
     for file in files:
         content = json.loads(file.read_text("utf-8"))
-        for _, url in content.get("tools", {}).items():
+        for url in content.get("tools", {}).values():
             if url.startswith(("http://", "https://")):
                 yield url
 
@@ -44,10 +44,11 @@ def download_all(cache: str):
 if __name__ == "__main__":
     cache = os.getenv("VALIDATE_PYPROJECT_CACHE_REMOTE")
     if not cache:
-        raise SystemExit("Please define VALIDATE_PYPROJECT_CACHE_REMOTE")
+        msg = "Please define VALIDATE_PYPROJECT_CACHE_REMOTE"
+        raise SystemExit(msg)
 
     Path(cache).mkdir(parents=True, exist_ok=True)
     downloads = download_all(cache)
-    assert len(downloads) > 0, f"empty {downloads=!r}"  # noqa
+    assert len(downloads) > 0, f"empty {downloads=!r}"
     files = list(map(print, Path(cache).iterdir()))
-    assert len(files) > 0, f"empty {files=!r}"  # noqa
+    assert len(files) > 0, f"empty {files=!r}"

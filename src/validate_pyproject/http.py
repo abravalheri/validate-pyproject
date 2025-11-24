@@ -10,6 +10,7 @@ else:
 
     def open_url(url: str) -> io.StringIO:
         if not url.startswith(("http:", "https:")):
-            raise ValueError("URL must start with 'http:' or 'https:'")
+            msg = "URL must start with 'http:' or 'https:'"
+            raise ValueError(msg)
         with urlopen(url) as response:  # noqa: S310
             return io.StringIO(response.read().decode("utf-8"))

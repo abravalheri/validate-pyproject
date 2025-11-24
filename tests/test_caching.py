@@ -17,7 +17,8 @@ def fn1(arg: str) -> io.StringIO:
 
 
 def fn2(arg: str) -> io.StringIO:
-    raise RuntimeError("should not be called")
+    msg = "should not be called"
+    raise RuntimeError(msg)
 
 
 def test_as_file(tmp_path):

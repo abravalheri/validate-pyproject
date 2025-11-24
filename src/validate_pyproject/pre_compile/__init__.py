@@ -1,5 +1,6 @@
+from __future__ import annotations
+
 import logging
-import os
 from importlib import metadata as _M
 from pathlib import Path
 from types import MappingProxyType
@@ -10,6 +11,8 @@ import fastjsonschema as FJS
 from .. import api, dist_name, types
 
 if TYPE_CHECKING:  # pragma: no cover
+    import os
+
     from ..plugins import PluginProtocol
 
 
@@ -24,13 +27,13 @@ TEXT_REPLACEMENTS = MappingProxyType(
 
 
 def pre_compile(  # noqa: PLR0913
-    output_dir: Union[str, os.PathLike] = ".",
+    output_dir: str | os.PathLike = ".",
     main_file: str = "__init__.py",
     original_cmd: str = "",
-    plugins: Union[api.AllPlugins, Sequence["PluginProtocol"]] = api.ALL_PLUGINS,
+    plugins: api.AllPlugins | Sequence[PluginProtocol] = api.ALL_PLUGINS,
     text_replacements: Mapping[str, str] = TEXT_REPLACEMENTS,
     *,
-    extra_plugins: Sequence["PluginProtocol"] = (),
+    extra_plugins: Sequence[PluginProtocol] = (),
 ) -> Path:
     """Populate the given ``output_dir`` with all files necessary to perform
     the validation.
@@ -58,33 +61,33 @@ def pre_compile(  # noqa: PLR0913
     return out
 
 
-def replace_text(text: str, replacements: Dict[str, str]) -> str:
+def replace_text(text: str, replacements: dict[str, str]) -> str:
     for orig, subst in replacements.items():
         text = text.replace(orig, subst)
     return text
 
 
 def copy_fastjsonschema_exceptions(
-    output_dir: Path, replacements: Dict[str, str]
+    output_dir: Path, replacements: dict[str, str]
 ) -> Path:
     code = replace_text(api.read_text(FJS.__name__, "exceptions.py"), replacements)
     return _write(output_dir / "fastjsonschema_exceptions.py", code)
 
 
-def copy_module(name: str, output_dir: Path, replacements: Dict[str, str]) -> Path:
+def copy_module(name: str, output_dir: Path, replacements: dict[str, str]) -> Path:
     code = api.read_text(api.__package__, f"{name}.py")
     return _write(output_dir / f"{name}.py", replace_text(code, replacements))
 
 
 def write_main(
-    file_path: Path, schema: types.Schema, replacements: Dict[str, str]
+    file_path: Path, schema: types.Schema, replacements: dict[str, str]
 ) -> Path:
     code = api.read_text(__name__, "main_file.template")
     return _write(file_path, replace_text(code, replacements))
 
 
 def write_notice(
-    out: Path, main_file: str, cmd: str, replacements: Dict[str, str]
+    out: Path, main_file: str, cmd: str, replacements: dict[str, str]
 ) -> Path:
     if cmd:
         opening = api.read_text(__name__, "cli-notice.template")
@@ -98,7 +101,7 @@ def write_notice(
     return _write(out / "NOTICE", notice)
 
 
-def load_licenses() -> Dict[str, str]:
+def load_licenses() -> dict[str, str]:
     return {
         "fastjsonschema_license": _find_and_load_licence(_M.files("fastjsonschema")),
         "validate_pyproject_license": _find_and_load_licence(_M.files(dist_name)),
@@ -117,9 +120,10 @@ NOCHECK_HEADERS = (
 )
 
 
-def _find_and_load_licence(files: Optional[Sequence[_M.PackagePath]]) -> str:
+def _find_and_load_licence(files: Sequence[_M.PackagePath] | None) -> str:
     if files is None:  # pragma: no cover
-        raise ImportError("Could not find LICENSE for package")
+        msg = "Could not find LICENSE for package"
+        raise ImportError(msg)
     try:
         return next(f for f in files if f.stem.upper() == "LICENSE").read_text("UTF-8")
     except FileNotFoundError:  # pragma: no cover

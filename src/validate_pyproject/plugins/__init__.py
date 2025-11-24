@@ -5,6 +5,8 @@
 .. _entry point: https://setuptools.readthedocs.io/en/latest/userguide/entry_point.html
 """
 
+from __future__ import annotations
+
 import typing
 from importlib.metadata import EntryPoint, entry_points
 from itertools import chain
@@ -23,7 +25,9 @@ from typing import (
 )
 
 from .. import __version__
-from ..types import Plugin, Schema
+
+if typing.TYPE_CHECKING:
+    from ..types import Plugin, Schema
 
 _DEFAULT_MULTI_PRIORITY = 0
 _DEFAULT_TOOL_PRIORITY = 1
@@ -182,7 +186,7 @@ def load_from_multi_entry_point(
 
 class _SortablePlugin(NamedTuple):
     name: str
-    plugin: Union[PluginWrapper, StoredPlugin]
+    plugin: PluginWrapper | StoredPlugin
 
     def key(self) -> str:
         return self.plugin.tool or self.plugin.id
@@ -208,7 +212,7 @@ class _SortablePlugin(NamedTuple):
 
 def list_from_entry_points(
     filtering: Callable[[EntryPoint], bool] = lambda _: True,
-) -> List[Union[PluginWrapper, StoredPlugin]]:
+) -> list[PluginWrapper | StoredPlugin]:
     """Produces a list of plugin objects for each plugin registered
     via ``setuptools`` `entry point`_ mechanism.
 
@@ -240,7 +244,7 @@ class ErrorLoadingPlugin(RuntimeError):
     """
     __doc__ = _DESC
 
-    def __init__(self, plugin: str = "", entry_point: Optional[EntryPoint] = None):
+    def __init__(self, plugin: str = "", entry_point: EntryPoint | None = None):
         if entry_point and not plugin:
             plugin = getattr(entry_point, "module", entry_point.name)
 

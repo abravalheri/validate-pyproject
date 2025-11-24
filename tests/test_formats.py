@@ -422,7 +422,7 @@ class TestClassifiers:
         downloader.assert_called_once()
 
     @pytest.mark.parametrize(
-        "no_network", ("NO_NETWORK", "VALIDATE_PYPROJECT_NO_NETWORK")
+        "no_network", ["NO_NETWORK", "VALIDATE_PYPROJECT_NO_NETWORK"]
     )
     def test_always_valid_with_no_network(self, monkeypatch, no_network):
         monkeypatch.setenv(no_network, "1")

@@ -7,7 +7,8 @@ The correspondence is given by replacing the ``_`` character in the name of the
 function with a ``-`` to obtain the format name and vice versa.
 """
 
-import builtins
+from __future__ import annotations
+
 import keyword
 import logging
 import os
@@ -17,6 +18,8 @@ import typing
 from itertools import chain as _chain
 
 if typing.TYPE_CHECKING:
+    import builtins
+
     from typing_extensions import Literal
 
 _logger = logging.getLogger(__name__)
@@ -55,7 +58,9 @@ VERSION_PATTERN = r"""
     (?:\+(?P<local>[a-z0-9]+(?:[-_\.][a-z0-9]+)*))?       # local version
 """
 
-VERSION_REGEX = re.compile(r"^\s*" + VERSION_PATTERN + r"\s*$", re.X | re.I)
+VERSION_REGEX = re.compile(
+    r"^\s*" + VERSION_PATTERN + r"\s*$", re.VERBOSE | re.IGNORECASE
+)
 
 
 def pep440(version: str) -> bool:
@@ -69,7 +74,7 @@ def pep440(version: str) -> bool:
 # PEP 508
 
 PEP508_IDENTIFIER_PATTERN = r"([A-Z0-9]|[A-Z0-9][A-Z0-9._-]*[A-Z0-9])"
-PEP508_IDENTIFIER_REGEX = re.compile(f"^{PEP508_IDENTIFIER_PATTERN}$", re.I)
+PEP508_IDENTIFIER_REGEX = re.compile(f"^{PEP508_IDENTIFIER_PATTERN}$", re.IGNORECASE)
 
 
 def pep508_identifier(name: str) -> bool:
@@ -164,7 +169,7 @@ class _TroveClassifier:
     option (classifiers will be validated anyway during the upload to PyPI).
     """
 
-    downloaded: typing.Union[None, "Literal[False]", typing.Set[str]]
+    downloaded: None | Literal[False] | set[str]
     """
     None => not cached yet
     False => unavailable
@@ -254,7 +259,7 @@ def url(value: str) -> bool:
                 "`scheme` prefix in your URL (e.g. 'http://'). "
                 f"Given value: {value}"
             )
-            if not (value.startswith("/") or value.startswith("\\") or "@" in value):
+            if not (value.startswith(("/", "\\")) or "@" in value):
                 parts = urlparse(f"http://{value}")
 
         return bool(parts.scheme and parts.netloc)
@@ -264,11 +269,13 @@ def url(value: str) -> bool:
 
 # https://packaging.python.org/specifications/entry-points/
 ENTRYPOINT_PATTERN = r"[^\[\s=]([^=]*[^\s=])?"
-ENTRYPOINT_REGEX = re.compile(f"^{ENTRYPOINT_PATTERN}$", re.I)
+ENTRYPOINT_REGEX = re.compile(f"^{ENTRYPOINT_PATTERN}$", re.IGNORECASE)
 RECOMMEDED_ENTRYPOINT_PATTERN = r"[\w.-]+"
-RECOMMEDED_ENTRYPOINT_REGEX = re.compile(f"^{RECOMMEDED_ENTRYPOINT_PATTERN}$", re.I)
+RECOMMEDED_ENTRYPOINT_REGEX = re.compile(
+    f"^{RECOMMEDED_ENTRYPOINT_PATTERN}$", re.IGNORECASE
+)
 ENTRYPOINT_GROUP_PATTERN = r"\w+(\.\w+)*"
-ENTRYPOINT_GROUP_REGEX = re.compile(f"^{ENTRYPOINT_GROUP_PATTERN}$", re.I)
+ENTRYPOINT_GROUP_REGEX = re.compile(f"^{ENTRYPOINT_GROUP_PATTERN}$", re.IGNORECASE)
 
 
 def python_identifier(value: str) -> bool:

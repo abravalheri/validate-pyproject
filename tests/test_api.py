@@ -125,7 +125,7 @@ class TestValidator:
 
     TOOLS = ("distutils", "setuptools")
 
-    @pytest.mark.parametrize("tool, other_tool", zip(TOOLS, reversed(TOOLS)))
+    @pytest.mark.parametrize(("tool", "other_tool"), zip(TOOLS, reversed(TOOLS)))
     def test_plugin_not_enabled(self, tool, other_tool):
         plg = self.plugin(tool)
         validator = api.Validator([plg])
