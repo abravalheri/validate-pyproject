@@ -219,11 +219,11 @@ if os.getenv("VALIDATE_PYPROJECT_NO_TROVE_CLASSIFIERS"):
 else:
     try:
         from trove_classifiers import classifiers as _trove_classifiers
-    
+
         def trove_classifier(value: str) -> bool:
             """See https://pypi.org/classifiers/"""
             return value in _trove_classifiers or value.lower().startswith("private ::")
-    
+
     except ImportError:  # pragma: no cover
         trove_classifier = _TroveClassifier()
 
