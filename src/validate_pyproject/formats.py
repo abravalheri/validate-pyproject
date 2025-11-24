@@ -214,18 +214,18 @@ class _TroveClassifier:
         return value in self.downloaded or value.lower().startswith("private ::")
 
 
-try:
-    from trove_classifiers import classifiers as _trove_classifiers
-
-    def trove_classifier(value: str) -> bool:
-        """See https://pypi.org/classifiers/"""
-        return value in _trove_classifiers or value.lower().startswith("private ::")
-
-    if os.getenv("VALIDATE_PYPROJECT_NO_TROVE_CLASSIFIERS"):  # pragma: no cover
-        raise ImportError()
-
-except ImportError:  # pragma: no cover
+if os.getenv("VALIDATE_PYPROJECT_NO_TROVE_CLASSIFIERS"):
     trove_classifier = _TroveClassifier()
+else:
+    try:
+        from trove_classifiers import classifiers as _trove_classifiers
+    
+        def trove_classifier(value: str) -> bool:
+            """See https://pypi.org/classifiers/"""
+            return value in _trove_classifiers or value.lower().startswith("private ::")
+    
+    except ImportError:  # pragma: no cover
+        trove_classifier = _TroveClassifier()
 
 
 # -------------------------------------------------------------------------------------
