@@ -234,7 +234,7 @@ def run(args: Sequence[str] = ()) -> int:
     for file in params.input_file:
         try:
             _run_on_file(validator, params, file)
-        except _REGULAR_EXCEPTIONS as ex:
+        except _REGULAR_EXCEPTIONS as ex:  # noqa: PERF203
             exceptions.add(f"Invalid {_format_file(file)}", ex)
 
     exceptions.raise_if_any()

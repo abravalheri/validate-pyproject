@@ -36,7 +36,7 @@ def download(url):
     # ^-- side-effect only: write cached file
 
 
-def download_all(cache: str):
+def download_all(cache: str):  # noqa: ARG001
     with ThreadPoolExecutor(max_workers=5) as executor:
         return list(executor.map(download, set(iter_test_urls())))  # Consume iterator
 

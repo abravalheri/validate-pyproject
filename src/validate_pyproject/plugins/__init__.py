@@ -17,11 +17,8 @@ from typing import (
     Callable,
     Generator,
     Iterable,
-    List,
     NamedTuple,
-    Optional,
     Protocol,
-    Union,
 )
 
 from .. import __version__

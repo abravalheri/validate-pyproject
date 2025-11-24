@@ -19,7 +19,7 @@ MODULE_TEMPLATE = """
 __location__ = Path(__file__).parent
 
 
-def gen_stubs(module_dir: str, output_dir: str):
+def gen_stubs(module_dir: str, output_dir: str):  # noqa: ARG001
     shutil.rmtree(output_dir, ignore_errors=True)  # Always start fresh
     out = Path(output_dir)
     out.mkdir(parents=True, exist_ok=True)

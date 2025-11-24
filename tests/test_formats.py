@@ -390,7 +390,7 @@ class TestClassifiers:
     def test_download(self):
         try:
             classifiers = formats._download_classifiers()
-        except Exception as ex:
+        except Exception as ex:  # noqa: BLE001
             pytest.xfail(f"Error with download: {ex.__class__.__name__} - {ex}")
         assert isinstance(classifiers, str)
         assert bytes(classifiers, "utf-8")

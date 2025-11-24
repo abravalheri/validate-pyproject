@@ -4,7 +4,7 @@ import logging
 from importlib import metadata as _M
 from pathlib import Path
 from types import MappingProxyType
-from typing import TYPE_CHECKING, Dict, Mapping, Optional, Sequence, Union
+from typing import TYPE_CHECKING, Mapping, Sequence
 
 import fastjsonschema as FJS
 
@@ -80,7 +80,9 @@ def copy_module(name: str, output_dir: Path, replacements: dict[str, str]) -> Pa
 
 
 def write_main(
-    file_path: Path, schema: types.Schema, replacements: dict[str, str]
+    file_path: Path,
+    schema: types.Schema,  # noqa: ARG001
+    replacements: dict[str, str],
 ) -> Path:
     code = api.read_text(__name__, "main_file.template")
     return _write(file_path, replace_text(code, replacements))

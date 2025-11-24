@@ -74,7 +74,8 @@ def ensure_dict(name: str, value: Any) -> dict:
     if not isinstance(value, dict):
         msg = f"`{value.__class__.__name__}` given (value = {value!r})."
         msg = f"`{name}` should be a dict. {msg}"
-        raise ValueError(msg)
+        # Should be type error according to linter
+        raise ValueError(msg)  # noqa: TRY004
     return value
 
 

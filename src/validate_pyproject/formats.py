@@ -99,9 +99,9 @@ try:
         """
         try:
             _req.Requirement(value)
-            return True
         except _req.InvalidRequirement:
             return False
+        return True
 
 except ImportError:  # pragma: no cover
     _logger.warning(
@@ -110,7 +110,7 @@ except ImportError:  # pragma: no cover
         "To enforce validation, please install `packaging`."
     )
 
-    def pep508(value: str) -> bool:
+    def pep508(value: str) -> bool:  # noqa: ARG001
         return True
 
 
@@ -206,7 +206,7 @@ class _TroveClassifier:
             _logger.debug(msg)
             try:
                 self.downloaded = set(_download_classifiers().splitlines())
-            except Exception:
+            except Exception:  # noqa: BLE001
                 self.downloaded = False
                 _logger.debug("Problem with download, skipping validation")
                 return True
@@ -263,7 +263,7 @@ def url(value: str) -> bool:
                 parts = urlparse(f"http://{value}")
 
         return bool(parts.scheme and parts.netloc)
-    except Exception:
+    except Exception:  # noqa: BLE001
         return False
 
 
@@ -425,9 +425,9 @@ try:
         """
         try:
             _licenses.canonicalize_license_expression(value)
-            return True
         except _licenses.InvalidLicenseExpression:
             return False
+        return True
 
 except ImportError:  # pragma: no cover
     _logger.warning(
@@ -436,7 +436,7 @@ except ImportError:  # pragma: no cover
         "To enforce validation, please install `packaging>=24.2`."
     )
 
-    def SPDX(value: str) -> bool:
+    def SPDX(value: str) -> bool:  # noqa: ARG001
         return True
 
 
