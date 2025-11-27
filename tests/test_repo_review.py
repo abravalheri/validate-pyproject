@@ -15,8 +15,6 @@ INVALID_EXAMPLES = DIR / "invalid-examples"
 def repo_review_processor():
     try:
         from repo_review import processor
-
-        return processor
     except ImportError:
 
         class _Double:  # just for the sake of Python < 3.10 coverage
@@ -34,6 +32,8 @@ def repo_review_processor():
                 )
 
         return _Double
+
+    return processor
 
 
 @pytest.mark.parametrize("name", ["atoml", "flit", "pdm", "pep_text", "trampolim"])

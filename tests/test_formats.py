@@ -390,7 +390,7 @@ class TestClassifiers:
     def test_download(self):
         try:
             classifiers = formats._download_classifiers()
-        except Exception as ex:
+        except Exception as ex:  # noqa: BLE001
             pytest.xfail(f"Error with download: {ex.__class__.__name__} - {ex}")
         assert isinstance(classifiers, str)
         assert bytes(classifiers, "utf-8")
@@ -422,7 +422,7 @@ class TestClassifiers:
         downloader.assert_called_once()
 
     @pytest.mark.parametrize(
-        "no_network", ("NO_NETWORK", "VALIDATE_PYPROJECT_NO_NETWORK")
+        "no_network", ["NO_NETWORK", "VALIDATE_PYPROJECT_NO_NETWORK"]
     )
     def test_always_valid_with_no_network(self, monkeypatch, no_network):
         monkeypatch.setenv(no_network, "1")

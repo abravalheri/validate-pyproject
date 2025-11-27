@@ -12,7 +12,8 @@ except ImportError:  # pragma: no cover
         )
         from toml import loads  # type: ignore[no-redef]
     except ImportError as ex:
-        raise ImportError("Please install `tomli` (TOML parser)") from ex
+        msg = "Please install `tomli` (TOML parser)"
+        raise ImportError(msg) from ex
 
 
 __all__ = [

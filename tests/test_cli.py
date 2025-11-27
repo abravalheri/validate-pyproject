@@ -103,7 +103,7 @@ class TestEnable:
 class TestDisable:
     TOOLS = ("setuptools", "distutils")
 
-    @pytest.mark.parametrize("tool, other_tool", zip(TOOLS, reversed(TOOLS)))
+    @pytest.mark.parametrize(("tool", "other_tool"), zip(TOOLS, reversed(TOOLS)))
     def test_parse(self, valid_example, tool, other_tool):
         all_plugins = parse_args([str(valid_example), "-D", tool]).plugins
         our_plugins = [p for p in all_plugins if p.id.startswith("validate_pyproject")]
@@ -181,7 +181,7 @@ def test_multiple_files(tmp_path, capsys):
     assert number_invalid == N + 3
 
 
-def test_missing_toolname(tmp_path, capsys):
+def test_missing_toolname(tmp_path):
     example = write_example(tmp_path, name="valid-pyproject.toml")
     with pytest.raises(
         errors.URLMissingTool,
@@ -190,7 +190,7 @@ def test_missing_toolname(tmp_path, capsys):
         cli.run(["--tool=http://json.schemastore.org/poetry.toml", str(example)])
 
 
-def test_bad_url(tmp_path, capsys):
+def test_bad_url(tmp_path):
     example = write_example(tmp_path, name="valid-pyproject.toml")
     with pytest.raises(ValueError, match="URL must start with 'http:' or 'https:'"):
         cli.run(
@@ -198,7 +198,7 @@ def test_bad_url(tmp_path, capsys):
         )
 
 
-def test_bad_extra_url(tmp_path, capsys):
+def test_bad_extra_url(tmp_path):
     example = write_example(tmp_path, name="valid-pyproject.toml")
     with pytest.raises(ValueError, match="URL must start with 'http:' or 'https:'"):
         cli.run(["--tool", "=file://json.schemastore.org/poetry.toml", str(example)])
