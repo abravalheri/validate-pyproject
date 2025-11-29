@@ -16,3 +16,7 @@ packages = ["mypkg-stubs"]
 
 [tool.setuptools.package-data]
 "*" = ["*.pyi"]
+"mypkg-stubs" = ["METADATA.toml"]
+
+[tool.setuptools.exclude-package-data]
+"mypkg-stubs" = ["*.rst"]
