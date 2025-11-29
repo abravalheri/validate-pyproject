@@ -115,7 +115,9 @@
       ],
       "type": "object",
       "additionalProperties": false,
-      "propertyNames": {"type": "string", "format": "package-data-module-name-or-wildcard"},
+      "propertyNames": {
+        "anyOf": [{"$ref": "#/definitions/package-name"}, {"const": "*"}]
+      },
       "patternProperties": {
         "^.*$": {"type": "array", "items": {"type": "string"}}
       }
@@ -137,7 +139,9 @@
       ],
       "type": "object",
       "additionalProperties": false,
-      "propertyNames": {"type": "string", "format": "package-data-module-name-or-wildcard"},
+      "propertyNames": {
+        "anyOf": [{"$ref": "#/definitions/package-name"}, {"const": "*"}]
+      },
       "patternProperties": {
           "^.*$": {"type": "array", "items": {"type": "string"}}
       }

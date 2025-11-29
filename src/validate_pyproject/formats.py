@@ -313,15 +313,6 @@ def python_module_name_relaxed(value: str) -> bool:
     return python_module_name(value.replace("-", "_"))
 
 
-def package_data_module_name_or_wildcard(value: str) -> bool:
-    """Python module name, stubs package name or wildcard used for package-data."""
-    if value == "*":
-        return True
-    if python_module_name(value):
-        return True
-    return pep561_stub_name(value)
-
-
 def python_entrypoint_group(value: str) -> bool:
     """See ``Data model > group`` in the :ref:`PyPA's entry-points specification
     <pypa:entry-points>`.
