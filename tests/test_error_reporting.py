@@ -119,21 +119,23 @@ def test_error_reporting(caplog, example):
     message = cleandoc(EXAMPLES[example]["message"])
     debug_info = cleandoc(EXAMPLES[example]["debug_info"])
 
-    try:
-        with caplog.at_level(logging.CRITICAL), detailed_errors():
-            validate(schema, value, formats=FORMAT_FUNCTIONS)
-    except ValidationError as ex:
-        assert ex.message.strip() == message
-        assert ex.message == ex.summary
-        assert "GIVEN VALUE:" in ex.details
-        assert "DEFINITION:" in ex.details
+    with pytest.raises(ValidationError) as excinfo, caplog.at_level(
+        logging.CRITICAL
+    ), detailed_errors():
+        validate(schema, value, formats=FORMAT_FUNCTIONS)
+    ex = excinfo.value
+    assert ex.message.strip() == message
+    assert ex.message == ex.summary
+    assert "GIVEN VALUE:" in ex.details
+    assert "DEFINITION:" in ex.details
 
-    try:
-        with caplog.at_level(logging.DEBUG), detailed_errors():
-            validate(schema, value, formats=FORMAT_FUNCTIONS)
-    except ValidationError as ex:
-        assert "GIVEN VALUE:" in ex.message
-        assert "DEFINITION:" in ex.message
-        assert ex.summary in ex.message
-        if debug_info != "**SKIP-TEST**":
-            assert debug_info in ex.details
+    with pytest.raises(ValidationError) as excinfo, caplog.at_level(
+        logging.DEBUG
+    ), detailed_errors():
+        validate(schema, value, formats=FORMAT_FUNCTIONS)
+    ex = excinfo.value
+    assert "GIVEN VALUE:" in ex.message
+    assert "DEFINITION:" in ex.message
+    assert ex.summary in ex.message
+    if debug_info != "**SKIP-TEST**":
+        assert debug_info in ex.details

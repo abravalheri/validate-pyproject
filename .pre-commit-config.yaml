@@ -26,10 +26,10 @@ repos:
     args: ["--ignore-words-list=THIRDPARTY", --write-changes]
 
 - repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.14.1
+  rev: v0.14.5
   hooks:
   - id: ruff-check
-    args: [--exclude=tools/to_schemastore.py, "--ignore=PLC0415,RUF200", --fix, --show-fixes, ]
+    args: [--fix, --show-fixes]
   - id: ruff-format
 
 - repo: https://github.com/adamchainz/blacken-docs
@@ -63,7 +63,7 @@ repos:
       - validate-pyproject[all]>=0.13
 
 - repo: https://github.com/python-jsonschema/check-jsonschema
-  rev: 0.34.1
+  rev: 0.35.0
   hooks:
     - id: check-metaschema
       files: \.schema\.json$
@@ -71,7 +71,7 @@ repos:
     - id: check-github-workflows
 
 - repo: https://github.com/scientific-python/cookie
-  rev: 2025.10.20
+  rev: 2025.11.10
   hooks:
     - id: sp-repo-review
       name: Validate Python repository

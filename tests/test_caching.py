@@ -12,12 +12,13 @@ def no_cache_env_var(monkeypatch):
     monkeypatch.delenv("VALIDATE_PYPROJECT_CACHE_REMOTE", raising=False)
 
 
-def fn1(arg: str) -> io.StringIO:
+def fn1(_: str) -> io.StringIO:
     return io.StringIO("42")
 
 
-def fn2(arg: str) -> io.StringIO:
-    raise RuntimeError("should not be called")
+def fn2(_: str) -> io.StringIO:
+    msg = "should not be called"
+    raise RuntimeError(msg)
 
 
 def test_as_file(tmp_path):
@@ -49,7 +50,7 @@ def test_as_file_no_cache():
         caching.as_file(fn2, "hello-world")
 
 
-def test_path_for_no_cache(monkeypatch):
+def test_path_for_no_cache():
     cache_path = caching.path_for("hello-world", None)
     assert cache_path is None
 

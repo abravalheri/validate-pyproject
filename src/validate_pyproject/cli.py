@@ -4,9 +4,9 @@
 
 # ruff: noqa: C408
 # Unnecessary `dict` call (rewrite as a literal)
+from __future__ import annotations
 
 import argparse
-import io
 import json
 import logging
 import sys
@@ -14,15 +14,12 @@ from contextlib import contextmanager
 from itertools import chain
 from textwrap import dedent, wrap
 from typing import (
+    TYPE_CHECKING,
     Callable,
-    Dict,
     Generator,
     Iterator,
-    List,
     NamedTuple,
     Sequence,
-    Tuple,
-    Type,
     TypeVar,
 )
 
@@ -33,6 +30,9 @@ from .errors import ValidationError
 from .plugins import PluginProtocol, PluginWrapper
 from .plugins import list_from_entry_points as list_plugins_from_entry_points
 from .remote import RemotePlugin, load_store
+
+if TYPE_CHECKING:
+    import io
 
 _logger = logging.getLogger(__package__)
 T = TypeVar("T", bound=NamedTuple)
@@ -53,7 +53,7 @@ def critical_logging() -> Generator[None, None, None]:
 
 _STDIN = argparse.FileType("r")("-")
 
-META: Dict[str, dict] = {
+META: dict[str, dict] = {
     "version": dict(
         flags=("-V", "--version"),
         action="version",
@@ -116,15 +116,15 @@ META: Dict[str, dict] = {
 
 
 class CliParams(NamedTuple):
-    input_file: List[io.TextIOBase]
-    plugins: List[PluginWrapper]
-    tool: List[str]
+    input_file: list[io.TextIOBase]
+    plugins: list[PluginWrapper]
+    tool: list[str]
     store: str
     loglevel: int = logging.WARNING
     dump_json: bool = False
 
 
-def __meta__(plugins: Sequence[PluginProtocol]) -> Dict[str, dict]:
+def __meta__(plugins: Sequence[PluginProtocol]) -> dict[str, dict]:
     """'Hyper parameters' to instruct :mod:`argparse` how to create the CLI"""
     meta = {k: v.copy() for k, v in META.items()}
     meta["enable"]["choices"] = {p.tool for p in plugins}
@@ -137,8 +137,8 @@ def parse_args(
     args: Sequence[str],
     plugins: Sequence[PluginProtocol],
     description: str = "Validate a given TOML file",
-    get_parser_spec: Callable[[Sequence[PluginProtocol]], Dict[str, dict]] = __meta__,
-    params_class: Type[T] = CliParams,  # type: ignore[assignment]
+    get_parser_spec: Callable[[Sequence[PluginProtocol]], dict[str, dict]] = __meta__,
+    params_class: type[T] = CliParams,  # type: ignore[assignment]
 ) -> T:
     """Parse command line parameters
 
@@ -174,7 +174,7 @@ def select_plugins(
     plugins: Sequence[Plugins],
     enabled: Sequence[str] = (),
     disabled: Sequence[str] = (),
-) -> List[Plugins]:
+) -> list[Plugins]:
     available = list(plugins)
     if enabled:
         available = [p for p in available if p.tool in enabled]
@@ -200,13 +200,13 @@ def exceptions2exit() -> Generator[None, None, None]:
     except _ExceptionGroup as group:
         for prefix, ex in group:
             print(prefix)
-            _logger.error(str(ex) + "\n")
+            _logger.exception(str(ex) + "\n")
         raise SystemExit(1) from None
     except _REGULAR_EXCEPTIONS as ex:
-        _logger.error(str(ex))
+        _logger.exception(str(ex))
         raise SystemExit(1) from None
     except Exception as ex:  # pragma: no cover
-        _logger.error(f"{ex.__class__.__name__}: {ex}\n")
+        _logger.exception(f"{ex.__class__.__name__}: {ex}\n")
         _logger.debug("Please check the following information:", exc_info=True)
         raise SystemExit(1) from None
 
@@ -234,7 +234,7 @@ def run(args: Sequence[str] = ()) -> int:
     for file in params.input_file:
         try:
             _run_on_file(validator, params, file)
-        except _REGULAR_EXCEPTIONS as ex:
+        except _REGULAR_EXCEPTIONS as ex:  # noqa: PERF203
             exceptions.add(f"Invalid {_format_file(file)}", ex)
 
     exceptions.raise_if_any()
@@ -262,7 +262,7 @@ class Formatter(argparse.RawTextHelpFormatter):
     # order to create our own formatter, we are left no choice other then overwrite a
     # "private" method considered to be an implementation detail.
 
-    def _split_lines(self, text: str, width: int) -> List[str]:
+    def _split_lines(self, text: str, width: int) -> list[str]:
         return list(chain.from_iterable(wrap(x, width) for x in text.splitlines()))
 
 
@@ -289,7 +289,7 @@ def _format_file(file: io.TextIOBase) -> str:
 
 
 class _ExceptionGroup(Exception):
-    _members: List[Tuple[str, Exception]]
+    _members: list[tuple[str, Exception]]
 
     def __init__(self) -> None:
         self._members = []
@@ -298,7 +298,7 @@ class _ExceptionGroup(Exception):
     def add(self, prefix: str, ex: Exception) -> None:
         self._members.append((prefix, ex))
 
-    def __iter__(self) -> Iterator[Tuple[str, Exception]]:
+    def __iter__(self) -> Iterator[tuple[str, Exception]]:
         return iter(self._members)
 
     def raise_if_any(self) -> None:

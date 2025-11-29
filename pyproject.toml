@@ -52,6 +52,7 @@ validate_pyproject = "validate_pyproject.repo_review:repo_review_families"
 [dependency-groups]
 dev = [
     { include-group = "test" },
+    "validate_pyproject[all]",
 ]
 docs = [
     "furo>=2023.08.17",
@@ -79,9 +80,6 @@ typecheck = [
 environments = [
   "python_version >= '3.9'",
 ]
-dev-dependencies = [
-  "validate_pyproject[all]",
-]
 
 [tool.setuptools_scm]
 version_scheme = "no-guess-dev"
@@ -97,7 +95,7 @@ addopts = """
 """
 norecursedirs = ["dist", "build", ".*"]
 testpaths = ["src", "tests"]
-log_cli_level = "info"
+log_level = "INFO"
 
 [tool.mypy]
 python_version = "3.8"

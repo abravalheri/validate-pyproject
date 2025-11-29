@@ -1,31 +1,52 @@
 # --- General config ---
 target-version = "py38"
+exclude = ["tools/to_schemastore.py", "tests/invalid-examples"]
 
 # --- Linting config ---
 [lint]
 extend-select = [
+  "ARG",         # flake8-unused-arguments
   "B",           # flake8-bugbear
+  "BLE",         # flake8-blind-except
   "C4",          # flake8-comprehensions
   "C90",         # McCabe cyclomatic complexity
   "DTZ",         # flake8-datetimez
+  "EM",          # flake8-errmsg
   "EXE",         # flake8-executable
+  "FA",          # flake8-future-annotations
   "FBT",         # flake8-boolean-trap
+  "FLY",         # flynt
+  "FURB",        # refurb
   "I",           # isort
   "ICN",         # flake8-import-conventions
   "INT",         # flake8-gettext
+  "ISC",         # flake8-implicit-str-concat
+  "LOG",         # flake8-logging
+  "PERF",        # Perflint
+  "PGH",         # pygrep-hooks
+  "PIE",         # flake8-pie
   "PL",          # Pylint
+  "PT",          # flake8-pytest-style
   "PYI",         # flake8-pyi
+  "Q",           # flake8-quotes
   "RET",         # flake8-return
+  "RSE",         # flake8-raise
   "RUF",         # Ruff-specific rules
   "S",           # flake8-bandit
   "SIM",         # flake8-simplify
+  "SLOT",        # flake8-slots
   "T10",         # flake8-debugger
+  "TC",          # flake8-type-checking
   "TCH",         # flake8-type-checking
+  "TRY",         # tryceratops
   "UP",          # pyupgrade
   "YTT",         # flake8-2020
 ]
 ignore = [
-  "SIM105",  # contextlib.supress (3.7 feature)
+  "PLC0415",  # import at top of file
+  "RSE102",   # parens on exception raise
+  "S101",     # assert is used by mypy and pytest
+  "TRY401",   # redundant logging message, TODO check
 ]
 
 [lint.per-file-ignores]
