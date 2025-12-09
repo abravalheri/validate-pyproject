@@ -101,8 +101,7 @@ linux_task:
     - name: test (Linux - 3.13)
       container: {image: "python:3.13-trixie"}
     - name: test (Linux - 3.14)
-      container: {image: "python:3.14-rc-bookworm"}
-      allow_failures: true  # RC
+      container: {image: "python:3.14-bookworm"}
   install_script:
     - python -m pip install --upgrade pip tox tox-uv pipx
   <<: *test-template
@@ -131,7 +130,7 @@ macos_task:
 
 freebsd_task:
   name: test (freebsd - 3.11)
-  freebsd_instance: {image_family: freebsd-14-2}
+  freebsd_instance: {image_family: freebsd-14-3}
   install_script:
     - pkg remove -y python lang/python
     - pkg install -y git python311 py311-pip py311-gdbm py311-sqlite3 py311-tox py311-tomli py311-pipx
