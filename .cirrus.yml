@@ -73,9 +73,9 @@ env:
 # ---- CI Pipeline ----
 
 build_task:
-  name: build and check (Linux - 3.11)
+  name: build and check (Linux - 3.12)
   alias: build
-  container: {image: "python:3.11-trixie"}
+  container: {image: "python:3.12-trixie"}
   clone_script: *clone
   <<: *task-template
   install_script: pip install tox tox-uv
@@ -159,7 +159,7 @@ windows_task:
   depends_on: [build, base-test]
 
 finalize_task:
-  container: {image: "python:3.10-trixie"}
+  container: {image: "python:3.12-trixie"}
   depends_on: [test]
   <<: *task-template
   install_script: pip install 'coveralls<4'
@@ -167,9 +167,9 @@ finalize_task:
   finalize_coverage_script: coveralls --finish
 
 linkcheck_task:
-  name: linkcheck (Linux - 3.10)
+  name: linkcheck (Linux - 3.12)
   only_if: $BRANCH =~ "^(main|master)$"
-  container: {image: "python:3.10-trixie"}
+  container: {image: "python:3.12-trixie"}
   depends_on: [finalize]
   allow_failures: true
   <<: *task-template
@@ -180,8 +180,8 @@ linkcheck_task:
 # # The following task is already covered by a GitHub Action,
 # # (commented to avoid errors when publishing duplicated packages to PyPI)
 # publish_task:
-#   name: publish (Linux - 3.10)
-#   container: {image: "python:3.10-trixie"}
+#   name: publish (Linux - 3.12)
+#   container: {image: "python:3.12-trixie"}
 #   depends_on: [build, base-test, test]
 #   only_if: $CIRRUS_TAG =~ 'v\d.*' && $CIRRUS_USER_PERMISSION == "admin"
 #   <<: *task-template
