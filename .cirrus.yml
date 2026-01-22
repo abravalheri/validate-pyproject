@@ -75,7 +75,7 @@ env:
 build_task:
   name: build and check (Linux - 3.11)
   alias: build
-  container: {image: "python:3.11-bullseye"}
+  container: {image: "python:3.11-trixie"}
   clone_script: *clone
   <<: *task-template
   install_script: pip install tox tox-uv
@@ -91,17 +91,16 @@ linux_task:
     - name: test (Linux - 3.8)
       container: {image: "python:3.8-bookworm"}
     - name: test (Linux - 3.10)
-      container: {image: "python:3.10-bookworm"}
+      container: {image: "python:3.10-trixie"}
       skip: $BRANCH !=~ "^(main|master)$"
     - name: test (Linux - 3.12)
-      container: {image: "python:3.12-bookworm"}
+      container: {image: "python:3.12-trixie"}
       skip: $BRANCH !=~ "^(main|master)$"
-    - name: test (Linux - 3.13)
-      container: {image: "python:3.13-bookworm"}
-    - name: test (Linux - 3.13)
-      container: {image: "python:3.13-trixie"}
     - name: test (Linux - 3.14)
-      container: {image: "python:3.14-bookworm"}
+      container: {image: "python:3.14-trixie"}
+    - name: test (Linux - 3.15)
+      container: {image: "python:3.15-rc-trixie"}
+      allow_failures: true  # RC
   install_script:
     - python -m pip install --upgrade pip tox tox-uv pipx
   <<: *test-template
@@ -139,7 +138,7 @@ freebsd_task:
   depends_on: [build, base-test]
 
 windows_task:
-  name: test (Windows - 3.12.5)
+  name: test (Windows - 3.12.10)
   windows_container:
     image: "cirrusci/windowsservercore:2019"
     os_version: 2019
@@ -157,7 +156,7 @@ windows_task:
   depends_on: [build, base-test]
 
 finalize_task:
-  container: {image: "python:3.10-bullseye"}
+  container: {image: "python:3.10-trixie"}
   depends_on: [test]
   <<: *task-template
   install_script: pip install 'coveralls<4'
@@ -167,7 +166,7 @@ finalize_task:
 linkcheck_task:
   name: linkcheck (Linux - 3.10)
   only_if: $BRANCH =~ "^(main|master)$"
-  container: {image: "python:3.10-bullseye"}
+  container: {image: "python:3.10-trixie"}
   depends_on: [finalize]
   allow_failures: true
   <<: *task-template
@@ -179,7 +178,7 @@ linkcheck_task:
 # # (commented to avoid errors when publishing duplicated packages to PyPI)
 # publish_task:
 #   name: publish (Linux - 3.10)
-#   container: {image: "python:3.10-bullseye"}
+#   container: {image: "python:3.10-trixie"}
 #   depends_on: [build, base-test, test]
 #   only_if: $CIRRUS_TAG =~ 'v\d.*' && $CIRRUS_USER_PERMISSION == "admin"
 #   <<: *task-template
