@@ -150,8 +150,11 @@ windows_task:
     - ps: New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" -Name "LongPathsEnabled" -Value 1 -PropertyType DWORD -Force
     - choco install -y --no-progress python3 --version=3.12.10 --params "/NoLockdown"
     - choco install -y --no-progress curl
-    - pip install --upgrade certifi
+    - python -m pip install --upgrade certifi
     - python -m pip install -U pip tox tox-uv pipx
+  configure_certs_script: |
+    CERT_PATH="$(python -m certifi | tr -d '\r\n')"
+    echo "SSL_CERT_FILE=$CERT_PATH" >> "$CIRRUS_ENV"
   <<: *test-template
   depends_on: [build, base-test]
 
