@@ -8,13 +8,16 @@ import sys
 from functools import partial, wraps
 from pathlib import Path
 from types import MappingProxyType
-from typing import Any, Mapping, NamedTuple, Sequence
+from typing import TYPE_CHECKING, Any, NamedTuple
 
 from .. import cli
 from ..plugins import PluginProtocol, PluginWrapper
 from ..plugins import list_from_entry_points as list_plugins_from_entry_points
 from ..remote import RemotePlugin, load_store
 from . import pre_compile
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping, Sequence
 
 if sys.platform == "win32":  # pragma: no cover
     from subprocess import list2cmdline as arg_join

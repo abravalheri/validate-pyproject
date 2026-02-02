@@ -16,10 +16,7 @@ from textwrap import dedent, wrap
 from typing import (
     TYPE_CHECKING,
     Callable,
-    Generator,
-    Iterator,
     NamedTuple,
-    Sequence,
     TypeVar,
 )
 
@@ -33,6 +30,7 @@ from .remote import RemotePlugin, load_store
 
 if TYPE_CHECKING:
     import io
+    from collections.abc import Generator, Iterator, Sequence
 
 _logger = logging.getLogger(__package__)
 T = TypeVar("T", bound=NamedTuple)

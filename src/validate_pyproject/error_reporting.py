@@ -8,12 +8,13 @@ import re
 import typing
 from contextlib import contextmanager
 from textwrap import indent, wrap
-from typing import Any, Generator, Iterator, Sequence
+from typing import Any
 
 from fastjsonschema import JsonSchemaValueException
 
 if typing.TYPE_CHECKING:
     import sys
+    from collections.abc import Generator, Iterator, Sequence
 
     if sys.version_info < (3, 11):
         from typing_extensions import Self

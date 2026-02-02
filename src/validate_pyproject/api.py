@@ -6,16 +6,14 @@ from __future__ import annotations
 
 import json
 import logging
-import sys
 import typing
+from collections.abc import Iterator, Mapping, Sequence
 from enum import Enum
 from functools import partial, reduce
+from importlib.resources import files
 from types import MappingProxyType, ModuleType
 from typing import (
     Callable,
-    Iterator,
-    Mapping,
-    Sequence,
     TypeVar,
 )
 
@@ -32,17 +30,6 @@ if typing.TYPE_CHECKING:  # pragma: no cover
     from .plugins import PluginProtocol
 
 
-if sys.version_info >= (3, 9):  # pragma: no cover
-    from importlib.resources import files
-
-    def read_text(package: str | ModuleType, resource: str) -> str:
-        """:meta private:"""
-        return files(package).joinpath(resource).read_text(encoding="utf-8")
-
-else:  # pragma: no cover
-    from importlib.resources import read_text as read_text  # noqa: PLC0414
-
-
 __all__ = ["Validator"]
 
 
@@ -52,6 +39,11 @@ ALL_PLUGINS = AllPlugins.ALL_PLUGINS
 
 TOP_LEVEL_SCHEMA = "pyproject_toml"
 PROJECT_TABLE_SCHEMA = "project_metadata"
+
+
+def read_text(package: str | ModuleType, resource: str) -> str:
+    """:meta private:"""
+    return files(package).joinpath(resource).read_text(encoding="utf-8")
 
 
 def _get_public_functions(module: ModuleType) -> Mapping[str, FormatValidationFn]:

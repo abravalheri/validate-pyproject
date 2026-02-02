@@ -4,7 +4,7 @@ import logging
 from importlib import metadata as _M
 from pathlib import Path
 from types import MappingProxyType
-from typing import TYPE_CHECKING, Mapping, Sequence
+from typing import TYPE_CHECKING
 
 import fastjsonschema as FJS
 
@@ -12,6 +12,7 @@ from .. import api, dist_name, types
 
 if TYPE_CHECKING:  # pragma: no cover
     import os
+    from collections.abc import Mapping, Sequence
 
     from ..plugins import PluginProtocol
 

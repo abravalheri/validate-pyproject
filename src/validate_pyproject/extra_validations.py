@@ -5,8 +5,9 @@ JSON Schema library).
 
 import collections
 import itertools
+from collections.abc import Generator, Iterable, Mapping
 from inspect import cleandoc
-from typing import Generator, Iterable, Mapping, TypeVar
+from typing import TypeVar
 
 from .error_reporting import ValidationError
 
