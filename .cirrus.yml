@@ -88,8 +88,8 @@ build_task:
 
 linux_task:
   matrix:
-    - name: test (Linux - 3.8)
-      container: {image: "python:3.8-bookworm"}
+    - name: test (Linux - 3.9)
+      container: {image: "python:3.9-bookworm"}
     - name: test (Linux - 3.10)
       container: {image: "python:3.10-trixie"}
       skip: $BRANCH !=~ "^(main|master)$"
