@@ -6,12 +6,19 @@ Changelog
    Development Version
    ====================
 
-* Added support for specifying package-data for stub packages, #248.
-
+Version 0.25
+============
+* Add PEP 794 support by :user:`henryiii` (:pr:`271`)
+* Fix broken store loading if properties is nested by :user:`henryiii` (:pr:`281`)
+* Fix more integer types by :user:`henryiii` (:pr:`282`)
+* Allow ``package-data`` for stubs packages by :user:`cdce8p` (:pr:`248`)
+* Tested on Python 3.14 by :user:`cclauss` (:pr:`265`)
+* Several testing and CI improvements including contributions from
+  :user:`henryiii`, :user:`udifuchs` and :user:`cclaus`.
 
 Version 0.24.1
 ==============
-* Fixed multi plugin id was read from the wrong place by @henryiii, #240.
+* Fixed multi plugin id was read from the wrong place by :user:`henryiii`, #240.
 * Implemented alternative plugin sorting, #243
 
 Version 0.24
@@ -22,20 +29,20 @@ Version 0.24
 * Added support for ``validate_pyproject.multi_schema`` plugins with extra schemas, #231.
 * ``validate-pyproject`` no longer communicates test dependencies via the ``tests``
   extra and documentation dependencies dependencies via the ``docs/requirements.txt`` file.
-  Instead :doc:`pypa:dependency-groups` have been adopted to support CI environments, #227.
+  Instead :external+pypa:ref:`dependency-groups` have been adopted to support CI environments, #227.
 
   As a result, ``uv``'s high level interface also works for developers. You can use the :pypi:`dependency-groups`
   package on PyPI if you need to convert to a classic requirements list.
 
-Contributions by @henryiii.
+Contributions by :user:`henryiii`.
 
 Version 0.23
 ============
-* Validate SPDX license expressions by @cdce8p in #217
+* Validate SPDX license expressions by :user:`cdce8p` in #217
 
 Version 0.22
 ============
-* Prevent injecting defaults and modifying input in-place, by @henryiii in #213
+* Prevent injecting defaults and modifying input in-place, by :user:`henryiii` in #213
 
 Version 0.21
 ============
@@ -86,14 +93,14 @@ Version 0.16
 Version 0.15
 ============
 - Update ``setuptools`` schema definitions, #112
-- Add ``__repr__`` to plugin wrapper, by @henryiii #114
-- Fix standard ``$schema`` ending ``#``, by @henryiii #113
+- Add ``__repr__`` to plugin wrapper, by :user:`henryiii` #114
+- Fix standard ``$schema`` ending ``#``, by :user:`henryiii` #113
 
 Version 0.14
 ============
 
 - Ensure reporting show more detailed error messages for ``RedefiningStaticFieldAsDynamic``, #104
-- Add support for ``repo-review``, by @henryiii in #105
+- Add support for ``repo-review``, by :user:`henryiii` in #105
 
 Version 0.13
 ============
