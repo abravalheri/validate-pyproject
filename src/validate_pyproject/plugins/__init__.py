@@ -115,7 +115,7 @@ class StoredPlugin:
 
     @property
     def help_text(self) -> str:
-        return self.schema.get("description", "")
+        return self.schema.get("description") or ""
 
     def __str__(self) -> str:
         return self._source
