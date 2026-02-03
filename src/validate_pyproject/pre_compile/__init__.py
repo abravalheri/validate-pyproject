@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING
 
 import fastjsonschema as FJS
 
-from .. import api, dist_name, types
+from .. import _resources, api, dist_name, types
 
 if TYPE_CHECKING:  # pragma: no cover
     import os
@@ -71,12 +71,13 @@ def replace_text(text: str, replacements: dict[str, str]) -> str:
 def copy_fastjsonschema_exceptions(
     output_dir: Path, replacements: dict[str, str]
 ) -> Path:
-    code = replace_text(api.read_text(FJS.__name__, "exceptions.py"), replacements)
+    code = _resources.read_text(FJS.__name__, "exceptions.py")
+    code = replace_text(code, replacements)
     return _write(output_dir / "fastjsonschema_exceptions.py", code)
 
 
 def copy_module(name: str, output_dir: Path, replacements: dict[str, str]) -> Path:
-    code = api.read_text(api.__package__, f"{name}.py")
+    code = _resources.read_text(api.__package__, f"{name}.py")
     return _write(output_dir / f"{name}.py", replace_text(code, replacements))
 
 
@@ -85,7 +86,7 @@ def write_main(
     schema: types.Schema,  # noqa: ARG001
     replacements: dict[str, str],
 ) -> Path:
-    code = api.read_text(__name__, "main_file.template")
+    code = _resources.read_text(__name__, "main_file.template")
     return _write(file_path, replace_text(code, replacements))
 
 
@@ -93,11 +94,11 @@ def write_notice(
     out: Path, main_file: str, cmd: str, replacements: dict[str, str]
 ) -> Path:
     if cmd:
-        opening = api.read_text(__name__, "cli-notice.template")
+        opening = _resources.read_text(__name__, "cli-notice.template")
         opening = opening.format(command=cmd)
     else:
-        opening = api.read_text(__name__, "api-notice.template")
-    notice = api.read_text(__name__, "NOTICE.template")
+        opening = _resources.read_text(__name__, "api-notice.template")
+    notice = _resources.read_text(__name__, "NOTICE.template")
     notice = notice.format(notice=opening, main_file=main_file, **load_licenses())
     notice = replace_text(notice, replacements)
 

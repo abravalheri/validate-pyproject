@@ -10,7 +10,6 @@ import typing
 from collections.abc import Iterator, Mapping, Sequence
 from enum import Enum
 from functools import partial, reduce
-from importlib.resources import files
 from types import MappingProxyType, ModuleType
 from typing import (
     Callable,
@@ -19,7 +18,7 @@ from typing import (
 
 import fastjsonschema as FJS
 
-from . import errors, formats
+from . import _resources, errors, formats
 from .error_reporting import detailed_errors
 from .extra_validations import EXTRA_VALIDATIONS
 from .types import FormatValidationFn, Schema, ValidationFn
@@ -41,11 +40,6 @@ TOP_LEVEL_SCHEMA = "pyproject_toml"
 PROJECT_TABLE_SCHEMA = "project_metadata"
 
 
-def read_text(package: str | ModuleType, resource: str) -> str:
-    """:meta private:"""
-    return files(package).joinpath(resource).read_text(encoding="utf-8")
-
-
 def _get_public_functions(module: ModuleType) -> Mapping[str, FormatValidationFn]:
     return {
         fn.__name__.replace("_", "-"): fn
@@ -63,7 +57,7 @@ def load(name: str, package: str = __package__, ext: str = ".schema.json") -> Sc
 
     :meta private: (low level detail)
     """
-    return Schema(json.loads(read_text(package, f"{name}{ext}")))
+    return Schema(json.loads(_resources.read_text(package, f"{name}{ext}")))
 
 
 def load_builtin_plugin(name: str) -> Schema:
