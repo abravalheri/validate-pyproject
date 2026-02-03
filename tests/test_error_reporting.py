@@ -119,9 +119,11 @@ def test_error_reporting(caplog, example):
     message = cleandoc(EXAMPLES[example]["message"])
     debug_info = cleandoc(EXAMPLES[example]["debug_info"])
 
-    with pytest.raises(ValidationError) as excinfo, caplog.at_level(
-        logging.CRITICAL
-    ), detailed_errors():
+    with (
+        pytest.raises(ValidationError) as excinfo,
+        caplog.at_level(logging.CRITICAL),
+        detailed_errors(),
+    ):
         validate(schema, value, formats=FORMAT_FUNCTIONS)
     ex = excinfo.value
     assert ex.message.strip() == message
@@ -129,9 +131,11 @@ def test_error_reporting(caplog, example):
     assert "GIVEN VALUE:" in ex.details
     assert "DEFINITION:" in ex.details
 
-    with pytest.raises(ValidationError) as excinfo, caplog.at_level(
-        logging.DEBUG
-    ), detailed_errors():
+    with (
+        pytest.raises(ValidationError) as excinfo,
+        caplog.at_level(logging.DEBUG),
+        detailed_errors(),
+    ):
         validate(schema, value, formats=FORMAT_FUNCTIONS)
     ex = excinfo.value
     assert "GIVEN VALUE:" in ex.message
