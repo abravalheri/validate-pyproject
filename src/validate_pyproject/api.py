@@ -6,22 +6,19 @@ from __future__ import annotations
 
 import json
 import logging
-import sys
 import typing
+from collections.abc import Iterator, Mapping, Sequence
 from enum import Enum
 from functools import partial, reduce
 from types import MappingProxyType, ModuleType
 from typing import (
     Callable,
-    Iterator,
-    Mapping,
-    Sequence,
     TypeVar,
 )
 
 import fastjsonschema as FJS
 
-from . import errors, formats
+from . import _resources, errors, formats
 from .error_reporting import detailed_errors
 from .extra_validations import EXTRA_VALIDATIONS
 from .types import FormatValidationFn, Schema, ValidationFn
@@ -30,17 +27,6 @@ _logger = logging.getLogger(__name__)
 
 if typing.TYPE_CHECKING:  # pragma: no cover
     from .plugins import PluginProtocol
-
-
-if sys.version_info >= (3, 9):  # pragma: no cover
-    from importlib.resources import files
-
-    def read_text(package: str | ModuleType, resource: str) -> str:
-        """:meta private:"""
-        return files(package).joinpath(resource).read_text(encoding="utf-8")
-
-else:  # pragma: no cover
-    from importlib.resources import read_text as read_text  # noqa: PLC0414
 
 
 __all__ = ["Validator"]
@@ -71,7 +57,7 @@ def load(name: str, package: str = __package__, ext: str = ".schema.json") -> Sc
 
     :meta private: (low level detail)
     """
-    return Schema(json.loads(read_text(package, f"{name}{ext}")))
+    return Schema(json.loads(_resources.read_text(package, f"{name}{ext}")))
 
 
 def load_builtin_plugin(name: str) -> Schema:

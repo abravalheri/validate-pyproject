@@ -26,7 +26,7 @@ def get_test_config(example: Path) -> dict[str, str | dict[str, str]]:
     return {}
 
 
-@functools.lru_cache(maxsize=None)
+@functools.cache
 def get_tools(example: Path) -> list[RemotePlugin]:
     config = get_test_config(example)
     tools: dict[str, str] = config.get("tools", {})
@@ -37,7 +37,7 @@ def get_tools(example: Path) -> list[RemotePlugin]:
     return load_tools
 
 
-@functools.lru_cache(maxsize=None)
+@functools.cache
 def get_tools_as_args(example: Path) -> list[str]:
     config = get_test_config(example)
     tools: dict[str, str] = config.get("tools", {})

@@ -1,5 +1,5 @@
 # --- General config ---
-target-version = "py38"
+target-version = "py39"
 exclude = ["tools/to_schemastore.py", "tests/invalid-examples"]
 
 # --- Linting config ---

@@ -15,8 +15,6 @@ from textwrap import dedent
 from typing import (
     Any,
     Callable,
-    Generator,
-    Iterable,
     NamedTuple,
     Protocol,
 )
@@ -24,6 +22,8 @@ from typing import (
 from .. import __version__
 
 if typing.TYPE_CHECKING:
+    from collections.abc import Generator, Iterable
+
     from ..types import Plugin, Schema
 
 _DEFAULT_MULTI_PRIORITY = 0
@@ -115,7 +115,7 @@ class StoredPlugin:
 
     @property
     def help_text(self) -> str:
-        return self.schema.get("description", "")
+        return self.schema.get("description") or ""
 
     def __str__(self) -> str:
         return self._source

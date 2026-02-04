@@ -4,12 +4,12 @@ import json
 import logging
 import typing
 import urllib.parse
-from typing import Generator
 
 from . import caching, errors, http
 
 if typing.TYPE_CHECKING:
     import sys
+    from collections.abc import Generator
 
     from .types import Schema
 
