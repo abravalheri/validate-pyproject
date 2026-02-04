@@ -77,7 +77,9 @@ def copy_fastjsonschema_exceptions(
 
 
 def copy_module(name: str, output_dir: Path, replacements: dict[str, str]) -> Path:
-    code = _resources.read_text(api.__package__, f"{name}.py")
+    assert api.__spec__ is not None
+    assert api.__spec__.parent is not None
+    code = _resources.read_text(api.__spec__.parent, f"{name}.py")
     return _write(output_dir / f"{name}.py", replace_text(code, replacements))
 
 

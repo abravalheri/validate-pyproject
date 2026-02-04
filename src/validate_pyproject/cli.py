@@ -32,7 +32,10 @@ if TYPE_CHECKING:
     import io
     from collections.abc import Generator, Iterator, Sequence
 
-_logger = logging.getLogger(__package__)
+assert __spec__ is not None
+assert __spec__.parent is not None
+
+_logger = logging.getLogger(__spec__.parent)
 T = TypeVar("T", bound=NamedTuple)
 
 _REGULAR_EXCEPTIONS = (ValidationError, tomllib.TOMLDecodeError)
@@ -55,7 +58,7 @@ META: dict[str, dict] = {
     "version": dict(
         flags=("-V", "--version"),
         action="version",
-        version=f"{__package__} {__version__}",
+        version=f"{__spec__.parent} {__version__}",
     ),
     "input_file": dict(
         dest="input_file",
