@@ -103,7 +103,7 @@ def parser_spec(
 
 
 def run(args: Sequence[str] = ()) -> int:
-    args = args if args else sys.argv[1:]
+    args = args or sys.argv[1:]
     cmd = f"python -m {__package__} " + arg_join(args)
     plugins = list_plugins_from_entry_points()
     desc = 'Generate files for "pre-compiling" `validate-pyproject`'
