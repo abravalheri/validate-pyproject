@@ -48,8 +48,7 @@ a JSON schema parsed as a Python :obj:`dict`:
 
 .. code-block:: python
 
-   def plugin(tool_name: str) -> dict:
-       ...
+   def plugin(tool_name: str) -> dict: ...
 
 These functions receive as argument the name of the tool subtable and should
 return a JSON schema for the data structure **under** this table (it **should**

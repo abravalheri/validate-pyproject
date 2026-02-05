@@ -108,7 +108,7 @@ def run(args: Sequence[str] = ()) -> int:
     assert __spec__ is not None
     assert __spec__.parent is not None
 
-    args = args if args else sys.argv[1:]
+    args = args or sys.argv[1:]
     cmd = f"python -m {__spec__.parent} " + arg_join(args)
     plugins = list_plugins_from_entry_points()
     desc = 'Generate files for "pre-compiling" `validate-pyproject`'
