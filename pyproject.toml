@@ -72,7 +72,7 @@ test = [
     "tomli>=1.2.1; python_version<'3.11'",
 ]
 typecheck = [
-    "mypy",
+    "tomli>=1.2.1",
     "importlib-resources",
 ]
 
@@ -98,6 +98,7 @@ testpaths = ["src", "tests"]
 log_level = "INFO"
 
 [tool.mypy]
+files = "src"
 python_version = "3.9"
 enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
 show_traceback = true
@@ -106,6 +107,8 @@ strict = true
 # Scaling back on some of the strictness for now
 disallow_any_generics = false
 disallow_subclassing_any = false
+show_error_context = true
+pretty = true
 
 [[tool.mypy.overrides]]
 module = ["fastjsonschema", "setuptools._vendor.packaging"]
