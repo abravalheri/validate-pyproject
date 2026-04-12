@@ -34,7 +34,7 @@ jobs:
         with: {fetch-depth: 0}  # deep clone for setuptools-scm
       - uses: actions/setup-python@v6
         with: {python-version: "3.x"}
-      - uses: astral-sh/setup-uv@v7
+      - uses: astral-sh/setup-uv@v8.0.0
       - name: Run static analysis and format checkers
         run: >-
           uvx --with tox-uv
@@ -83,7 +83,7 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
           allow-prereleases: true
-      - uses: astral-sh/setup-uv@v7
+      - uses: astral-sh/setup-uv@v8.0.0
       - name: Retrieve pre-built distribution files
         uses: actions/download-artifact@v7
         with: {name: python-distribution-files, path: dist/}
@@ -172,7 +172,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: actions/setup-python@v6
         with: {python-version: "3.x"}
-      - uses: astral-sh/setup-uv@v7
+      - uses: astral-sh/setup-uv@v8.0.0
       - name: Retrieve pre-built distribution files
         uses: actions/download-artifact@v7
         with: {name: python-distribution-files, path: dist/}
