@@ -51,7 +51,9 @@ def _get_public_functions(module: ModuleType) -> Mapping[str, FormatValidationFn
 FORMAT_FUNCTIONS = MappingProxyType(_get_public_functions(formats))
 
 
-def load(name: str, package: str = __spec__.parent, ext: str = ".schema.json") -> Schema:
+def load(
+    name: str, package: str = __spec__.parent, ext: str = ".schema.json"
+) -> Schema:
     """Load the schema from a JSON Schema file.
     The returned dict-like object is immutable.
 
