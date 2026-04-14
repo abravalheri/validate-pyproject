@@ -38,27 +38,27 @@ def is_entry_point(ep):
 def test_iterate_entry_points():
     plugin_iter = plugins.iterate_entry_points("validate_pyproject.tool_schema")
     assert hasattr(plugin_iter, "__iter__")
-    pluging_list = list(plugin_iter)
-    assert all(is_entry_point(e) for e in pluging_list)
-    name_list = [e.name for e in pluging_list]
+    plugin_list = list(plugin_iter)
+    assert all(is_entry_point(e) for e in plugin_list)
+    name_list = [e.name for e in plugin_list]
     for ext in EXISTING:
         assert ext in name_list
 
 
 def test_list_from_entry_points():
     # Should return a list with all the plugins registered in the entrypoints
-    pluging_list = plugins.list_from_entry_points()
-    orig_len = len(pluging_list)
-    plugin_names = " ".join(e.tool for e in pluging_list)
+    plugin_list = plugins.list_from_entry_points()
+    orig_len = len(plugin_list)
+    plugin_names = " ".join(e.tool for e in plugin_list)
     for example in EXISTING:
         assert example in plugin_names
 
     # a filtering function can be passed to avoid loading plugins that are not needed
-    pluging_list = plugins.list_from_entry_points(
+    plugin_list = plugins.list_from_entry_points(
         filtering=lambda e: e.name != "setuptools"
     )
-    plugin_names = " ".join(e.tool for e in pluging_list)
-    assert len(pluging_list) == orig_len - 1
+    plugin_names = " ".join(e.tool for e in plugin_list)
+    assert len(plugin_list) == orig_len - 1
     assert "setuptools" not in plugin_names
 
 
