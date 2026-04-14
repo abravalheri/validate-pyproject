@@ -293,7 +293,7 @@ on PyPI_, the following steps can be used to release a new version for
 .. _Pytest can drop you: https://docs.pytest.org/en/stable/how-to/failures.html#using-python-library-pdb-with-pytest
 .. _Python Software Foundation's Code of Conduct: https://www.python.org/psf/conduct/
 .. _reStructuredText: https://www.sphinx-doc.org/en/master/usage/restructuredtext/
-.. _ruff: https://beta.ruff.rs/docs/
+.. _ruff: https://docs.astral.sh/ruff/
 .. _Sphinx: https://www.sphinx-doc.org/en/master/
 .. _tox: https://tox.wiki/en/stable/
 .. _virtual environment: https://realpython.com/python-virtual-environments-a-primer/
