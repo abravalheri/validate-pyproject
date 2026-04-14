@@ -245,6 +245,6 @@ class ErrorLoadingPlugin(RuntimeError):
         if entry_point and not plugin:
             plugin = getattr(entry_point, "module", entry_point.name)
 
-        sub = {"package": __package__, "version": __version__, "plugin": plugin}
+        sub = {"package": __spec__.parent, "version": __version__, "plugin": plugin}
         msg = dedent(self._DESC).format(**sub).splitlines()
         super().__init__(f"{msg[0]}\n{' '.join(msg[1:])}")
