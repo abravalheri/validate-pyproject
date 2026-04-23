@@ -108,8 +108,54 @@ jobs:
           flag-name: ${{ matrix.platform }} - py${{ matrix.python }}
           parallel: true
 
+  test-mamba:
+    needs: prepare
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Setup Micromamba
+        uses: mamba-org/setup-micromamba@v2
+        with:
+          environment-name: test
+          create-args: >-
+            pip
+            pipx
+            tox
+            curl
+      - name: Retrieve pre-built distribution files
+        uses: actions/download-artifact@v7
+        with: {name: python-distribution-files, path: dist/}
+      - name: Retrieve test download files
+        uses: actions/download-artifact@v7
+        with:
+          name: test-download-files
+          path: ${{ env.VALIDATE_PYPROJECT_CACHE_REMOTE }}
+      - name: Run tests
+        shell: bash -el {0}
+        run: >-
+          tox
+          --installpkg '${{ needs.prepare.outputs.wheel-distribution }}'
+          -- -n 5 -rFEx --durations 10 --color yes
+
+  linkcheck:
+    needs: finalize
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with: {python-version: "3.x"}
+      - uses: astral-sh/setup-uv@v7
+      - name: Retrieve pre-built distribution files
+        uses: actions/download-artifact@v7
+        with: {name: python-distribution-files, path: dist/}
+      - name: Check links
+        run: >-
+          uvx --with tox-uv
+          tox --installpkg dist/*.whl -e linkcheck -- -q
+
   finalize:
-    needs: test
+    needs: [test, test-mamba]
     runs-on: ubuntu-latest
     steps:
       - name: Finalize coverage report

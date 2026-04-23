@@ -1,5 +1,6 @@
 ---
-# ---- Default values to be merged into tasks ----
+# Cirrus CI configuration - FreeBSD testing only
+# Other platforms and tests are now covered by GitHub Actions
 
 env:
   LC_ALL: C.UTF-8
@@ -31,10 +32,6 @@ env:
   pip_cache:
     folder: "${CIRRUS_WORKING_DIR}/.cache/pip"
     fingerprint_script: echo "${CIRRUS_OS}-${CIRRUS_TASK_NAME}"
-    reupload_on_changes: true
-  pre_commit_cache:
-    folder: "${CIRRUS_WORKING_DIR}/.cache/pre-commit"
-    fingerprint_script: echo "${CIRRUS_OS}-${CIRRUS_TASK_NAME}" | cat - .pre-commit-config.yaml
     reupload_on_changes: true
 
 .test_template: &test-template
@@ -85,48 +82,6 @@ build_task:
   upload_artifacts:
     path: dist.tar.gz
 
-
-linux_task:
-  matrix:
-    - name: test (Linux - 3.9)
-      container: {image: "python:3.9-bookworm"}
-    - name: test (Linux - 3.10)
-      container: {image: "python:3.10-trixie"}
-      skip: $BRANCH !=~ "^(main|master)$"
-    - name: test (Linux - 3.12)
-      container: {image: "python:3.12-trixie"}
-      skip: $BRANCH !=~ "^(main|master)$"
-    - name: test (Linux - 3.14)
-      container: {image: "python:3.14-trixie"}
-    - name: test (Linux - 3.15)
-      container: {image: "python:3.15-rc-trixie"}
-      allow_failures: true  # RC
-  install_script:
-    - python -m pip install --upgrade pip tox tox-uv pipx
-  <<: *test-template
-  alias: base-test
-
-mamba_task:
-  name: test (Linux - mambaforge)
-  container: {image: "condaforge/mambaforge"}
-  install_script:  # Overwrite template
-    - mamba install -y pip pipx tox curl
-  <<: *test-template
-  depends_on: [base-test]
-
-macos_task:
-  name: test (macOS - brew)
-  macos_instance:
-    image: ghcr.io/cirruslabs/macos-runner:sonoma
-  env:
-    PATH: "/opt/homebrew/opt/python/libexec/bin:${PATH}"
-  brew_cache: {folder: "$HOME/Library/Caches/Homebrew"}
-  install_script:
-    - brew reinstall python
-    - brew install tox pipx
-  <<: *test-template
-  depends_on: [build, base-test]
-
 freebsd_task:
   name: test (freebsd - 3.11)
   freebsd_instance: {image_family: freebsd-14-3}
@@ -135,28 +90,7 @@ freebsd_task:
     - pkg install -y git python311 py311-pip py311-gdbm py311-sqlite3 py311-tox py311-tomli py311-pipx
     - ln -s /usr/local/bin/python3.11 /usr/local/bin/python
   <<: *test-template
-  depends_on: [build, base-test]
-
-windows_task:
-  name: test (Windows - 3.12.10)
-  windows_container:
-    image: "cirrusci/windowsservercore:2019"
-    os_version: 2019
-  env:
-    CIRRUS_SHELL: bash
-    PATH: /c/Python312:/c/Python312/Scripts:/c/tools:${PATH}
-  install_script:
-    # Activate long file paths to avoid some errors
-    - ps: New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" -Name "LongPathsEnabled" -Value 1 -PropertyType DWORD -Force
-    - choco install -y --no-progress python3 --version=3.12.10 --params "/NoLockdown"
-    - choco install -y --no-progress curl
-    - python -m pip install --upgrade certifi
-    - python -m pip install -U pip tox tox-uv pipx
-  configure_certs_script: |
-    CERT_PATH="$(python -m certifi | tr -d '\r\n')"
-    echo "SSL_CERT_FILE=$CERT_PATH" >> "$CIRRUS_ENV"
-  <<: *test-template
-  depends_on: [build, base-test]
+  depends_on: [build]
 
 finalize_task:
   container: {image: "python:3.12-trixie"}
@@ -165,33 +99,3 @@ finalize_task:
   install_script: pip install 'coveralls<4'
     # ^-- https://github.com/TheKevJames/coveralls-python/issues/434
   finalize_coverage_script: coveralls --finish
-
-linkcheck_task:
-  name: linkcheck (Linux - 3.12)
-  only_if: $BRANCH =~ "^(main|master)$"
-  container: {image: "python:3.12-trixie"}
-  depends_on: [finalize]
-  allow_failures: true
-  <<: *task-template
-  install_script: pip install tox tox-uv
-  download_artifact_script: *download-artifact
-  linkcheck_script: tox --installpkg dist/*.whl -e linkcheck -- -q
-
-# # The following task is already covered by a GitHub Action,
-# # (commented to avoid errors when publishing duplicated packages to PyPI)
-# publish_task:
-#   name: publish (Linux - 3.12)
-#   container: {image: "python:3.12-trixie"}
-#   depends_on: [build, base-test, test]
-#   only_if: $CIRRUS_TAG =~ 'v\d.*' && $CIRRUS_USER_PERMISSION == "admin"
-#   <<: *task-template
-#   env:
-#     TWINE_REPOSITORY: pypi
-#     TWINE_USERNAME: __token__
-#     TWINE_PASSWORD: $PYPI_TOKEN
-#     # See: https://cirrus-ci.org/guide/writing-tasks/#encrypted-variables
-#   install_script: pip install tox tox-uv
-#   download_artifact_script: *download-artifact
-#   publish_script:
-#     - ls dist/*
-#     - tox -e publish
