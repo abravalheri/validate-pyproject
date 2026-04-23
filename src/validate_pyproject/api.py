@@ -140,7 +140,14 @@ class SchemaRegistry(Mapping[str, Schema]):
             raise errors.SchemaMissingId(reference or "<extra>")
         sid = schema["$id"]
         if sid in self._schemas and sid != allow_overwrite:
-            raise errors.SchemaWithDuplicatedId(sid)
+            existing = self._schemas[sid][-1]
+            if dict(existing) != dict(schema):
+                raise errors.SchemaWithDuplicatedId(sid)
+            _logger.warning(
+                f"Duplicate schema {sid!r} for `tool.{reference}` ignored "
+                "(same schema already registered)"
+            )
+            return existing
         version = schema.get("$schema")
         # Support schemas with missing trailing # (incorrect, but required before 0.15)
         if version and version.rstrip("#") != self.spec_version.rstrip("#"):

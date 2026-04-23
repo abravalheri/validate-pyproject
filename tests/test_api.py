@@ -67,6 +67,25 @@ class TestRegistry:
         schema = self.fake_plugin("plg")
         fn = wraps(self.fake_plugin)(lambda _: schema)  # Same ID
         plg = [plugins.PluginWrapper(f"plg{i}", fn) for i in range(2)]
+        # Same schema for different tools is allowed (e.g. aliases)
+        registry = api.SchemaRegistry(plg)
+        sid = schema["$id"]
+        assert sid in registry
+
+    def test_duplicated_id_different_tools__different_schema(self):
+        base = self.fake_plugin("plg")
+
+        def _make_schema(i):
+            s = dict(base)
+            s["description"] = f"schema {i}"
+            return types.Schema(s)
+
+        fn0 = wraps(self.fake_plugin)(lambda _: _make_schema(0))
+        fn1 = wraps(self.fake_plugin)(lambda _: _make_schema(1))
+        plg = [
+            plugins.PluginWrapper("plg0", fn0),
+            plugins.PluginWrapper("plg1", fn1),
+        ]
         with pytest.raises(errors.SchemaWithDuplicatedId):
             api.SchemaRegistry(plg)
 
