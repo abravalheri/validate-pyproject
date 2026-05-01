@@ -2,5 +2,3 @@
 # Reduces reporting sensitivity to minor coverage fluctuations
 # (0.1% shows up in CI on unrelated changes)
 allow-loss: 0.3
-
-
