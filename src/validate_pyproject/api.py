@@ -19,6 +19,7 @@ from typing import (
 import fastjsonschema as FJS
 
 from . import _resources, errors, formats
+from .config import select_plugins
 from .error_reporting import detailed_errors
 from .extra_validations import EXTRA_VALIDATIONS
 from .types import FormatValidationFn, Schema, ValidationFn
@@ -204,13 +205,15 @@ class RefHandler(Mapping[str, Callable[[str], Schema]]):
 class Validator:
     _plugins: Sequence[PluginProtocol]
 
-    def __init__(
+    def __init__(  # noqa: PLR0913
         self,
         plugins: Sequence[PluginProtocol] | AllPlugins = ALL_PLUGINS,
         format_validators: Mapping[str, FormatValidationFn] = FORMAT_FUNCTIONS,
         extra_validations: Sequence[ValidationFn] = EXTRA_VALIDATIONS,
         *,
         extra_plugins: Sequence[PluginProtocol] = (),
+        enable: Sequence[str] = (),
+        disable: Sequence[str] = (),
     ):
         self._code_cache: str | None = None
         self._cache: ValidationFn | None = None
@@ -224,6 +227,8 @@ class Validator:
             from .plugins import list_from_entry_points
 
             plugins = list_from_entry_points()
+
+        plugins = select_plugins(plugins, enabled=enable, disabled=disable)
 
         self._plugins = (*plugins, *extra_plugins)
 

@@ -23,6 +23,7 @@ from typing import (
 from . import __version__
 from . import _tomllib as tomllib
 from .api import Validator
+from .config import apply_config, select_plugins
 from .errors import ValidationError
 from .plugins import PluginProtocol, PluginWrapper
 from .plugins import list_from_entry_points as list_plugins_from_entry_points
@@ -123,6 +124,8 @@ class CliParams(NamedTuple):
     store: str
     loglevel: int = logging.WARNING
     dump_json: bool = False
+    cli_enable: tuple[str, ...] = ()
+    cli_disable: tuple[str, ...] = ()
 
 
 def __meta__(plugins: Sequence[PluginProtocol]) -> dict[str, dict]:
@@ -160,28 +163,14 @@ def parse_args(
 
     parser.set_defaults(loglevel=logging.WARNING)
     params = vars(parser.parse_args(args))
-    enabled = params.pop("enable", ())
-    disabled = params.pop("disable", ())
+    cli_enable = params.pop("enable", ())
+    cli_disable = params.pop("disable", ())
+    params["cli_enable"] = cli_enable
+    params["cli_disable"] = cli_disable
     params["tool"] = params["tool"] or []
     params["store"] = params["store"] or ""
-    params["plugins"] = select_plugins(plugins, enabled, disabled)
+    params["plugins"] = select_plugins(plugins, cli_enable, cli_disable)
     return params_class(**params)  # type: ignore[call-overload, no-any-return]
-
-
-Plugins = TypeVar("Plugins", bound=PluginProtocol)
-
-
-def select_plugins(
-    plugins: Sequence[Plugins],
-    enabled: Sequence[str] = (),
-    disabled: Sequence[str] = (),
-) -> list[Plugins]:
-    available = list(plugins)
-    if enabled:
-        available = [p for p in available if p.tool in enabled]
-    if disabled:
-        available = [p for p in available if p.tool not in disabled]
-    return available
 
 
 def setup_logging(loglevel: int) -> None:
@@ -229,12 +218,11 @@ def run(args: Sequence[str] = ()) -> int:
     tool_plugins = [RemotePlugin.from_str(t) for t in params.tool]
     if params.store:
         tool_plugins.extend(load_store(params.store))
-    validator = Validator(params.plugins, extra_plugins=tool_plugins)
 
     exceptions = _ExceptionGroup()
     for file in params.input_file:
         try:
-            _run_on_file(validator, params, file)
+            _run_on_file(plugins, tool_plugins, params, file)
         except _REGULAR_EXCEPTIONS as ex:  # noqa: PERF203
             exceptions.add(f"Invalid {_format_file(file)}", ex)
 
@@ -243,11 +231,23 @@ def run(args: Sequence[str] = ()) -> int:
     return 0
 
 
-def _run_on_file(validator: Validator, params: CliParams, file: io.TextIOBase) -> None:
+def _run_on_file(
+    plugins: Sequence[PluginProtocol],
+    tool_plugins: Sequence[PluginProtocol],
+    params: CliParams,
+    file: io.TextIOBase,
+) -> None:
     if file in (sys.stdin, _STDIN):
         print("Expecting input via `stdin`...", file=sys.stderr, flush=True)
 
     toml_equivalent = tomllib.loads(file.read())
+    filtered = apply_config(
+        plugins,
+        pyproject=toml_equivalent,
+        cli_enable=params.cli_enable,
+        cli_disable=params.cli_disable,
+    )
+    validator = Validator(filtered, extra_plugins=tool_plugins)
     validator(toml_equivalent)
     if params.dump_json:
         print(json.dumps(toml_equivalent, indent=2))

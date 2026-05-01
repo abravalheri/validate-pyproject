@@ -168,3 +168,29 @@ class TestValidator:
 
             assert "setuptools" not in json.dumps(main_schema)
             raise
+
+    def test_enable_parameter(self):
+        # enable parameter should filter plugins
+        validator = api.Validator(enable=("distutils",))
+        registry = validator.registry
+        main_schema = registry[registry.main]
+        assert "distutils" in main_schema["properties"]["tool"]["properties"]
+        assert "setuptools" not in main_schema["properties"]["tool"]["properties"]
+
+    def test_disable_parameter(self):
+        # disable parameter should filter plugins
+        validator = api.Validator(disable=("setuptools",))
+        registry = validator.registry
+        main_schema = registry[registry.main]
+        assert "distutils" in main_schema["properties"]["tool"]["properties"]
+        assert "setuptools" not in main_schema["properties"]["tool"]["properties"]
+
+    def test_enable_disable_parameter_combined(self):
+        # Combined enable/disable
+        validator = api.Validator(
+            enable=("setuptools", "distutils"), disable=("distutils",)
+        )
+        registry = validator.registry
+        main_schema = registry[registry.main]
+        assert "setuptools" in main_schema["properties"]["tool"]["properties"]
+        assert "distutils" not in main_schema["properties"]["tool"]["properties"]

@@ -204,6 +204,44 @@ def test_bad_extra_url(tmp_path):
         cli.run(["--tool", "=file://json.schemastore.org/poetry.toml", str(example)])
 
 
+class TestPyprojectConfig:
+    def _write_with_config(self, tmp_path, **cfg):
+        text = simple_example
+        if cfg:
+            lines = ["\n[tool.validate-pyproject]"]
+            for key, val in cfg.items():
+                if isinstance(val, list):
+                    joined = ", ".join(f'"{v}"' for v in val)
+                    lines.append(f"{key} = [{joined}]")
+                else:
+                    lines.append(f'{key} = "{val}"')
+            text += "\n".join(lines)
+        return write_example(tmp_path, _text=text)
+
+    def test_toml_disable(self, tmp_path, capsys):
+        example = self._write_with_config(tmp_path, disable=["setuptools"])
+        assert cli.main([str(example)]) == 0
+        captured = capsys.readouterr()
+        assert "valid" in captured.out.lower()
+
+    def test_toml_enable(self, tmp_path):
+        # If only distutils enabled, the invalid setuptools section won't error
+        example = self._write_with_config(tmp_path, enable=["distutils"])
+        assert cli.main([str(example)]) == 0
+
+    def test_cli_overrides_toml_disable(self, tmp_path):
+        example = self._write_with_config(tmp_path, disable=["setuptools"])
+        # CLI -E setuptools should override TOML disable
+        assert cli.main([str(example), "-E", "setuptools"]) == 0
+
+    def test_cli_overrides_toml_enable(self, tmp_path):
+        example = self._write_with_config(tmp_path, enable=["distutils"])
+        # CLI -D distutils should override: still enabled via CLI?
+        # No, CLI chosen is -E/-D. Here enable=[distutils] in toml,
+        # CLI -E setuptools → only setuptools
+        assert cli.main([str(example), "-E", "setuptools"]) == 0
+
+
 @pytest.mark.skipif(sys.version_info[:2] < (3, 11), reason="requires 3.11+")
 def test_parser_is_tomllib():
     """Make sure Python >= 3.11 uses tomllib instead of tomli"""
