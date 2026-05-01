@@ -154,8 +154,8 @@ weight than installing the entire package.
 
 If you want to write a custom plugin for your tool, please consider also contributing a copy to SchemaStore.
 
-pre-commit
-==========
+pre-commit / prek
+=================
 
 ``validate-pyproject`` can be installed as a pre-commit hook:
 
@@ -170,13 +170,13 @@ pre-commit
             # Optional extra validations from SchemaStore:
             additional_dependencies: ["validate-pyproject-schema-store[all]"]
 
-By default, this ``pre-commit`` hook will only validate the ``pyproject.toml``
-file at the root of the project repository.
+By default, this ``pre-commit`` / ``prek`` hook will only validate the
+``pyproject.toml`` file at the root of the project repository.
 You can customize that by defining a `custom regular expression pattern`_ using
 the ``files`` parameter.
 
-You can also use ``pre-commit autoupdate`` to update to the latest stable
-version of ``validate-pyproject`` (recommended).
+You can also use ``pre-commit autoupdate`` or ``prek auto-update`` to update to
+the latest stable version of ``validate-pyproject`` (recommended).
 
 You can also use `validate-pyproject-schema-store`_ as a pre-commit hook, which
 allows pre-commit to pin and update that instead of ``validate-pyproject`` itself.
