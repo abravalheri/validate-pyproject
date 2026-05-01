@@ -107,8 +107,6 @@ strict = true
 # Scaling back on some of the strictness for now
 disallow_any_generics = false
 disallow_subclassing_any = false
-show_error_context = true
-pretty = true
 
 [[tool.mypy.overrides]]
 module = ["fastjsonschema", "setuptools._vendor.packaging"]

@@ -33,7 +33,7 @@ __all__ = ["Validator"]
 
 assert __spec__ is not None
 assert __spec__.parent is not None
-PARENT = __spec__.parent
+_PARENT = __spec__.parent
 
 T = TypeVar("T", bound=Mapping)
 AllPlugins = Enum("AllPlugins", "ALL_PLUGINS")  #: :meta private:
@@ -54,7 +54,7 @@ def _get_public_functions(module: ModuleType) -> Mapping[str, FormatValidationFn
 FORMAT_FUNCTIONS = MappingProxyType(_get_public_functions(formats))
 
 
-def load(name: str, package: str = PARENT, ext: str = ".schema.json") -> Schema:
+def load(name: str, package: str = _PARENT, ext: str = ".schema.json") -> Schema:
     """Load the schema from a JSON Schema file.
     The returned dict-like object is immutable.
 
@@ -65,9 +65,7 @@ def load(name: str, package: str = PARENT, ext: str = ".schema.json") -> Schema:
 
 def load_builtin_plugin(name: str) -> Schema:
     """:meta private: (low level detail)"""
-    assert __spec__ is not None
-    assert __spec__.parent is not None
-    return load(name, f"{__spec__.parent}.plugins")
+    return load(name, f"{_PARENT}.plugins")
 
 
 class SchemaRegistry(Mapping[str, Schema]):
