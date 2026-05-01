@@ -24,8 +24,11 @@ if sys.platform == "win32":  # pragma: no cover
 else:  # pragma: no cover
     from shlex import join as arg_join
 
+assert __spec__ is not None
+assert __spec__.parent is not None
 
-_logger = logging.getLogger(__package__)
+_PARENT = __spec__.parent
+_logger = logging.getLogger(_PARENT)
 
 
 def JSON_dict(name: str, value: str) -> dict[str, Any]:
@@ -104,7 +107,7 @@ def parser_spec(
 
 def run(args: Sequence[str] = ()) -> int:
     args = args or sys.argv[1:]
-    cmd = f"python -m {__package__} " + arg_join(args)
+    cmd = f"python -m {_PARENT} " + arg_join(args)
     plugins = list_plugins_from_entry_points()
     desc = 'Generate files for "pre-compiling" `validate-pyproject`'
     prms = cli.parse_args(args, plugins, desc, parser_spec, CliParams)
