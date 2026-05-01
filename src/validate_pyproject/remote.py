@@ -79,13 +79,17 @@ def load_store(pyproject_url: str) -> Generator[RemotePlugin, None, None]:
             pass  # built-in
         elif "$ref" in info:
             _logger.info(f"Loading {tool} from store: {pyproject_url}")
-            rp = RemotePlugin.from_url(tool, info["$ref"])
+            rp = RemotePlugin.from_url(
+                tool, urllib.parse.urljoin(pyproject_url, info["$ref"])
+            )
             yield rp
             # Does not support anyOf and similar with properties inside them
             for values in rp.schema.get("properties", {}).values():
                 url = values.get("$ref", "")
-                if url.startswith(("https://", "https://")):
-                    yield RemotePlugin.from_url("", url)
+                if url:
+                    absolute_url = urllib.parse.urljoin(rp.id, url)
+                    if absolute_url.startswith(("http://", "https://")):
+                        yield RemotePlugin.from_url("", absolute_url)
         else:
             _logger.warning(f"{tool!r} does not contain $ref")  # pragma: no cover
 

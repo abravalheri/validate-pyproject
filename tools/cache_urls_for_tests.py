@@ -2,6 +2,7 @@ import json
 import logging
 import os
 import sys
+import urllib.parse
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
@@ -16,13 +17,30 @@ from validate_pyproject import caching, http  # noqa: E402
 SCHEMA_STORE = "https://json.schemastore.org/pyproject.json"
 
 
+def _iter_nested_refs(base_url: str):
+    """Yield nested $ref URLs found inside a schema's properties."""
+    with caching.as_file(http.open_url, base_url) as f:
+        try:
+            schema = json.load(f)
+        except json.JSONDecodeError:
+            return
+    for values in schema.get("properties", {}).values():
+        ref_url = values.get("$ref", "")
+        if ref_url:
+            nested = urllib.parse.urljoin(base_url, ref_url)
+            if nested.startswith(("http://", "https://")):
+                yield nested
+
+
 def iter_test_urls():
     with caching.as_file(http.open_url, SCHEMA_STORE) as f:
         store = json.load(f)
         for tool in store["properties"]["tool"]["properties"].values():
-            if "$ref" in tool and tool["$ref"].startswith(("http://", "https://")):
-                yield tool["$ref"]
-
+            if "$ref" in tool:
+                url = urllib.parse.urljoin(SCHEMA_STORE, tool["$ref"])
+                if url.startswith(("http://", "https://")):
+                    yield url
+                    yield from _iter_nested_refs(url)
     files = PROJECT.glob("**/test_config.json")
     for file in files:
         content = json.loads(file.read_text("utf-8"))
