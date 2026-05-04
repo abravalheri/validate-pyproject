@@ -52,7 +52,7 @@ def critical_logging() -> Generator[None, None, None]:
         raise
 
 
-_STDIN = argparse.FileType("r")("-")
+_STDIN = argparse.FileType("r", encoding="utf-8")("-")
 
 META: dict[str, dict] = {
     "version": dict(
@@ -64,7 +64,7 @@ META: dict[str, dict] = {
         dest="input_file",
         nargs="*",
         # default=[_STDIN],  # postponed to facilitate testing
-        type=argparse.FileType("r"),
+        type=argparse.FileType("r", encoding="utf-8"),
         help="TOML file to be verified (`stdin` by default)",
     ),
     "enable": dict(
