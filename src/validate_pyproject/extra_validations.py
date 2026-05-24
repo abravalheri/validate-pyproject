@@ -15,15 +15,14 @@ T = TypeVar("T", bound=Mapping)
 
 
 class RedefiningStaticFieldAsDynamic(ValidationError):
-    _DESC = """According to PEP 621:
+    _DESC = """According to PEP 621 (as amended by PEP 808):
 
-    Build back-ends MUST raise an error if the metadata specifies a field
-    statically as well as being listed in dynamic.
+    Build back-ends MUST raise an error if the metadata specifies a
+    non-list/non-table field statically as well as being listed in dynamic.
+    List and table fields may be partially dynamic (PEP 808).
     """
     __doc__ = _DESC
-    _URL = (
-        "https://packaging.python.org/en/latest/specifications/pyproject-toml/#dynamic"
-    )
+    _URL = "https://peps.python.org/pep-0808/"
 
 
 class IncludedDependencyGroupMustExist(ValidationError):
@@ -51,15 +50,35 @@ class ImportNameMissing(ValidationError):
     _URL = "https://peps.python.org/pep-0794/"
 
 
+_DYNAMIC_TABLE_ARRAY_FIELDS = frozenset(
+    {
+        "authors",
+        "maintainers",
+        "classifiers",
+        "dependencies",
+        "entry-points",
+        "scripts",
+        "gui-scripts",
+        "keywords",
+        "license-files",
+        "optional-dependencies",
+        "urls",
+        "import-names",
+        "import-namespaces",
+    }
+)
+
+
 def validate_project_dynamic(pyproject: T) -> T:
     project_table = pyproject.get("project", {})
     dynamic = project_table.get("dynamic", [])
 
     for field in dynamic:
-        if field in project_table:
+        if field in project_table and field not in _DYNAMIC_TABLE_ARRAY_FIELDS:
             raise RedefiningStaticFieldAsDynamic(
                 message=f"You cannot provide a value for `project.{field}` and "
-                "list it under `project.dynamic` at the same time",
+                "list it under `project.dynamic` at the same time "
+                "(PEP 808: only list and table fields can be partially dynamic)",
                 value={
                     field: project_table[field],
                     "...": " # ...",
@@ -70,7 +89,7 @@ def validate_project_dynamic(pyproject: T) -> T:
                     "description": cleandoc(RedefiningStaticFieldAsDynamic._DESC),
                     "see": RedefiningStaticFieldAsDynamic._URL,
                 },
-                rule="PEP 621",
+                rule="PEP 808",
             )
 
     return pyproject

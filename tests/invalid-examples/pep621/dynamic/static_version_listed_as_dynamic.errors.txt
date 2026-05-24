@@ -1,0 +1,1 @@
+You cannot provide a value for `project.version` and list it under `project.dynamic` at the same time (PEP 808: only list and table fields can be partially dynamic)
