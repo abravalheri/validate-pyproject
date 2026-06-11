@@ -19,8 +19,7 @@ from itertools import chain as _chain
 
 if typing.TYPE_CHECKING:
     import builtins
-
-    from typing_extensions import Literal
+    from typing import Literal
 
 _logger = logging.getLogger(__name__)
 

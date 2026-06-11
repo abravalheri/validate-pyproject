@@ -39,7 +39,6 @@ _SKIP_DETAILS = (
 _NEED_DETAILS = {"anyOf", "oneOf", "allOf", "contains", "propertyNames", "not", "items"}
 
 _CAMEL_CASE_SPLITTER = re.compile(r"\W+|([A-Z][^A-Z\W]*)")
-_IDENTIFIER = re.compile(r"^[\w_]+$", re.IGNORECASE)
 
 _TOML_JARGON = {
     "object": "table",
@@ -147,7 +146,7 @@ class _ErrorFormatting:
 
     def _expand_details(self) -> str:
         optional = []
-        definition = self.ex.definition or {}
+        definition = dict(self.ex.definition) if self.ex.definition else {}
         desc_lines = definition.pop("$$description", [])
         desc = definition.pop("description", None) or " ".join(desc_lines)
         if desc:
