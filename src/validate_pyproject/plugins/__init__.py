@@ -226,8 +226,8 @@ def list_from_entry_points(
     multi_eps = (
         _SortablePlugin(e.name, p)
         for e in iterate_entry_points("validate_pyproject.multi_schema")
-        for p in load_from_multi_entry_point(e)
         if filtering(e)
+        for p in load_from_multi_entry_point(e)
     )
     eps = chain(tool_eps, multi_eps)
     dedup = {e.key(): e.plugin for e in sorted(eps)}
