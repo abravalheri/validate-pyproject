@@ -94,7 +94,7 @@ class SchemaRegistry(Mapping[str, Schema]):
         project_table_schema = load(PROJECT_TABLE_SCHEMA)
         self._ensure_compatibility(PROJECT_TABLE_SCHEMA, project_table_schema)
         sid = project_table_schema["$id"]
-        top_level["project"] = {"$ref": sid}
+        top_properties["project"] = {"$ref": sid}
         origin = f"{__name__} - project metadata"
         self._schemas = {sid: ("project", origin, project_table_schema)}
 
