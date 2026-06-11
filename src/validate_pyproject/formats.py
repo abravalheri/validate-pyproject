@@ -15,7 +15,6 @@ import os
 import re
 import string
 import typing
-from itertools import chain as _chain
 
 if typing.TYPE_CHECKING:
     import builtins
@@ -133,15 +132,25 @@ def pep508_versionspec(value: str) -> bool:
 # PEP 517
 
 
+def _is_dotted_identifier(value: str) -> bool:
+    """Every dot-separated segment of ``value`` must be a valid Python identifier
+    (and there must be at least one, i.e. ``value`` must be non-empty).
+    """
+    parts = value.split(".")
+    return all(python_identifier(part.strip()) for part in parts)
+
+
 def pep517_backend_reference(value: str) -> bool:
     """See PyPA's specification for defining build-backend references
     introduced in :pep:`517#source-trees`.
 
     This is similar to an entry-point reference (e.g., ``package.module:object``).
     """
-    module, _, obj = value.partition(":")
-    identifiers = (i.strip() for i in _chain(module.split("."), obj.split(".")))
-    return all(python_identifier(i) for i in identifiers if i)
+    module, sep, obj = value.partition(":")
+    if not _is_dotted_identifier(module):
+        return False
+    # If a separator is present, the object part must also be a valid dotted identifier
+    return _is_dotted_identifier(obj) if sep else True
 
 
 # -------------------------------------------------------------------------------------
@@ -349,10 +358,16 @@ def python_entrypoint_reference(value: str) -> bool:
     See ``Data model >object reference`` in the :ref:`PyPA's entry-points specification
     <pypa:entry-points>`.
     """
-    module, _, rest = value.partition(":")
+    module, sep, rest = value.partition(":")
+    if not _is_dotted_identifier(module):
+        return False
+    if not sep:
+        # No object reference: ``importable.module`` is sufficient.
+        return True
+
     if "[" in rest:
         obj, _, extras_ = rest.partition("[")
-        if extras_.strip()[-1] != "]":
+        if not extras_.strip().endswith("]"):
             return False
         extras = (x.strip() for x in extras_.strip(string.whitespace + "[]").split(","))
         if not all(pep508_identifier(e) for e in extras):
@@ -361,9 +376,8 @@ def python_entrypoint_reference(value: str) -> bool:
     else:
         obj = rest
 
-    module_parts = module.split(".")
-    identifiers = _chain(module_parts, obj.split(".")) if rest else iter(module_parts)
-    return all(python_identifier(i.strip()) for i in identifiers)
+    # A separator was present, so the object reference is required and must be valid.
+    return _is_dotted_identifier(obj)
 
 
 def uint8(value: builtins.int) -> bool:
@@ -443,7 +457,7 @@ except ImportError:  # pragma: no cover
 VALID_IMPORT_NAME = re.compile(
     r"""
     ^                                  # start of string
-        [A-Za-z_][A-Za-z_0-9]+         # a valid Python identifier
+        [A-Za-z_][A-Za-z_0-9]*         # a valid Python identifier
         (?:\.[A-Za-z_][A-Za-z_0-9]*)*  # optionally followed by .identifier's
     (?:\s*;\s*private)?                # optionally followed by ; private
     $                                  # end of string
