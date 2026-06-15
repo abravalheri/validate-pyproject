@@ -243,3 +243,27 @@ def test_broken_multi_plugin(monkeypatch):
     monkeypatch.setattr(plugins, "iterate_entry_points", fake_eps.get)
     with pytest.raises(ErrorLoadingPlugin):
         plugins.list_from_entry_points()
+
+
+def test_multi_plugin_filtering_prevents_load(monkeypatch):
+    """Filtering should prevent loading a multi_schema entry point entirely.
+
+    A broken excluded plugin must NOT raise ErrorLoadingPlugin — the filter
+    decision must be applied before ``load_from_multi_entry_point`` is called.
+    """
+    fake_eps = _FakeEntryPoints(monkeypatch, "validate_pyproject.multi_schema")
+
+    loaded = []
+    _msg = "should never be called"
+
+    def broken_multi():
+        loaded.append(True)
+        raise RuntimeError(_msg)
+
+    fake_eps(name="excluded", value="test_module:broken_multi")(broken_multi)
+    monkeypatch.setattr(plugins, "iterate_entry_points", fake_eps.get)
+
+    # filtering excludes the entry point — no error should be raised
+    result = plugins.list_from_entry_points(filtering=lambda e: e.name != "excluded")
+    assert result == []
+    assert loaded == [], "broken excluded plugin was loaded despite filtering"
