@@ -143,3 +143,40 @@ def test_error_reporting(caplog, example):
     assert ex.summary in ex.message
     if debug_info != "**SKIP-TEST**":
         assert debug_info in ex.details
+
+
+def test_definition_not_mutated_after_formatting():
+    """Formatting a ValidationError must not mutate ex.definition (no side-effects)."""
+    schema = {"type": "string", "description": "A descriptive message"}
+    with (
+        pytest.raises(ValidationError) as excinfo,
+        detailed_errors(),
+    ):
+        validate(schema, {"name": 42}, formats=FORMAT_FUNCTIONS)
+    ex = excinfo.value
+    # Trigger formatting (which internally calls _expand_details)
+    _ = ex.details
+    # The original definition on the exception must still contain "description"
+    assert ex.definition is not None
+    assert "description" in ex.definition
+
+
+def test_dollar_dollar_description_not_mutated_after_formatting():
+    """Formatting must not mutate $$description out of ex.definition."""
+    schema = {
+        "properties": {
+            "name": {
+                "type": "string",
+                "$$description": ["Lorem ipsum"],
+            }
+        }
+    }
+    with (
+        pytest.raises(ValidationError) as excinfo,
+        detailed_errors(),
+    ):
+        validate(schema, {"name": 42}, formats=FORMAT_FUNCTIONS)
+    ex = excinfo.value
+    _ = ex.details
+    assert ex.definition is not None
+    assert "$$description" in ex.definition
