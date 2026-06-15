@@ -4,6 +4,8 @@ import io
 import sys
 from urllib.request import urlopen
 
+_TIMEOUT = 10  # seconds; avoids hanging indefinitely in pre-commit hooks
+
 if sys.platform == "emscripten" and "pyodide" in sys.modules:
     from pyodide.http import open_url
 else:
@@ -12,5 +14,5 @@ else:
         if not url.startswith(("http:", "https:")):
             msg = "URL must start with 'http:' or 'https:'"
             raise ValueError(msg)
-        with urlopen(url) as response:  # noqa: S310
+        with urlopen(url, timeout=_TIMEOUT) as response:  # noqa: S310
             return io.StringIO(response.read().decode("utf-8"))
