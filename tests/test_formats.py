@@ -145,6 +145,22 @@ def test_invalid_entrypoint_references(example):
     assert formats.python_entrypoint_reference(example) is result
 
 
+@pytest.mark.parametrize("example", ["mod:obj[", "module:"])
+def test_malformed_entrypoint_references(example):
+    # Should return False instead of raising an exception
+    assert formats.python_entrypoint_reference(example) is False
+
+
+@pytest.mark.parametrize("example", ["", ":attr", "module:", "a..b:c", "module."])
+def test_invalid_pep517_backend_references(example):
+    assert formats.pep517_backend_reference(example) is False
+
+
+@pytest.mark.parametrize("example", ["module", "package.module:object.attr"])
+def test_valid_pep517_backend_references(example):
+    assert formats.pep517_backend_reference(example) is True
+
+
 @pytest.mark.parametrize("example", ["λ", "a", "_"])
 def test_valid_python_identifier(example):
     assert formats.python_identifier(example)
@@ -462,6 +478,9 @@ def test_import_name():
     assert formats.import_name("some1; private")
     assert formats.import_name("other.thing ; private")
     assert formats.import_name("_other._thing ; private")
+
+    assert formats.import_name("x")
+    assert formats.import_name("x.y")
 
     assert not formats.import_name("one two")
     assert not formats.import_name("one; two")
