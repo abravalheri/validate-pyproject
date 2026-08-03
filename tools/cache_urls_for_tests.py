@@ -12,7 +12,7 @@ PROJECT = HERE.parent
 sys.path.insert(0, str(PROJECT / "src"))  # <-- Use development version of library
 logging.basicConfig(level=logging.DEBUG)
 
-from validate_pyproject import caching, http  # noqa: E402
+from validate_pyproject import caching, http
 
 SCHEMA_STORE = "https://json.schemastore.org/pyproject.json"
 

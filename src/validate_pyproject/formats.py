@@ -164,7 +164,7 @@ def _download_classifiers() -> str:
     _TIMEOUT = 10  # seconds; avoids hanging indefinitely in pre-commit hooks
     url = "https://pypi.org/pypi?:action=list_classifiers"
     context = ssl.create_default_context()
-    with urlopen(url, context=context, timeout=_TIMEOUT) as response:  # noqa: S310 (audit URLs)
+    with urlopen(url, context=context, timeout=_TIMEOUT) as response:
         headers = Message()
         headers["content_type"] = response.getheader("content-type", "text/plain")
         return response.read().decode(headers.get_param("charset", "utf-8"))  # type: ignore[no-any-return]
@@ -178,7 +178,7 @@ class _TroveClassifier:
     option (classifiers will be validated anyway during the upload to PyPI).
     """
 
-    downloaded: None | Literal[False] | set[str]
+    downloaded: Literal[False] | set[str] | None
     """
     None => not cached yet
     False => unavailable
