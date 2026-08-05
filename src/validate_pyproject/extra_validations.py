@@ -22,7 +22,9 @@ class RedefiningStaticFieldAsDynamic(ValidationError):
     List and table fields may be partially dynamic (PEP 808).
     """
     __doc__ = _DESC
-    _URL = "https://peps.python.org/pep-0808/"
+    _URL = (
+        "https://packaging.python.org/en/latest/specifications/pyproject-toml/#dynamic"
+    )
 
 
 class IncludedDependencyGroupMustExist(ValidationError):
