@@ -1,1 +1,1 @@
-You cannot provide a value for `project.description` and list it under `project.dynamic` at the same time (PEP 808: only list and table fields can be partially dynamic)
+You cannot provide a value for `project.description` and list it under `project.dynamic` at the same time (PEP 808 only allows specific list and table fields to be partially dynamic)

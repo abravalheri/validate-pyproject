@@ -1,0 +1,10 @@
+[project]
+name = "spam"
+version = "0.1.0"
+dynamic = ["urls", "scripts"]
+
+[project.urls]
+homepage = "https://example.com"
+
+[project.scripts]
+spam = "spam:main"

@@ -80,7 +80,8 @@ def validate_project_dynamic(pyproject: T) -> T:
             raise RedefiningStaticFieldAsDynamic(
                 message=f"You cannot provide a value for `project.{field}` and "
                 "list it under `project.dynamic` at the same time "
-                "(PEP 808: only list and table fields can be partially dynamic)",
+                "(PEP 808 only allows specific list and table fields "
+                "to be partially dynamic)",
                 value={
                     field: project_table[field],
                     "...": " # ...",
@@ -91,7 +92,7 @@ def validate_project_dynamic(pyproject: T) -> T:
                     "description": cleandoc(RedefiningStaticFieldAsDynamic._DESC),
                     "see": RedefiningStaticFieldAsDynamic._URL,
                 },
-                rule="PEP 808",
+                rule="PEP 621",
             )
 
     return pyproject
