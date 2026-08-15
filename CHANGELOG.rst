@@ -3,8 +3,22 @@ Changelog
 =========
 
 ..
-   Development Version
-   ====================
+  Development Version
+  ====================
+
+Development Version
+====================
+
+* Add support for :pep:`808` partially dynamic metadata by :user:`henryiii`
+  (:pr:`314`)
+* Allow multiple schemas describing the same tool when the schema definitions
+  are identical by :user:`henryiii` (:pr:`303`)
+* Improve ``SchemaStore`` compatibility by supporting relative schema URLs by
+  :user:`henryiii` (:pr:`306`)
+* Apply filtering before loading ``validate_pyproject.multi_schema`` entry
+  points by :user:`henryiii` (:pr:`318`)
+* Add timeouts to network requests to avoid indefinite blocking by
+  :user:`henryiii` (:pr:`319`)
 
 Version 0.25
 ============
