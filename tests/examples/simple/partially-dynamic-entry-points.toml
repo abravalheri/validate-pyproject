@@ -4,7 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "timmins"
-dynamic = ["version", "entry-points"]
+version = "0.1.0"
+dynamic = ["entry-points"]
 
 [project.entry-points."timmins.display"]
 excl = "timmins_plugin_fancy:excl_display"
