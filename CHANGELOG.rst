@@ -6,8 +6,8 @@ Changelog
   Development Version
   ====================
 
-Development Version
-====================
+Version 0.26
+============
 
 * Add support for :pep:`808` partially dynamic metadata by :user:`henryiii`
   (:pr:`314`)
