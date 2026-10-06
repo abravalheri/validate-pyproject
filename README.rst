@@ -14,9 +14,9 @@
 .. image:: https://img.shields.io/badge/-PyScaffold-005CA0?logo=pyscaffold
     :alt: Project generated with PyScaffold
     :target: https://pyscaffold.org/
-.. image:: https://api.cirrus-ci.com/github/abravalheri/validate-pyproject.svg?branch=main
+.. image:: https://github.com/abravalheri/validate-pyproject/actions/workflows/ci.yml/badge.svg?branch=main
     :alt: Built Status
-    :target: https://cirrus-ci.com/github/abravalheri/validate-pyproject
+    :target: https://github.com/abravalheri/validate-pyproject/actions/workflows/ci.yml
 .. image:: https://readthedocs.org/projects/validate-pyproject/badge/?version=latest
     :alt: ReadTheDocs
     :target: https://validate-pyproject.readthedocs.io
