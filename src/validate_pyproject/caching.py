@@ -6,12 +6,13 @@ import hashlib
 import logging
 import os
 from pathlib import Path
-from typing import TYPE_CHECKING, Callable, Union
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     import io
+    from collections.abc import Callable
 
-PathLike = Union[str, "os.PathLike[str]"]
+PathLike = str | os.PathLike[str]
 _logger = logging.getLogger(__name__)
 
 

@@ -8,7 +8,7 @@ description = "Validation library and CLI tool for checking on 'pyproject.toml' 
 authors = [{name = "Anderson Bravalheri", email = "andersonbravalheri@gmail.com"}]
 readme ="README.rst"
 license = {text = "MPL-2.0 and MIT and BSD-3-Clause"}
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
@@ -18,8 +18,7 @@ classifiers = [
     "Typing :: Typed",
 ]
 dependencies = [
-    "fastjsonschema>=2.16.2,<=3; python_version>='3.10'",
-    "fastjsonschema>=2.16.2,<=3,!=2.22.0; python_version<'3.10'"
+    "fastjsonschema>=2.16.2,<=3",
 ]
 dynamic = ["version"]
 
@@ -71,7 +70,7 @@ test = [
     "pytest-cov",
     "pytest-xdist",
     "pytest-randomly",
-    "repo-review; python_version>='3.10'",
+    "repo-review",
     "tomli>=1.2.1; python_version<'3.11'",
 ]
 typecheck = [
@@ -81,7 +80,7 @@ typecheck = [
 
 [tool.uv]
 environments = [
-  "python_version >= '3.9'",
+  "python_version >= '3.10'",
 ]
 
 [tool.setuptools_scm]
@@ -102,7 +101,7 @@ log_level = "INFO"
 
 [tool.mypy]
 files = "src"
-python_version = "3.9"
+python_version = "3.10"
 enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
 show_traceback = true
 warn_unreachable = true

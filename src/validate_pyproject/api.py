@@ -7,12 +7,11 @@ from __future__ import annotations
 import json
 import logging
 import typing
-from collections.abc import Iterator, Mapping, Sequence
+from collections.abc import Callable, Iterator, Mapping, Sequence
 from enum import Enum
 from functools import partial, reduce
 from types import MappingProxyType, ModuleType
 from typing import (
-    Callable,
     TypeVar,
 )
 

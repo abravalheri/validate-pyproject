@@ -5,9 +5,10 @@ from __future__ import annotations
 
 import sys
 from collections import defaultdict
+from collections.abc import Callable
 from importlib.metadata import EntryPoint
 from types import ModuleType
-from typing import Callable, TypeVar
+from typing import TypeVar
 
 import pytest
 
