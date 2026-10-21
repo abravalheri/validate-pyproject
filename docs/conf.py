@@ -294,6 +294,11 @@ intersphinx_mapping = {
     "fastjsonschema": ("https://horejsek.github.io/python-fastjsonschema/", None),
     "pypa": ("https://packaging.python.org/en/latest/", None),
 }
+# json-schema.org renders its pages with JavaScript, so their anchors are not in
+# the HTML that linkcheck downloads; coveralls.io answers 403 to non-browser clients.
+linkcheck_anchors_ignore_for_url = [r"https://json-schema\.org/"]
+linkcheck_ignore = [r"https://coveralls\.io/"]
+
 extlinks = {
     "issue": (f"{repository}/issues/%s", "issue #%s"),
     "pr": (f"{repository}/pull/%s", "PR #%s"),
