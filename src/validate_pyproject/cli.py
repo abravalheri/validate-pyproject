@@ -15,7 +15,6 @@ from itertools import chain
 from textwrap import dedent, wrap
 from typing import (
     TYPE_CHECKING,
-    Callable,
     NamedTuple,
     TypeVar,
 )
@@ -30,7 +29,7 @@ from .remote import RemotePlugin, load_store
 
 if TYPE_CHECKING:
     import io
-    from collections.abc import Generator, Iterator, Sequence
+    from collections.abc import Callable, Generator, Iterator, Sequence
 
 assert __spec__ is not None
 assert __spec__.parent is not None

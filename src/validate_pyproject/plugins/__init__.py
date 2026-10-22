@@ -14,7 +14,6 @@ from string import Template
 from textwrap import dedent
 from typing import (
     Any,
-    Callable,
     NamedTuple,
     Protocol,
 )
@@ -22,7 +21,7 @@ from typing import (
 from .. import __version__
 
 if typing.TYPE_CHECKING:
-    from collections.abc import Generator, Iterable
+    from collections.abc import Callable, Generator, Iterable
 
     from ..types import Plugin, Schema
 
@@ -139,19 +138,7 @@ def iterate_entry_points(group: str) -> Iterable[EntryPoint]:
     the plugins before actually loading them. The entry points are not
     deduplicated.
     """
-    entries = entry_points()
-    if hasattr(entries, "select"):  # pragma: no cover
-        # The select method was introduced in importlib_metadata 3.9 (and Python 3.10)
-        # and the previous dict interface was declared deprecated
-        select = typing.cast(
-            "Callable[..., Iterable[EntryPoint]]",
-            getattr(entries, "select"),  # noqa: B009
-        )  # typecheck gymnastics
-        return select(group=group)
-    # pragma: no cover
-    # TODO: Once Python 3.10 becomes the oldest version supported, this fallback and
-    #       conditional statement can be removed.
-    return (plugin for plugin in entries.get(group, []))
+    return entry_points(group=group)
 
 
 def load_from_entry_point(entry_point: EntryPoint) -> PluginWrapper:

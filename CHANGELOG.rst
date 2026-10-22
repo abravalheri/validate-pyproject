@@ -2,9 +2,10 @@
 Changelog
 =========
 
-..
-  Development Version
-  ====================
+Development Version
+====================
+
+* Drop support for Python 3.9 by :user:`henryiii`
 
 Version 0.26
 ============

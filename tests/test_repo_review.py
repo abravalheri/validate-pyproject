@@ -1,10 +1,6 @@
-from argparse import Namespace
 from pathlib import Path
 
 import pytest
-
-from validate_pyproject import _tomllib as tomllib
-from validate_pyproject.repo_review import repo_review_checks, repo_review_families
 
 DIR = Path(__file__).parent.resolve()
 EXAMPLES = DIR / "examples"
@@ -13,25 +9,7 @@ INVALID_EXAMPLES = DIR / "invalid-examples"
 
 @pytest.fixture
 def repo_review_processor():
-    try:
-        from repo_review import processor
-    except ImportError:
-
-        class _Double:  # just for the sake of Python < 3.10 coverage
-            @staticmethod
-            def process(file: Path):
-                pyproject = (file / "pyproject.toml").read_text(encoding="utf-8")
-                opts = tomllib.loads(pyproject)
-                checks = (
-                    checker.check(opts) == ""  # No errors
-                    for checker in repo_review_checks().values()
-                )
-                return Namespace(
-                    families=repo_review_families(opts),
-                    results=[Namespace(result=check) for check in checks],
-                )
-
-        return _Double
+    from repo_review import processor
 
     return processor
 
