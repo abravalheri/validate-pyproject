@@ -1,0 +1,3 @@
+[dependency-groups]
+"Test.Tools" = ["pytest"]
+dev = ["one", {include-group = "test_tools"}]

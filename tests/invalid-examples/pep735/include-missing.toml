@@ -1,0 +1,2 @@
+[dependency-groups]
+dev = ["one", {include-group = "test_tools"}]
