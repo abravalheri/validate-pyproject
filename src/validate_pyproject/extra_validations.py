@@ -5,6 +5,7 @@ JSON Schema library).
 
 import collections
 import itertools
+import re
 from collections.abc import Generator, Iterable, Mapping
 from inspect import cleandoc
 from typing import TypeVar
@@ -98,14 +99,22 @@ def validate_project_dynamic(pyproject: T) -> T:
     return pyproject
 
 
+_NORMALISE_GROUP_NAME = re.compile(r"[-_.]+")
+
+
+def _normalise_group_name(name: str) -> str:
+    return _NORMALISE_GROUP_NAME.sub("-", name).lower()
+
+
 def validate_include_dependency(pyproject: T) -> T:
     dependency_groups = pyproject.get("dependency-groups", {})
+    normalised_groups = {_normalise_group_name(group) for group in dependency_groups}
     for key, value in dependency_groups.items():
         for each in value:
             if (
                 isinstance(each, dict)
                 and (include_group := each.get("include-group"))
-                and include_group not in dependency_groups
+                and _normalise_group_name(include_group) not in normalised_groups
             ):
                 raise IncludedDependencyGroupMustExist(
                     message=f"The included dependency group {include_group} doesn't exist",
