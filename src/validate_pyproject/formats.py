@@ -123,8 +123,10 @@ def pep508_versionspec(value: str) -> bool:
         # versionspec
         return False
     # Let's pretend we have a dependency called `requirement` with the given
-    # version spec, then we can reuse the pep508 function for validation:
-    return pep508(f"requirement{value}")
+    # version spec, then we can reuse the pep508 function for validation.
+    # The space keeps the value from being read as part of the name
+    # (e.g. "3.8" would otherwise give the valid name "requirement3.8"):
+    return pep508(f"requirement {value}")
 
 
 # -------------------------------------------------------------------------------------
