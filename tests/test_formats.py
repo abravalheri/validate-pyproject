@@ -225,6 +225,11 @@ def test_valid_pep508_versionspec(example):
         "~ 0.9",
         "@ file:///localbuilds/pip-1.3.1.zip",
         'v1.0; python_version<"2.7"',
+        # Missing comparison operator
+        "3.8",
+        "1.4.5",
+        "v1.0",
+        "py3",
     ],
 )
 def test_invalid_pep508_versionspec(example):
