@@ -58,3 +58,34 @@ def test_include_group_missing_raises(included):
     message = str(exc_info.value)
     assert included in message
     assert "doesn't exist" in message
+
+
+@pytest.mark.parametrize(
+    ("first", "second"),
+    [
+        ("test", "Test"),
+        ("test_tools", "test-tools"),
+        ("Test.Tools", "test--tools"),
+    ],
+)
+def test_duplicate_normalised_group_names_raise(first, second):
+    document = {"dependency-groups": {first: ["pytest"], second: ["nose"]}}
+    with pytest.raises(ValidationError) as exc_info:
+        _validator()(document)
+    message = str(exc_info.value)
+    assert repr(first) in message
+    assert repr(second) in message
+
+
+@pytest.mark.parametrize(
+    ("first", "second"), [("test", "tests"), ("test-tools", "testtools")]
+)
+def test_distinct_normalised_group_names_allowed(first, second):
+    document = {
+        "dependency-groups": {
+            first: ["pytest"],
+            second: ["nose"],
+            "dev": [{"include-group": first}],
+        }
+    }
+    assert _validator()(document) is not None

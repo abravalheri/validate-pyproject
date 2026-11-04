@@ -35,6 +35,13 @@ class IncludedDependencyGroupMustExist(ValidationError):
     _URL = "https://peps.python.org/pep-0735/"
 
 
+class DuplicatedDependencyGroup(ValidationError):
+    _DESC = """Dependency group names must be unique after normalisation.
+    """
+    __doc__ = _DESC
+    _URL = "https://packaging.python.org/en/latest/specifications/dependency-groups/"
+
+
 class ImportNameCollision(ValidationError):
     _DESC = """According to PEP 794:
 
@@ -108,7 +115,22 @@ def _normalise_group_name(name: str) -> str:
 
 def validate_include_dependency(pyproject: T) -> T:
     dependency_groups = pyproject.get("dependency-groups", {})
-    normalised_groups = {_normalise_group_name(group) for group in dependency_groups}
+    normalised_groups: dict[str, str] = {}
+    for group in dependency_groups:
+        normalised = _normalise_group_name(group)
+        if normalised in normalised_groups:
+            raise DuplicatedDependencyGroup(
+                message=f"Dependency groups {normalised_groups[normalised]!r} and "
+                f"{group!r} normalise to the same name {normalised!r}",
+                value=group,
+                name="data.dependency_groups",
+                definition={
+                    "description": cleandoc(DuplicatedDependencyGroup._DESC),
+                    "see": DuplicatedDependencyGroup._URL,
+                },
+                rule="PEP 735",
+            )
+        normalised_groups[normalised] = group
     for key, value in dependency_groups.items():
         for each in value:
             if (

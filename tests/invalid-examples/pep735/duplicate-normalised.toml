@@ -1,0 +1,3 @@
+[dependency-groups]
+test = ["pytest"]
+Test = ["nose"]
