@@ -273,12 +273,14 @@ def plugins_help(plugins: Sequence[PluginProtocol]) -> str:
 def _flatten_str(text: str) -> str:
     text = " ".join(x.strip() for x in dedent(text).splitlines()).strip()
     text = text.rstrip(".,;").strip()
+    if not text:
+        return ""
     return (text[0].lower() + text[1:]).strip()
 
 
 def _format_plugin_help(plugin: PluginProtocol) -> str:
-    help_text = plugin.help_text
-    help_text = f": {_flatten_str(help_text)}" if help_text else ""
+    help_text = _flatten_str(plugin.help_text) if plugin.help_text else ""
+    help_text = f": {help_text}" if help_text else ""
     return f"* {plugin.tool!r}{help_text}"
 
 
