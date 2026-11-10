@@ -34,6 +34,27 @@ class TestHelp:
         captured = capsys.readouterr()
         assert "my42" in captured.out
 
+    def test_blank_plugin_help_text(self, capsys):
+        def blank_plugin(tool):
+            """..."""
+
+            return {}
+
+        fake_plugin = plugins.PluginWrapper("blank42", blank_plugin)
+        with pytest.raises(SystemExit):
+            cli.parse_args(["--help"], plugins=[fake_plugin])
+        captured = capsys.readouterr()
+        assert "blank42" in captured.out
+
+
+class TestFlattenStr:
+    @pytest.mark.parametrize("text", ["", "   ", "...", ".,;"])
+    def test_blank(self, text):
+        assert cli._flatten_str(text) == ""
+
+    def test_regular_text(self):
+        assert cli._flatten_str("Hello World.") == "hello World"
+
 
 def parse_args(args):
     plg = plugins.list_from_entry_points()
